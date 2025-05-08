@@ -29,7 +29,7 @@
   <!-- Navigation-->
   <nav class="navbar navbar-expand-lg navbar-light fixed-top py-2" id="mainNav">
     <div class="container px-4 px-lg-5">
-      <a class="navbar-brand" href="#page-top">Liveable London</a>
+      <a class="navbar-brand" href="#page-top">Portal</a>
       <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse"
         data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
         aria-label="Toggle navigation">
@@ -40,19 +40,18 @@
           <li class="nav-item"><a class="nav-link" href="#about">Overview</a></li>
           <li class="nav-item"><a class="nav-link" href="#intro">City Map</a></li>
           <li class="nav-item"><a class="nav-link" href="#transport">Transport</a></li>
-          <li class="nav-item"><a class="nav-link" href="#isochrone">Accessibility</a></li>
+          <li class="nav-item"><a class="nav-link" href="#isochrone">Isochrone</a></li>
           <li class="nav-item"><a class="nav-link" href="#housing">Housing</a></li>
           <li class="nav-item"><a class="nav-link" href="#safety">Safety</a></li>
           <li class="nav-item"><a class="nav-link" href="#convenience">Amenities</a></li>
-          <li class="nav-item"><a class="nav-link" href="#selector">Area Selector</a></li>
-          <li class="nav-item"><a class="nav-link" href="#more">More</a></li>
-          <li class="nav-item"><a class="nav-link" href="#source">Data Sources</a></li>
+          <li class="nav-item"><a class="nav-link" href="#selector">Selector</a></li>
+          <li class="nav-item"><a class="nav-link" href="#source">Sources</a></li>
         </ul>
       </div>
     </div>
   </nav>
   <!-- Masthead-->
-  <header class="masthead">
+  <header class="page-section masthead">
     <div class="container px-4 px-lg-5 h-100">
       <div class="row gx-4 gx-lg-5 h-100 align-items-center justify-content-center text-center">
         <div class="col-lg-8 align-self-end">
@@ -61,7 +60,7 @@
         </div>
         <div class="col-lg-8 align-self-baseline">
           <p class="text-white-75 mb-5">
-            Find your ideal London neighborhood by balancing rent, commute time, and quality of life
+            Find your ideal London neighborhood by balancing rent, commute time, and so forth.
           </p>
           <div class="spinner-grow text-danger" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -78,16 +77,19 @@
       </div>
     </div>
   </header>
+
   <!-- About-->
-  <section class="page-section bg-primary" id="about" style="background: linear-gradient(135deg, #f4623a 0%, #f46e3a 100%);">
+  <section class="page-section bg-primary" id="about"
+  style="background: linear-gradient(135deg, #f4623a 50%, #ffffff 100%);">
     <div class="container px-4 px-lg-5">
       <div class="row gx-4 gx-lg-5 justify-content-center">
         <div class="col-lg-8 text-center" data-aos="fade-up">
           <h2 class="text-white mt-0">Your Comprehensive London Living Guide</h2>
           <hr class="divider divider-light" />
-          <p class="text-white-75 mb-4">
-            Our platform provides comprehensive data analysis of all London boroughs. Whether you're looking for affordability, 
-            convenient transport options, or vibrant communities, we offer detailed insights on rental trends, commuting options, 
+          <p class="text-white-75 mb-2">
+            Our platform provides comprehensive data analysis of London. Whether you're looking for affordability,
+            convenient transport options, or vibrant communities, we offer detailed insights on rental trends, commuting
+            options,
             safety indices, and amenities to help you find your perfect place to live.
           </p>
           <a class="btn btn-light btn-xl" href="#intro">Learn More</a>
@@ -97,163 +99,231 @@
   </section>
 
   <!-- Introduction for London Map -->
-  <section id="intro" class="page-section" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
-    <div class="container-fluid px-4 px-lg-5">
-      <h2 class="text-muted text-center mb-4" data-aos="fade-up">London City Map Explorer</h2>
-      <div class="row">
-        <div class="col-lg-3" data-aos="fade-right" data-aos-delay="100">
-          <div class="pe-lg-4">
-            <p class="text-muted">
-              London, a vibrant global metropolis, features distinctive boroughs and communities. The interactive 3D map allows you to explore London's urban structure, building layout, and geographical features, helping you better understand the city's spatial distribution and unique character of each area.
+  <section id="intro" class="page-section" style="background: linear-gradient(225deg, #ffffff 0%, #abbaab 100%);">
+    <div class="container-fluid px-1 px-lg-2">
+      <h2 class="text-primary text-center mb-2" data-aos="fade-up">London City Map Explorer</h2>
+
+      <div class="row justify-content-center mb-4">
+        <div class="col-lg-10" data-aos="fade-down" data-aos-delay="100">
+          <div>
+            <p>
+              London, a vibrant global metropolis, features distinctive boroughs and communities. The interactive 3D map
+              allows you to explore London's urban structure, building layout, and geographical features, helping you
+              better understand the city's spatial distribution and unique character of each area.
             </p>
-            <div class="mb-4 mt-4">
-              <h5 class="text-muted"><i class="bi bi-info-circle me-2"></i>Map Usage Guide:</h5>
-              <ul class="text-muted small">
+            <div class="mt-4">
+              <h5><i class="bi bi-info-circle me-2"></i>Map Usage Guide:</h5>
+              <ul class="median">
                 <li>Control map content using sidebar sliders or button selections</li>
                 <li>Click on 3D buildings for detailed information</li>
                 <li>Use the mouse wheel to zoom and left-click drag to pan</li>
-                <li>Hold Shift while dragging to rotate your view and experience London from all angles</li>
+                <li>Right-click and drag to rotate your view and experience London from all angles</li>
               </ul>
-            </div>
-            <div class="d-grid gap-2">
-              <button type="button" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-building me-2"></i>Show Major Landmarks
-              </button>
-              <button type="button" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-map me-2"></i>Toggle Borough Boundaries
-              </button>
             </div>
           </div>
         </div>
-        <div class="col-lg-9" data-aos="fade-left" data-aos-delay="200">
-          <iframe src="./maps&data/CityMap.html" frameborder="0" style="width: 100%; height: 70vh; border-radius: 10px;" loading="lazy"></iframe>
+      </div>
+
+      <div class="row justify-content-center">
+        <div class="col-11" data-aos="fade-up" data-aos-delay="200">
+          <iframe src="./maps&data/CityMap.html" frameborder="0" style="width: 100%; height: 80vh; border-radius: 10px;"
+            loading="lazy"></iframe>
         </div>
       </div>
     </div>
   </section>
 
+
   <!-- Transport Section -->
-  <section id="transport" class="page-section" style="background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);">
-    <div class="container-fluid px-4 px-lg-5">
-      <h2 class="text-muted text-center mb-4" data-aos="fade-up">London Transport Network</h2>
-      <div class="row">
-        <div class="col-lg-3" data-aos="fade-right" data-aos-delay="100">
-          <div class="pe-lg-4">
-            <p class="text-muted">
-              Understanding London's transport network is crucial when choosing your ideal place to live. London boasts an extensive public transport system including the iconic red double-decker buses, the Underground, Docklands Light Railway (DLR), and trains, offering diverse travel options throughout the city.
+  <section id="transport" class="page-section" style="background: linear-gradient(135deg, #abbaab 0%, #ffffff 100%);">
+    <div class="container-fluid px-1 px-lg-2">
+      <h2 class="text-primary text-center mb-2" data-aos="fade-up">London Transport Network</h2>
+
+      <div class="row justify-content-center mb-4">
+        <div class="col-lg-10" data-aos="fade-down" data-aos-delay="100">
+          <div>
+            <p class="median">
+              Understanding London's transport network is crucial when choosing your ideal place to live. London boasts
+              an extensive public transport system including the iconic red double-decker buses, the Underground,
+              Docklands Light Railway (DLR), and trains, offering diverse travel options throughout the city.
             </p>
+
             <div class="card border-0 bg-white shadow-sm mt-4 mb-4">
               <div class="card-body">
                 <h5 class="card-title text-primary"><i class="bi bi-star me-2"></i>Transport Tips</h5>
                 <ul class="list-group list-group-flush small">
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-credit-card me-2 text-primary"></i>Use an Oyster card or contactless payment to save on fares</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-clock me-2 text-primary"></i>Peak hours (07:30-09:30, 16:00-19:00) have higher fares</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-phone me-2 text-primary"></i>Plan journeys with Citymapper or TfL Go apps</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-bicycle me-2 text-primary"></i>Consider Santander Cycles for short trips</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-info-circle me-2 text-primary"></i>Zones 1-3 cover most popular areas</li>
+                  <li class="list-group-item border-0 ps-0"><i class="bi bi-credit-card me-2 text-primary"></i>Use an
+                    Oyster card or contactless payment to save on fares</li>
+                  <li class="list-group-item border-0 ps-0"><i class="bi bi-clock me-2 text-primary"></i>Peak hours
+                    (07:30–09:30, 16:00–19:00) have higher fares</li>
+                  <li class="list-group-item border-0 ps-0"><i class="bi bi-phone me-2 text-primary"></i>Plan journeys
+                    with Citymapper or TfL Go apps</li>
+                  <li class="list-group-item border-0 ps-0"><i class="bi bi-bicycle me-2 text-primary"></i>Consider
+                    Santander Cycles for short trips</li>
+                  <li class="list-group-item border-0 ps-0"><i class="bi bi-info-circle me-2 text-primary"></i>Zones 1–3
+                    cover most popular areas</li>
                 </ul>
               </div>
             </div>
           </div>
         </div>
-        <div class="col-lg-9" data-aos="fade-left" data-aos-delay="200">
-          <iframe src="./maps&data/Transport.html" frameborder="0" style="width: 100%; height: 70vh; border-radius: 10px;" loading="lazy"></iframe>
+        
+      </div>
+
+      <div class="row justify-content-center">
+        <div class="col-11" data-aos="fade-up" data-aos-delay="200">
+          <iframe src="./maps&data/Transport.html" frameborder="0"
+            style="width: 100%; height: 80vh; border-radius: 10px;" loading="lazy"></iframe>
         </div>
       </div>
     </div>
   </section>
+
 
   <!-- Isochrone Section -->
-  <section id="isochrone" class="page-section" style="background: linear-gradient(135deg, #dee2e6 0%, #ced4da 100%);">
-    <div class="container-fluid px-4 px-lg-5">
-      <h2 class="text-muted text-center mb-4" data-aos="fade-up">Travel Time & Accessibility</h2>
-      <div class="row">
-        <div class="col-lg-3" data-aos="fade-right" data-aos-delay="100">
-          <div class="pe-lg-4">
-            <p class="text-muted">
-              Commute time is often a decisive factor when choosing where to live in London. Isochrone maps show you areas that can be reached within specific time frames from different starting points, helping you evaluate commute times and convenience.
+  <section id="isochrone" class="page-section" style="background: linear-gradient(225deg, #ffffff 0%, #abbaab 100%);">
+    <div class="container-fluid px-1 px-lg-2">
+      <h2 class="text-primary text-center mb-2" data-aos="fade-up">Travel Time & Accessibility</h2>
+
+      <!-- 上方：说明文字和交互按钮 -->
+      <div class="row justify-content-center mb-4">
+        <div class="col-lg-10" data-aos="fade-down" data-aos-delay="100">
+          <div>
+            <p>
+              Commute time is often a decisive factor when choosing where to live in London. Isochrone maps show you
+              areas that can be reached within specific time frames from different starting points, helping you evaluate
+              commute times and convenience.
             </p>
-            <div class="card border-0 bg-white shadow-sm mt-4 mb-4">
-              <div class="card-body">
-                <h5 class="card-title text-primary"><i class="bi bi-clock-history me-2"></i>Commute Analysis</h5>
-                <p class="small text-muted">Select your daily destination and see how far you can travel in:</p>
-                <div class="d-grid gap-2">
-                  <button type="button" class="btn btn-sm btn-outline-primary">15 Minutes</button>
-                  <button type="button" class="btn btn-sm btn-outline-primary">30 Minutes</button>
-                  <button type="button" class="btn btn-sm btn-outline-primary">45 Minutes</button>
-                  <button type="button" class="btn btn-sm btn-outline-primary">60 Minutes</button>
-                </div>
-              </div>
-            </div>
-            <p class="small text-muted fst-italic">
-              <i class="bi bi-lightbulb me-2"></i>Pro tip: Areas within a 30-minute commute of your workplace often provide the best balance between affordability and convenience.
+            <p class="median text-primary fst-italic">
+              <i class="bi bi-lightbulb me-2"></i>Pro tip: Areas within a 30-minute commute of your workplace often
+              provide the best balance between affordability and convenience.
             </p>
           </div>
         </div>
-        <div class="col-lg-9" data-aos="fade-left" data-aos-delay="200">
-          <iframe src="./maps&data/IsochroneMap.html" frameborder="0" style="width: 100%; height: 70vh; border-radius: 10px;" loading="lazy"></iframe>
+      </div>
+
+      <!-- 下方：地图部分 -->
+      <div class="row justify-content-center">
+        <div class="col-11" data-aos="fade-up" data-aos-delay="200">
+          <iframe src="./maps&data/IsochroneMap.html" frameborder="0"
+            style="width: 100%; height: 80vh; border-radius: 10px;" loading="lazy"></iframe>
         </div>
       </div>
     </div>
   </section>
 
+
   <!-- Housing Section -->
-  <section id="housing" class="page-section" style="background: linear-gradient(135deg, #ced4da 0%, #adb5bd 100%);">
-    <div class="container-fluid px-4 px-lg-5">
-      <h2 class="text-muted text-center mb-4" data-aos="fade-up">London Housing Market Analysis</h2>
-      <div class="row">
-        <div class="col-lg-3" data-aos="fade-right" data-aos-delay="100">
-          <div class="pe-lg-4">
-            <p class="text-muted">
-              Finding suitable accommodation is a crucial decision when living in London. The city offers diverse housing options, from apartments to terraced houses, from central areas to suburban communities. When choosing a place to live, consider factors including rent levels, property quality, community environment, and commute convenience.
+  <section id="housing" class="page-section" style="background: linear-gradient(135deg, #abbaab 0%, #ffffff 100%);">
+    <div class="container-fluid px-1 px-lg-2">
+      <h2 class="text-primary text-center mb-2" data-aos="fade-up">London Housing Market Analysis</h2>
+
+      <div class="row justify-content-center mb-2">
+        <div class="col-lg-10" data-aos="fade-down" data-aos-delay="100">
+          <div>
+            <p>
+              Finding suitable accommodation is a crucial decision when living in London. The city offers diverse
+              housing options, from apartments to terraced houses, from central areas to suburban communities. When
+              choosing a place to live, consider factors including rent levels, property quality, community environment,
+              and commute convenience.
             </p>
-            <div class="card border-0 bg-white shadow-sm mt-4">
-              <div class="card-body">
-                <h5 class="card-title text-primary"><i class="bi bi-house-door me-2"></i>Housing Tips</h5>
-                <ul class="list-group list-group-flush small">
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-geo-alt text-primary me-2"></i>Consider distance to workplace or school</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-cash-coin text-primary me-2"></i>Check average rents and set a budget</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-shop text-primary me-2"></i>Review nearby amenities</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-train text-primary me-2"></i>Evaluate transport connections</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-shield-check text-primary me-2"></i>Research area safety</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-people text-primary me-2"></i>Consider flat sharing to split costs</li>
-                </ul>
-              </div>
+          </div>
+        </div>
+      </div>
+      
+
+
+      <div class="row justify-content-center">
+        <div class="col-11" data-aos="fade-up" data-aos-delay="200">
+          <iframe src="./maps&data/HousingPrice.html" frameborder="0"
+            style="width: 100%; height: 80vh; border-radius: 10px;" loading="lazy"></iframe>
+        </div>
+      </div>
+
+      <!-- 图表区域 -->
+      <div class="row mt-4 justify-content-center">
+        <!-- 租金趋势分析图表 -->
+        <div class="col-md-5 mb-4" data-aos="fade-up" data-aos-delay="300">
+          <div class="bg-white p-3 rounded shadow-sm h-100">
+            <h5 class="text-primary">Rental Trends Analysis</h5>
+            <p class="small text-muted mb-2">The chart shows average rent levels and historical changes across London
+              boroughs, helping you understand price differences and market dynamics.</p>
+
+            <!-- 缩略图 -->
+            <iframe src="./maps&data/Borough_Rental.html" frameborder="0"
+              style="width: 100%; height: 400px; border-radius: 8px;" loading="lazy"></iframe>
+
+            <!-- View Larger按钮 -->
+            <button type="button" class="btn btn-outline-primary btn-sm mt-2" data-bs-toggle="modal"
+              data-bs-target="#rentalModal">View Larger</button>
+          </div>
+        </div>
+
+        <!-- 价格比较 & 预测图表 -->
+        <div class="col-md-7 mb-4" data-aos="fade-up" data-aos-delay="400">
+          <div class="bg-white p-3 rounded shadow-sm h-100">
+            <h5 class="text-primary">Price Comparison & Forecast</h5>
+            <p class="small text-muted mb-2">Compare housing prices across different areas and their changing trends to
+              help you assess investment potential and long-term housing costs.</p>
+
+            <!-- 缩略图 -->
+            <iframe src="./maps&data/Borough_Propertyprice.html" frameborder="0"
+              style="width: 100%; height: 400px; border-radius: 8px;" loading="lazy"></iframe>
+
+            <!-- View Larger按钮 -->
+            <button type="button" class="btn btn-outline-primary btn-sm mt-2" data-bs-toggle="modal"
+              data-bs-target="#priceModal">View Larger</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 租金趋势分析弹窗 -->
+      <div class="modal fade" id="rentalModal" tabindex="-1" aria-labelledby="rentalModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="rentalModalLabel">Rental Trends Analysis</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <!-- 更大图表 -->
+              <iframe src="./maps&data/Borough_Rental.html" frameborder="0"
+                style="width: 100%; height: 500px; border-radius: 8px;" loading="lazy"></iframe>
             </div>
           </div>
         </div>
-        <div class="col-lg-9" data-aos="fade-left" data-aos-delay="200">
-          <iframe src="./maps&data/HousingPrice.html" frameborder="0" style="width: 100%; height: 70vh; border-radius: 10px;" loading="lazy"></iframe>
-          <div class="row mt-4">
-            <div class="col-md-5" data-aos="fade-up" data-aos-delay="300">
-              <div class="bg-white p-3 rounded shadow-sm h-100">
-                <h5 class="text-primary">Rental Trends Analysis</h5>
-                <p class="small text-muted mb-2">The chart shows average rent levels and historical changes across London boroughs, helping you understand price differences and market dynamics.</p>
-                <iframe src="./Individual_Visualisation/echarts2.html" frameborder="0" style="width: 100%; height: 300px; border-radius: 8px;" loading="lazy"></iframe>
-              </div>
+      </div>
+
+      <!-- 价格比较 & 预测弹窗 -->
+      <div class="modal fade" id="priceModal" tabindex="-1" aria-labelledby="priceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="priceModalLabel">Price Comparison & Forecast</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="col-md-7" data-aos="fade-up" data-aos-delay="400">
-              <div class="bg-white p-3 rounded shadow-sm h-100">
-                <h5 class="text-primary">Price Comparison & Forecast</h5>
-                <p class="small text-muted mb-2">Compare housing prices across different areas and their changing trends to help you assess investment potential and long-term housing costs.</p>
-                <iframe src="./Individual_Visualisation/echarts3.html" frameborder="0" style="width: 100%; height: 300px; border-radius: 8px;" loading="lazy"></iframe>
-              </div>
+            <div class="modal-body">
+              <!-- 更大图表 -->
+              <iframe src="./maps&data/Borough_Propertyprice.html" frameborder="0"
+                style="width: 100%; height: 750px; border-radius: 8px;" loading="lazy"></iframe>
             </div>
           </div>
         </div>
       </div>
     </div>
   </section>
+
 
   <!-- Safety Section -->
   <section id="safety" class="page-section" style="background: linear-gradient(135deg, #adb5bd 0%, #9aaab4 100%);">
     <div class="container-fluid px-4 px-lg-5">
-      <h2 class="text-muted text-center mb-4" data-aos="fade-up">London Safety Index</h2>
+      <h2 class="text-primary text-center mb-4" data-aos="fade-up">London Safety Index</h2>
       <div class="row">
         <div class="col-lg-3" data-aos="fade-right" data-aos-delay="100">
           <div class="pe-lg-4">
-            <p class="text-muted">
-              Safety is a crucial consideration when choosing where to live. Understanding crime rates and safety conditions across London boroughs helps you make more informed decisions about your potential home.
+            <p>
+              Safety is a crucial consideration when choosing where to live. Understanding crime rates and safety
+              conditions across London boroughs helps you make more informed decisions about your potential home.
             </p>
             <div class="card border-0 bg-white shadow-sm mt-4 mb-4">
               <div class="card-header bg-danger text-white">
@@ -291,9 +361,12 @@
               </div>
               <div class="card-body">
                 <ul class="list-group list-group-flush small">
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-shield me-2 text-primary"></i>Choose areas with good safety records, especially for night safety</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-lightbulb me-2 text-primary"></i>Check street lighting and walking route safety</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-house-door me-2 text-primary"></i>Consider building security features like access systems and monitoring</li>
+                  <li class="list-group-item border-0 ps-0"><i class="bi bi-shield me-2 text-primary"></i>Choose areas
+                    with good safety records, especially for night safety</li>
+                  <li class="list-group-item border-0 ps-0"><i class="bi bi-lightbulb me-2 text-primary"></i>Check
+                    street lighting and walking route safety</li>
+                  <li class="list-group-item border-0 ps-0"><i class="bi bi-house-door me-2 text-primary"></i>Consider
+                    building security features like access systems and monitoring</li>
                 </ul>
               </div>
             </div>
@@ -303,12 +376,13 @@
           <div class="bg-white p-3 rounded shadow-sm mb-4">
             <h5 class="text-primary mb-3">London Crime Density Map</h5>
             <!-- Placeholder for crime density map -->
-            <iframe src="./maps&data/CityMap.html" frameborder="0" style="width: 100%; height: 60vh; border-radius: 10px;" loading="lazy"></iframe>
+            <iframe src="./maps&data/CityMap.html" frameborder="0"
+              style="width: 100%; height: 60vh; border-radius: 10px;" loading="lazy"></iframe>
             <div class="small text-muted mt-2">
               <i class="bi bi-info-circle me-2"></i>Data source: Metropolitan Police open data, last updated: 2024
             </div>
           </div>
-          
+
           <div class="card border-0 shadow-sm">
             <div class="card-header bg-secondary text-white">
               <h5 class="my-0">Crime Type Distribution</h5>
@@ -342,9 +416,12 @@
                 </div>
                 <div class="col-md-6">
                   <h6 class="text-center mb-3">Crime Trend Analysis</h6>
-                  <p class="small">London's overall crime rate has shown a decreasing trend over the past five years, particularly in central areas. However, property crime has increased in some outer areas. When choosing where to live, consider crime data from the last two years for the most current trends.</p>
+                  <p class="small">London's overall crime rate has shown a decreasing trend over the past five years,
+                    particularly in central areas. However, property crime has increased in some outer areas. When
+                    choosing where to live, consider crime data from the last two years for the most current trends.</p>
                   <div class="alert alert-info small">
-                    <i class="bi bi-info-circle-fill me-2"></i>Safety data should be considered alongside personal needs and lifestyle; different people may have varying safety needs and perceptions.
+                    <i class="bi bi-info-circle-fill me-2"></i>Safety data should be considered alongside personal needs
+                    and lifestyle; different people may have varying safety needs and perceptions.
                   </div>
                 </div>
               </div>
@@ -358,12 +435,15 @@
   <!-- Convenience Section -->
   <section id="convenience" class="page-section" style="background: linear-gradient(135deg, #9aaab4 0%, #86a0b3 100%);">
     <div class="container-fluid px-4 px-lg-5">
-      <h2 class="text-muted text-center mb-4" data-aos="fade-up">Amenities & Convenience Analysis</h2>
+      <h2 class="text-primary text-center mb-4" data-aos="fade-up">Amenities & Convenience Analysis</h2>
       <div class="row">
         <div class="col-lg-3" data-aos="fade-right" data-aos-delay="100">
           <div class="pe-lg-4">
-            <p class="text-muted">
-              The convenience of daily life is an important indicator when evaluating the quality of living areas. London's boroughs have varying densities of amenities, including supermarkets, healthcare facilities, parks, and entertainment venues. Understanding the distribution of these facilities helps you choose an area that best suits your lifestyle needs.
+            <p>
+              The convenience of daily life is an important indicator when evaluating the quality of living areas.
+              London's boroughs have varying densities of amenities, including supermarkets, healthcare facilities,
+              parks, and entertainment venues. Understanding the distribution of these facilities helps you choose an
+              area that best suits your lifestyle needs.
             </p>
             <div class="card border-0 bg-white shadow-sm mt-4">
               <div class="card-header bg-success text-white">
@@ -373,11 +453,13 @@
                 <div class="accordion" id="convenienceAccordion">
                   <div class="accordion-item border-0">
                     <h2 class="accordion-header" id="headingOne">
-                      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                      <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                         <i class="bi bi-cart3 me-2"></i>Shopping & Daily Needs
                       </button>
                     </h2>
-                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#convenienceAccordion">
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                      data-bs-parent="#convenienceAccordion">
                       <div class="accordion-body">
                         <ul class="list-group list-group-flush small">
                           <li class="list-group-item border-0 ps-0">Large Supermarkets (Tesco, Sainsbury's)</li>
@@ -390,11 +472,13 @@
                   </div>
                   <div class="accordion-item border-0">
                     <h2 class="accordion-header" id="headingTwo">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                         <i class="bi bi-heart-pulse me-2"></i>Healthcare & Wellbeing
                       </button>
                     </h2>
-                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#convenienceAccordion">
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                      data-bs-parent="#convenienceAccordion">
                       <div class="accordion-body">
                         <ul class="list-group list-group-flush small">
                           <li class="list-group-item border-0 ps-0">Hospitals (NHS and private)</li>
@@ -415,7 +499,8 @@
           <div class="bg-white p-3 rounded shadow-sm mb-4">
             <h5 class="text-primary mb-3">London Amenities Distribution Map</h5>
             <!-- Placeholder for amenities map -->
-            <iframe src="./maps&data/CityMap.html" frameborder="0" style="width: 100%; height: 60vh; border-radius: 10px;" loading="lazy"></iframe>
+            <iframe src="./maps&data/CityMap.html" frameborder="0"
+              style="width: 100%; height: 60vh; border-radius: 10px;" loading="lazy"></iframe>
             <div class="d-flex justify-content-between align-items-center mt-2">
               <small class="text-muted">Data sources: OpenStreetMap, Google Places API</small>
               <div class="btn-group">
@@ -426,7 +511,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="row">
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
               <div class="card border-0 shadow-sm h-100">
@@ -521,12 +606,14 @@
   <!-- Area Selector Section -->
   <section id="selector" class="page-section" style="background: linear-gradient(135deg, #86a0b3 0%, #7395b3 100%);">
     <div class="container-fluid px-4 px-lg-5">
-      <h2 class="text-muted text-center mb-4" data-aos="fade-up">London Area Selector</h2>
+      <h2 class="text-primary text-center mb-4" data-aos="fade-up">London Area Selector</h2>
       <div class="row">
         <div class="col-lg-3" data-aos="fade-right" data-aos-delay="100">
           <div class="pe-lg-4">
-            <p class="text-muted">
-              Based on your personal needs and preferences, our area selector helps you find the most suitable London neighborhoods. By adjusting the parameters below, the system will recommend areas based on rent, commute time, safety index, and convenience.
+            <p>
+              Based on your personal needs and preferences, our area selector helps you find the most suitable London
+              neighborhoods. By adjusting the parameters below, the system will recommend areas based on rent, commute
+              time, safety index, and convenience.
             </p>
             <div class="card border-0 bg-white shadow-sm mt-4">
               <div class="card-header bg-primary text-white">
@@ -546,7 +633,7 @@
                       <span>£3000+</span>
                     </div>
                   </div>
-                  
+
                   <!-- Commute Time -->
                   <div class="mb-3">
                     <label for="commuteRange" class="form-label d-flex justify-content-between">
@@ -559,7 +646,7 @@
                       <span>60 min</span>
                     </div>
                   </div>
-                  
+
                   <!-- Commute Destination -->
                   <div class="mb-3">
                     <label class="form-label"><i class="bi bi-geo-alt me-2"></i>Commute Destination</label>
@@ -572,10 +659,11 @@
                       <option value="other">Other Location</option>
                     </select>
                   </div>
-                  
+
                   <!-- Key Factors -->
                   <div class="mb-3">
-                    <label class="form-label"><i class="bi bi-star me-2"></i>Most Important Factors (select up to 3)</label>
+                    <label class="form-label"><i class="bi bi-star me-2"></i>Most Important Factors (select up to
+                      3)</label>
                     <div class="form-check">
                       <input class="form-check-input" type="checkbox" value="safety" id="factorSafety">
                       <label class="form-check-label" for="factorSafety">
@@ -607,7 +695,7 @@
                       </label>
                     </div>
                   </div>
-                  
+
                   <button type="button" class="btn btn-primary w-100" id="findAreasBtn">
                     <i class="bi bi-search me-2"></i>Find Suitable Areas
                   </button>
@@ -620,9 +708,10 @@
           <div class="bg-white p-3 rounded shadow-sm mb-4">
             <h5 class="text-primary mb-3">Recommended Areas</h5>
             <!-- Area results map -->
-            <iframe src="./maps&data/CityMap.html" frameborder="0" style="width: 100%; height: 50vh; border-radius: 10px;" loading="lazy"></iframe>
+            <iframe src="./maps&data/CityMap.html" frameborder="0"
+              style="width: 100%; height: 50vh; border-radius: 10px;" loading="lazy"></iframe>
           </div>
-          
+
           <h5 class="text-muted border-bottom pb-2 mb-3">Areas Recommended for You</h5>
           <div class="row">
             <div class="col-md-4 mb-3">
@@ -647,7 +736,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="col-md-4 mb-3">
               <div class="card h-100 border-primary">
                 <div class="card-header bg-primary text-white">
@@ -670,7 +759,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="col-md-4 mb-3">
               <div class="card h-100 border-primary">
                 <div class="card-header bg-primary text-white">
@@ -694,51 +783,11 @@
               </div>
             </div>
           </div>
-          
-          <div class="alert alert-info mt-3 small">
-            <i class="bi bi-info-circle-fill me-2"></i>The above recommendations are automatically generated based on your preference settings. Please note that actual conditions may change, and we recommend on-site visits before making decisions.
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- More Information -->
-  <section id="more" class="page-section bg-light text-muted">
-    <div class="container-fluid">
-      <div class="row justify-content-center">
-        <div class="col-lg-8 text-center" data-aos="fade-up">
-          <h2 class="text-muted mt-0">更多资讯即将推出！</h2>
-          <hr class="divider">
-          <p class="mb-4">敬请期待更多更新和功能。我们正在努力为您带来最佳的伦敦居住指南体验！</p>
-          <div class="row mt-5">
-            <div class="col-md-4 mb-4" data-aos="flip-left" data-aos-delay="100">
-              <div class="card text-center shadow-sm h-100">
-                <div class="card-body">
-                  <i class="bi bi-newspaper text-primary" style="font-size: 2rem;"></i>
-                  <h5 class="card-title mt-3">最新租房政策</h5>
-                  <p class="card-text">关注伦敦最新的租房法规和政策变化</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4 mb-4" data-aos="flip-left" data-aos-delay="200">
-              <div class="card text-center shadow-sm h-100">
-                <div class="card-body">
-                  <i class="bi bi-currency-pound text-primary" style="font-size: 2rem;"></i>
-                  <h5 class="card-title mt-3">市场趋势预测</h5>
-                  <p class="card-text">伦敦房产市场未来走势分析与预测</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4 mb-4" data-aos="flip-left" data-aos-delay="300">
-              <div class="card text-center shadow-sm h-100">
-                <div class="card-body">
-                  <i class="bi bi-chat-dots text-primary" style="font-size: 2rem;"></i>
-                  <h5 class="card-title mt-3">居民真实评价</h5>
-                  <p class="card-text">各区域居民的生活体验分享与建议</p>
-                </div>
-              </div>
-            </div>
+          <div class="alert alert-info mt-3 small">
+            <i class="bi bi-info-circle-fill me-2"></i>The above recommendations are automatically generated based on
+            your preference settings. Please note that actual conditions may change, and we recommend on-site visits
+            before making decisions.
           </div>
         </div>
       </div>
@@ -748,78 +797,78 @@
   <!-- Source Data -->
   <section id="source" class="page-section bg-primary text-white">
     <div class="container px-4 px-lg-5">
-      <h2 class="text-center mb-4" data-aos="fade-up">数据与资料来源</h2>
+      <h2 class="text-center mb-4" data-aos="fade-up">Data and Sources</h2>
       <hr class="divider divider-light" />
       <div class="row">
         <!-- 数据来源 -->
         <div class="col-md-5 text-white-100 mb-4 justify-content-center" data-aos="fade-right" data-aos-delay="100">
-          <h3 class="text-center mb-3">数据来源</h3>
+          <h3 class="text-center mb-3">Data Sources</h3>
           <ul class="list-group">
             <li class="list-group-item bg-transparent text-white border-light">
               <i class="bi bi-train-front-fill me-2"></i>
-              <a href="https://gis-tfl.opendata.arcgis.com" target="_blank" class="text-white">伦敦交通数据</a>
+              <a href="https://gis-tfl.opendata.arcgis.com" target="_blank" class="text-white">London Transport Data (TfL)</a>
             </li>
             <li class="list-group-item bg-transparent text-white border-light">
               <i class="bi bi-clock-fill me-2"></i>
-              <a href="https://github.com/pbarber/uk-isochrones-map" target="_blank" class="text-white">等时线地图参考项目</a>
+              <a href="https://github.com/pbarber/uk-isochrones-map" target="_blank" class="text-white">Isochrone Map Reference Project</a>
             </li>
             <li class="list-group-item bg-transparent text-white border-light">
               <i class="bi bi-house-fill me-2"></i>
               <a href="https://data.london.gov.uk/dataset/uk-house-price-index" target="_blank"
-                class="text-white">伦敦各区房价数据</a>
+                class="text-white">London Borough House Price Data (GLA)</a>
             </li>
             <li class="list-group-item bg-transparent text-white border-light">
               <i class="bi bi-cash-coin me-2"></i>
               <a href="https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics"
-                target="_blank" class="text-white">各区租金数据</a>
+                target="_blank" class="text-white">Private Rental Market Statistics (ONS)</a>
             </li>
             <li class="list-group-item bg-transparent text-white border-light">
               <i class="bi bi-map-fill me-2"></i>
               <a href="https://www.ons.gov.uk/peoplepopulationandcommunity/housing/datasets/medianpricepaidbylowerlayersuperoutputareahpssadataset46"
-                target="_blank" class="text-white">小区域房价数据</a>
+                target="_blank" class="text-white">LSOA House Price Data (ONS)</a>
             </li>
             <li class="list-group-item bg-transparent text-white border-light">
               <i class="bi bi-shield-fill me-2"></i>
-              <a href="https://data.police.uk/data/" target="_blank" class="text-white">伦敦警方犯罪数据</a>
+              <a href="https://data.police.uk/data/" target="_blank" class="text-white">UK Police Crime Data</a>
             </li>
           </ul>
         </div>
         <!-- 材料与工具 -->
         <div class="col-md-7 text-white-100 mb-4 justify-content-center" data-aos="fade-left" data-aos-delay="200">
-          <h3 class="text-center mb-3">技术与工具</h3>
+          <h3 class="text-center mb-3">Technologies and Tools</h3>
           <div class="row">
             <div class="col-md-6">
               <ul class="list-group">
                 <li class="list-group-item bg-transparent text-white border-light">
-                  <i class="bi bi-code-slash me-2"></i><strong>HTML5 & CSS3:</strong> 网页结构与样式
+                  <i class="bi bi-code-slash me-2"></i><strong>HTML5 & CSS3:</strong> Web structure & styling
                 </li>
                 <li class="list-group-item bg-transparent text-white border-light">
-                  <i class="bi bi-filetype-js me-2"></i><strong>JavaScript:</strong> 交互功能与数据处理
+                  <i class="bi bi-filetype-js me-2"></i><strong>JavaScript:</strong> Interactivity & data handling
                 </li>
                 <li class="list-group-item bg-transparent text-white border-light">
-                  <i class="bi bi-map me-2"></i><strong>Mapbox:</strong> 交互地图库
+                  <i class="bi bi-map me-2"></i><strong>Mapbox:</strong> Interactive map library
                 </li>
               </ul>
             </div>
             <div class="col-md-6">
               <ul class="list-group">
                 <li class="list-group-item bg-transparent text-white border-light">
-                  <i class="bi bi-bar-chart-fill me-2"></i><strong>ECharts:</strong> 数据可视化库
+                  <i class="bi bi-bar-chart-fill me-2"></i><strong>ECharts:</strong> Data visualization library
                 </li>
                 <li class="list-group-item bg-transparent text-white border-light">
-                  <i class="bi bi-bootstrap me-2"></i><strong>Bootstrap:</strong> 响应式前端框架
+                  <i class="bi bi-bootstrap me-2"></i><strong>Bootstrap:</strong> Responsive frontend framework
                 </li>
                 <li class="list-group-item bg-transparent text-white border-light">
-                  <i class="bi bi-geo-alt-fill me-2"></i><strong>Turf.js:</strong> 空间数据分析库
+                  <i class="bi bi-geo-alt-fill me-2"></i><strong>Turf.js:</strong> Geospatial analysis library
                 </li>
               </ul>
             </div>
           </div>
           <div class="mt-4 text-center">
-            <h5 class="mb-3">项目团队</h5>
-            <p>本项目由CASA硕士课程的学生小组共同完成，为伦敦居民和潜在移居者提供全面的居住指南。</p>
+            <h5 class="mb-3">Project Team</h5>
+            <p>This project was collaboratively developed by a group of students from the CASA Master's program, aiming to provide a comprehensive living guide for London residents and potential newcomers.</p>
             <button class="btn btn-outline-light mt-2">
-              <i class="bi bi-people-fill me-2"></i>了解我们的团队
+              <i class="bi bi-people-fill me-2"></i>Meet Our Team
             </button>
           </div>
         </div>
@@ -831,11 +880,12 @@
   <footer class="bg-dark text-white py-5">
     <div class="container px-4 px-lg-5">
       <div class="row">
-        <div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="col-md-4 mb-3">
           <h5>Liveable London</h5>
-          <p class="small">A comprehensive guide to help you find the ideal place to live in London, integrating data on rent, transport, safety, and convenience.</p>
+          <p class="small">A comprehensive guide to help you find the ideal place to live in London, integrating data on
+            rent, transport, safety, and convenience.</p>
         </div>
-        <div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="200">
+        <div class="col-md-4 mb-3">
           <h5>Quick Links</h5>
           <ul class="list-unstyled">
             <li><a href="#about" class="text-white-50">Project Overview</a></li>
@@ -844,7 +894,7 @@
             <li><a href="#selector" class="text-white-50">Area Selector</a></li>
           </ul>
         </div>
-        <div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="300">
+        <div class="col-md-4 mb-3">
           <h5>Contact Us</h5>
           <ul class="list-unstyled">
             <li><i class="bi bi-envelope me-2"></i>info@londonliving.example.com</li>
@@ -862,7 +912,7 @@
       </div>
     </div>
   </footer>
-  
+
   <!-- Bootstrap core JS-->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
   <!-- SimpleLightbox plugin JS-->
@@ -872,70 +922,38 @@
   <!-- Core theme JS-->
   <script src="js/scripts.js"></script>
   <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
-  
+
   <!-- Custom Scripts -->
   <script>
-    // Initialize AOS animation library
-    AOS.init({
-      duration: 800,
-      once: true
-    });
-    
-    // Fullscreen toggle functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      const fullscreenToggle = document.getElementById('fullscreenToggle');
-      
-      if (fullscreenToggle) {
-        fullscreenToggle.addEventListener('click', function() {
-          if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => {
-              console.log(`Error attempting to enable fullscreen: ${err.message}`);
-            });
-            this.textContent = 'Exit Fullscreen';
-          } else {
-            if (document.exitFullscreen) {
-              document.exitFullscreen();
-              this.textContent = 'Fullscreen Mode (Recommended)';
-            }
-          }
-        });
-      }
-      
-      // Handle fullscreen change events
-      document.addEventListener('fullscreenchange', function() {
-        if (!document.fullscreenElement && fullscreenToggle) {
-          fullscreenToggle.textContent = 'Fullscreen Mode (Recommended)';
-        }
-      });
-    });
-    
+
+
     // Display slider values
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const budgetRange = document.getElementById('budgetRange');
       const budgetValue = document.getElementById('budgetValue');
-      
+
       if (budgetRange && budgetValue) {
-        budgetRange.addEventListener('input', function() {
+        budgetRange.addEventListener('input', function () {
           budgetValue.textContent = '£' + this.value;
         });
       }
-      
+
       const commuteRange = document.getElementById('commuteRange');
       const commuteValue = document.getElementById('commuteValue');
-      
+
       if (commuteRange && commuteValue) {
-        commuteRange.addEventListener('input', function() {
+        commuteRange.addEventListener('input', function () {
           commuteValue.textContent = this.value + ' minutes';
         });
       }
     });
-    
+
     // Area selector functionality
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const findAreasBtn = document.getElementById('findAreasBtn');
-      
+
       if (findAreasBtn) {
-        findAreasBtn.addEventListener('click', function() {
+        findAreasBtn.addEventListener('click', function () {
           // Can add real query logic here in the future
           alert('Area filtering feature is currently in development. Please check back soon!');
         });

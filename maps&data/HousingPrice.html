@@ -46,8 +46,8 @@
     }
 
     .info {
-      padding: 12px 16px;
-      font: 14px/18px sans-serif;
+      padding: 12px 6px 12px 12px;
+      font: 13px sans-serif;
       background: rgba(255, 255, 255, 0.8);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
       border-radius: 8px;
@@ -68,7 +68,7 @@
     }
 
     .info input[type="checkbox"] {
-      margin-right: 8px;
+      margin-right: 4px;
       transform: scale(1.1);
     }
 
@@ -199,6 +199,12 @@
       </div>
       <table>
         <tbody>
+          <tr id="lsoa-row">
+            <td>
+              <input type="checkbox" id="toggle-housing">
+              <label for="toggle-housing">Median (22&23) property price (LSOA)</label>
+            </td>
+          </tr>
           <tr id="rental-row">
             <td>
               <input type="checkbox" id="toggle-rental">
@@ -209,12 +215,6 @@
             <td>
               <input type="checkbox" id="toggle-boroughs-housing">
               <label for="toggle-boroughs-housing">Median property price (Borough)</label>
-            </td>
-          </tr>
-          <tr id="lsoa-row">
-            <td>
-              <input type="checkbox" id="toggle-housing">
-              <label for="toggle-housing">Median property price (LSOA)</label>
             </td>
           </tr>
           <tr id="slider-row" style="display: none;">
@@ -316,14 +316,14 @@
 
   <div id="lsoa-legend" class="legend2" style="display: none;">
     <b>LSOA Price Legend</b>
-    <div><span style="background-color: #b2182b; opacity: 1;"></span> <span id="legend-highest">Highest Price</span>
+    <div><span style="background-color: #b2182b; opacity: 0.7;"></span> <span id="legend-highest">Highest Price</span>
     </div>
-    <div><span style="background-color: #d6604d; opacity: 1;"></span> <span id="legend-quantile5"></span></div>
-    <div><span style="background-color: #f4a582; opacity: 1;"></span> <span id="legend-quantile4"></span></div>
-    <div><span style="background-color: #fddbc7; opacity: 1;"></span> <span id="legend-quantile3"></span></div>
-    <div><span style="background-color: #d1e5f0; opacity: 1;"></span> <span id="legend-quantile2"></span></div>
-    <div><span style="background-color: #92c5de; opacity: 1;"></span> <span id="legend-quantile1"></span></div>
-    <div><span style="background-color: #2166AC; opacity: 1;"></span> <span id="legend-lowest">Lowest Price</span>
+    <div><span style="background-color: #d6604d; opacity: 0.7;"></span> <span id="legend-quantile5"></span></div>
+    <div><span style="background-color: #f4a582; opacity: 0.7;"></span> <span id="legend-quantile4"></span></div>
+    <div><span style="background-color: #fddbc7; opacity: 0.7;"></span> <span id="legend-quantile3"></span></div>
+    <div><span style="background-color: #d1e5f0; opacity: 0.7;"></span> <span id="legend-quantile2"></span></div>
+    <div><span style="background-color: #92c5de; opacity: 0.7;"></span> <span id="legend-quantile1"></span></div>
+    <div><span style="background-color: #2166AC; opacity: 0.7;"></span> <span id="legend-lowest">Lowest Price</span>
     </div>
   </div>
 
@@ -628,7 +628,7 @@
             paint: {
               'fill-color': colorExpression,
               'fill-outline-color': '#000',
-              'fill-opacity': 1,
+              'fill-opacity': 0.7,
             }
           });
         });
