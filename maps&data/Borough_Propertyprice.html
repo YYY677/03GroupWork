@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Borough Price Dynamic Bar Chart with Timeline</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+</head>
+
+<body>
+  <div id="main" style="width: 900px; height: 700px; margin: 0 auto;"></div>
+
+  <script>
+    const myChart = echarts.init(document.getElementById("main"));
+    const updateFrequency = 1500;
+    const boroughColors = {};
+    // 生成年份数组 [2010, 2011, ..., 2024]
+    const years = Array.from({ length: 2024 - 2010 + 1 }, (_, i) => 2010 + i);
+
+    // 获取 GeoJSON 数据
+    fetch("./data/housing/boroughs_price.geojson")
+      .then((response) => response.json())
+      .then((data) => {
+        // 生成 Borough 颜色映射
+        const boroughs = data.features.map((f) => f.properties.NAME);
+        boroughs.forEach((b, i) => {
+          boroughColors[b] = `hsl(${(i * 20) % 360}, 70%, 50%)`;
+        });
+
+        // 获取某年数据并按房价降序排序，返回格式：[ [price, boroughName], ... ]
+        function getBoroughData(year) {
+          return data.features
+            .map((f) => [f.properties[String(year)] || 0, f.properties.NAME])
+            .sort((a, b) => b[0] - a[0]);
+        }
+
+        // 为每个年份构造对应的配置项（仅更新 yAxis、series 和 graphic 中的年份文本）
+        const options = years.map((year) => {
+          const source = getBoroughData(year);
+          return {
+            yAxis: { data: source.map((d) => d[1]) },
+            series: [
+              {
+                // 数据对应的顺序须和 baseOption 中的 series 保持一致
+                data: source.map((d) => d[0]),
+              },
+            ],
+            graphic: {
+              elements: [
+                {
+                  style: { text: year },
+                },
+              ],
+            },
+          };
+        });
+
+        // 整体配置（包含 timeline）
+        const option = {
+          baseOption: {
+            timeline: {
+              axisType: "category",
+              autoPlay: true,
+              playInterval: updateFrequency,
+              data: years,
+              label: { formatter: (s) => s },
+              controlPosition: "left",
+              controlStyle: {
+                showPlayBtn: true,
+                showNextBtn: true,
+                showPrevBtn: true,
+              },
+            },
+            tooltip: {
+              trigger: "axis",
+              axisPointer: { type: "shadow" },
+              formatter: (params) => {
+                if (params.length > 0 && params[0].name) {
+                  return `${params[0].name}: £${params[0].value.toLocaleString()}`;
+                }
+                return '';
+              },
+            },
+            title: {
+              text: "Median Property Price Dynamic Bar Chart",
+              left: "center",
+            },
+            grid: { top: 25, bottom: 80, left: 160, right: 60 },
+            xAxis: {
+              max: "dataMax",
+              axisLabel: { formatter: (n) => `£${n.toLocaleString()}` },
+            },
+            yAxis: {
+              type: "category",
+              inverse: true,
+              axisLabel: { fontSize: 12 },
+              // data 在各个 option 中更新
+            },
+            series: [
+              {
+                type: "bar",
+                label: {
+                  show: true,
+                  position: "right",
+                  valueAnimation: true,
+                },
+                itemStyle: {
+                  color: (p) => boroughColors[p.name] || "#5470c6",
+                },
+                // data 在各个 option 中更新
+              },
+            ],
+            animationDuration: 0, // 初始动画时长
+            animationDurationUpdate: updateFrequency, // 更新时动画时长
+            animationEasing: "linear",
+            animationEasingUpdate: "linear",
+            graphic: {
+              elements: [
+                {
+                  type: "text",
+                  right: 50,
+                  bottom: 60,
+                  style: {
+                    text: years[0],
+                    font: "bolder 80px monospace",
+                    fill: "rgba(100, 100, 100, 0.25)",
+                  },
+                },
+              ],
+            },
+          },
+          options: options,
+        };
+
+        myChart.setOption(option);
+      });
+  </script>
+</body>
+
+</html>

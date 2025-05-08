@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>London City Guide - Landmarks & Architecture</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <meta name="description"
+    content="Explore London's famous landmarks and unique architecture through an interactive 3D map.">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.js"></script>
+  <!-- Bootstrap Icons-->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- Core theme CSS (includes Bootstrap)-->
+  <!-- <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet"> -->
+  <link href="../css/styles.css" rel="stylesheet">
+
+  <!-- geocoder -->
+  <script
+    src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.min.js"></script>
+  <link rel="stylesheet"
+    href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.css" type="text/css">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100vh;
+    }
+
+    .top-controls-container {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .location-selector{
+      position: fixed;
+      top: 10px;
+      left: 45%;
+    }
+
+    .map-style-container {
+      position: relative;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 8px;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .style-btn {
+      padding: 5px 10px;
+      background-color: #f8d7c4;
+      border: none;
+      margin: 0 3px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .style-btn:hover {
+      background-color: #f4623a;
+      color: white;
+    }
+
+    .style-btn.active {
+      background-color: #f4623a;
+      color: white;
+    }
+
+    .map-controls {
+      position: relative;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+      width: 220px;
+    }
+
+    .control-group {
+      margin-bottom: 15px;
+    }
+
+    .control-label {
+      font-size: 14px;
+      margin-bottom: 5px;
+      display: block;
+      font-weight: bold;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .slider {
+      flex: 1;
+      height: 8px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: #ddd;
+      border-radius: 5px;
+      outline: none;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #f4623a;
+      cursor: pointer;
+    }
+
+    .slider-value {
+      width: 40px;
+      text-align: right;
+      margin-left: 10px;
+      font-size: 14px;
+    }
+
+    .reset-btn {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      background-color: #f8d7c4;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 5px;
+    }
+
+    .reset-btn:hover {
+      background-color: #f4623a;
+      color: white;
+    }
+
+    .mapboxgl-popup {
+      max-width: 300px;
+      font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    }
+
+    .mapboxgl-popup-content {
+      padding: 4px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      box-shadow: cadetblue 0px 0px 10px;
+    }
+
+    .mapboxgl-popup-close-button {
+      font-size: 16px;
+      color: #f4623a;
+      top: 5px;
+      right: 5px;
+    }
+
+    .legend {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+      max-width: 200px;
+      border: 1.5px dashed #f4623a;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+      border-radius: 3px;
+    }
+
+    /* Control the style of input box */
+    .mapboxgl-ctrl-geocoder {
+      width: 350px !important;
+      margin: 20px !important;
+      background-color: white !important;
+      border: 2px solid #f4623a !important;
+      box-shadow: 0 0 6px rgba(244, 98, 58, 0.4) !important;
+      border-radius: 8px !important;
+      z-index: 10 !important;
+      transition: box-shadow 0.2s, border 0.2s;
+    }
+
+    .mapboxgl-ctrl-geocoder input {
+      font-size: 16px !important;
+      font-weight: 500 !important;
+      color: #333 !important;
+      background-color: #fff !important;
+      border-radius: 6px !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .mapboxgl-ctrl-geocoder:hover,
+    .mapboxgl-ctrl-geocoder input:focus {
+      border: 2px solid #f4623a !important;
+      box-shadow: 0 0 14px rgba(244, 98, 58, 0.75) !important;
+    }
+
+    .card {
+      width: 220px;
+      border-radius: 5%;
+      font-size: 13px;
+      font-weight: normal;
+    }
+
+    .card .card-text:hover {
+      background-color: rgba(200, 200, 200, 0.8);
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+
+  <div class="top-controls-container">
+    <div class="map-style-container">
+      <button id="streets-v12" class="style-btn active">Streets</button>
+      <button id="light-v11" class="style-btn">Light</button>
+      <button id="standard-v12" class="style-btn">Standard</button>
+      <button id="satellite-streets-v12" class="style-btn">Satellite</button>
+    </div>
+    <div class="location-selector">
+      <div class="btn-group">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Landmarks!
+        </button>
+        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+          <li><a class="dropdown-item" href="#bigben">Big Ben & Houses of Parliament</a></li>
+          <li><a class="dropdown-item" href="#towerbridge">Tower Bridge</a></li>
+          <li><a class="dropdown-item" href="#londoneye">London Eye</a></li>
+          <li><a class="dropdown-item" href="#buckingham">Buckingham Palace</a></li>
+          <li><a class="dropdown-item" href="#britishmuseum">British Museum</a></li>
+          <li><a class="dropdown-item" href="#stpaul">St Paul's Cathedral</a></li>
+          <li><a class="dropdown-item" href="#towerof">Tower of London</a></li>
+          <li><a class="dropdown-item" href="#trafalgar">Trafalgar Square</a></li>
+          <li><a class="dropdown-item" href="#hydepark">Hyde Park</a></li>
+          <li><a class="dropdown-item" href="#kensington">Kensington Palace</a></li>
+          <li><a class="dropdown-item" href="#greenwich">Royal Observatory Greenwich</a></li>
+          <li><a class="dropdown-item" href="#shard">The Shard</a></li>
+          <li><a class="dropdown-item" href="#globe">Shakespeare's Globe</a></li>
+          <li><a class="dropdown-item" href="#camden">Camden Market</a></li>
+          <li><a class="dropdown-item" href="#oxford">Oxford Street</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="map-controls" id="mapControls">
+      <div class="control-group">
+        <label class="control-label">Pitch: <span id="pitchValue">0</span>°</label>
+        <div class="slider-container">
+          <input type="range" min="0" max="85" value="0" class="slider" id="pitchSlider">
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Bearing: <span id="bearingValue">0</span>°</label>
+        <div class="slider-container">
+          <input type="range" min="-180" max="180" value="0" class="slider" id="bearingSlider">
+        </div>
+      </div>
+
+      <button id="resetView" class="reset-btn">Reset View</button>
+    </div>
+
+    <div class="card border-dark mb-3" style="max-width: 18rem;">
+      <div class="card-header fs-6">Hints <i class="bi bi-emoji-sunglasses"></i></div>
+      <div class="card-body px-2">
+        <p class="card-text fw-bold tube_notif">Zoom in or use landmark guide to see detailed 3D builidings.</p>
+        <p class="card-text fw-bold tube_notif">Standard shows beautiful landmarks.</p>
+        <p class="card-text fw-bold tube_notif">Satellite shows real image.</p>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="legend">
+    <h6>Building Types</h6>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #FFD966;"></div>
+      <span>Residential</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #FF7F0E;"></div>
+      <span>Commercial</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #9467BD;"></div>
+      <span>Industrial</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #BCBD22;"></div>
+      <span>Agricultural</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #17BECF;"></div>
+      <span>Educational</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #AEC7E8;"></div>
+      <span>Medical</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #1F77B4;"></div>
+      <span>Government/Public</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #2CA02C;"></div>
+      <span>Entertainment</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #E377C2;"></div>
+      <span>Religious</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #A0522D;"></div>
+      <span>Transportation</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #7F7F7F;"></div>
+      <span>Utility</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #B0B0B0;"></div>
+      <span>Unclassified</span>
+    </div>
+  </div>
+
+  <script>
+    // TO MAKE THE MAP APPEAR YOU MUST
+    // ADD YOUR ACCESS TOKEN FROM
+    // https://account.mapbox.com
+    mapboxgl.accessToken =
+      "pk.eyJ1IjoieXV1eSIsImEiOiJjbTV6Nm9oMTgwMTZoMmpzZHNreGVrc3VsIn0.ohpsCdG3ASwD2ViFYw4e9g";
+
+    // Track if we're in satellite mode
+    let isSatelliteMode = false;
+    // Track if we're in standard mode
+    let isStandardMode = false;
+
+    // Store original pitch before satellite mode
+    let originalPitch = 0;
+
+    // Flag to track if data layers are loaded
+    let dataLayersLoaded = false;
+
+    let searchMarker; // Marker for search results
+
+    const map = new mapboxgl.Map({
+      container: "map",
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: [-0.13320, 51.52432],
+      zoom: 11,
+      pitch: 0,
+      bearing: 0,
+    });
+
+    //#region local geocoder and controls
+    const geocoder = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      placeholder: 'Enter a postcode (recommended)',
+      mapboxgl: mapboxgl,
+      marker: false,
+      language: 'en',
+      bbox: [-9.0, 49.75, 2.01, 61.01], // 限制搜索范围（英国）
+    });
+    geocoder.on('result', function (e) {
+      const lon = e.result.center[0];
+      const lat = e.result.center[1];
+      const placeName = e.result.place_name;
+      if (searchMarker) {
+        searchMarker.remove();
+      }
+      searchMarker = new mapboxgl.Marker({ color: '#f4623a' })
+        .setLngLat([lon, lat])
+        .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(placeName))
+        .addTo(map);
+      
+        map.flyTo({
+          center: [lon, lat],
+          zoom: 15.5,          
+          pitch: 45,         
+          bearing: 0,       
+          duration: 1500    
+        });
+    });
+    map.addControl(geocoder, 'top-right');
+    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+    //#endregion
+
+    // 初始化时更新控件状态
+    window.onload = function () {
+      updateLegendVisibility();
+      updateControlsVisibility();
+    };
+
+    // 确保地图首次加载完成后添加数据层
+    map.on('load', function () {
+      // 在初始地图样式加载完成后添加数据层
+      if (!isSatelliteMode && !isStandardMode) {
+        setTimeout(() => {
+          // 确保不重复添加图层
+          if (!map.getLayer('buildings')) {
+            addDataLayers();
+            dataLayersLoaded = true;
+          }
+        }, 500); // 添加小延迟确保地图样式完全加载
+      }
+    });
+
+    // 监听styleImageMissing事件提供缺失的图标
+    map.on('styleimagemissing', (e) => {
+      const id = e.id; // 缺失的图标ID
+
+      // 创建一个通用的图标作为替代
+      map.addImage(id, {
+        width: 16,
+        height: 16,
+        data: new Uint8Array(16 * 16 * 4).fill(0),
+        onAdd: function () {
+          const canvas = document.createElement('canvas');
+          canvas.width = 16;
+          canvas.height = 16;
+          this.context = canvas.getContext('2d');
+
+          // 绘制一个简单的红色圆圈作为图标
+          this.context.beginPath();
+          this.context.arc(8, 8, 6, 0, Math.PI * 2);
+          this.context.fillStyle = 'red';
+          this.context.fill();
+          this.context.strokeStyle = 'white';
+          this.context.lineWidth = 1;
+          this.context.stroke();
+
+          this.data = this.context.getImageData(0, 0, 16, 16).data;
+        },
+        render: function () {
+          return true;
+        }
+      });
+    });
+
+    // Map style switcher
+    document.getElementById('streets-v12').addEventListener('click', () => {
+      setActiveStyleButton('streets-v12');
+      // 在切换样式前移除数据层
+      removeDataLayers();
+      map.setStyle('mapbox://styles/mapbox/streets-v12');
+      isSatelliteMode = false;
+      isStandardMode = false;
+      updateControlsVisibility();
+      updateLegendVisibility();
+    });
+
+    document.getElementById('light-v11').addEventListener('click', () => {
+      setActiveStyleButton('light-v11');
+      // 在切换样式前移除数据层
+      removeDataLayers();
+      map.setStyle('mapbox://styles/mapbox/light-v11');
+      isSatelliteMode = false;
+      isStandardMode = false;
+      updateControlsVisibility();
+      updateLegendVisibility();
+    });
+
+    document.getElementById('standard-v12').addEventListener('click', () => {
+      setActiveStyleButton('standard-v12');
+      // 在切换样式前移除数据层
+      removeDataLayers();
+      map.setStyle('mapbox://styles/mapbox/standard');
+      isSatelliteMode = false;
+      isStandardMode = true;
+      updateControlsVisibility();
+      updateLegendVisibility();
+    });
+
+    document.getElementById('satellite-streets-v12').addEventListener('click', () => {
+      // 在切换到卫星模式前保存当前pitch值
+      if (!isSatelliteMode) {
+        originalPitch = map.getPitch();
+
+        // 只重置pitch为0，不改变bearing
+        map.easeTo({
+          pitch: 0,
+          duration: 1000
+        });
+      }
+
+      setActiveStyleButton('satellite-streets-v12');
+      // 在切换样式前移除数据层
+      removeDataLayers();
+      map.setStyle('mapbox://styles/mapbox/satellite-streets-v12');
+      isSatelliteMode = true;
+      isStandardMode = false;
+      updateControlsVisibility();
+      updateLegendVisibility();
+    });
+
+    function setActiveStyleButton(id) {
+      // Remove active class from all buttons
+      const styleButtons = document.querySelectorAll('.style-btn');
+      styleButtons.forEach(button => {
+        button.classList.remove('active');
+      });
+
+      // Add active class to selected button
+      document.getElementById(id).classList.add('active');
+    }
+
+    // When style changes, reload data layers
+    map.on('style.load', function () {
+      // Only add data layers if they haven't been added yet or if they were removed
+      // Don't add buildings in satellite or standard mode
+      if (!isSatelliteMode && !isStandardMode && !dataLayersLoaded) {
+        setTimeout(() => {
+          // 确保不重复添加图层
+          if (!map.getLayer('buildings')) {
+            addDataLayers();
+            dataLayersLoaded = true;
+          }
+        }, 300);
+      }
+
+      // 确保地图尺寸正确
+      map.resize();
+
+      // 更新图例可见性
+      updateLegendVisibility();
+    });
+
+    // Function to add all data layers
+    function addDataLayers() {
+      try {
+        // 只有当建筑图层不存在时才添加
+        if (!map.getLayer('buildings')) {
+          addBuildingLayers();
+        }
+      } catch (err) {
+        console.error("Error adding data layers:", err);
+      }
+    }
+
+    // Function to remove all data layers before changing style
+    function removeDataLayers() {
+      try {
+        // Remove building layer if it exists
+        if (map.getLayer('buildings')) {
+          // 删除建筑物点击事件监听器
+          map.off('click', 'buildings', onBuildingClick);
+
+          map.removeLayer('buildings');
+        }
+
+        // Remove building source if it exists
+        if (map.getSource('composite') && map.getLayer('buildings')) {
+          map.removeLayer('buildings');
+        }
+      } catch (err) {
+        console.error("Error removing layers:", err);
+      }
+
+      // Reset data layers loaded flag
+      dataLayersLoaded = false;
+    }
+
+    // 图例可见性控制
+    function updateLegendVisibility() {
+      const legend = document.querySelector('.legend');
+      if (isSatelliteMode || isStandardMode) {
+        // 在卫星或标准模式下隐藏图例
+        legend.style.display = 'none';
+      } else {
+        // 在其他模式下显示图例
+        legend.style.display = 'block';
+      }
+    }
+
+    // Set up pitch and bearing controls
+    const pitchSlider = document.getElementById('pitchSlider');
+    const pitchValue = document.getElementById('pitchValue');
+    const bearingSlider = document.getElementById('bearingSlider');
+    const bearingValue = document.getElementById('bearingValue');
+    const resetViewButton = document.getElementById('resetView');
+    const mapControls = document.getElementById('mapControls');
+
+    // Update pitch from slider
+    pitchSlider.addEventListener('input', function () {
+      if (!isSatelliteMode) {  // 卫星模式下禁用pitch调整
+        const pitch = parseInt(this.value);
+        pitchValue.textContent = pitch;
+        map.setPitch(pitch);
+      }
+    });
+
+    // Update bearing from slider
+    bearingSlider.addEventListener('input', function () {
+      const bearing = parseInt(this.value);
+      bearingValue.textContent = bearing;
+      map.setBearing(bearing);
+    });
+
+    // Reset view button
+    resetViewButton.addEventListener('click', function () {
+      pitchSlider.value = 0;
+      bearingSlider.value = 0;
+      pitchValue.textContent = 0;
+      bearingValue.textContent = 0;
+      map.easeTo({
+        pitch: 0,
+        bearing: 0,
+        duration: 1000
+      });
+    });
+
+    // Keep sliders in sync with map when map pitch/bearing changes
+    map.on('pitch', function () {
+      const currentPitch = Math.round(map.getPitch());
+      pitchSlider.value = currentPitch;
+      pitchValue.textContent = currentPitch;
+    });
+
+    map.on('rotate', function () {
+      const currentBearing = Math.round(map.getBearing());
+      bearingSlider.value = currentBearing;
+      bearingValue.textContent = currentBearing;
+    });
+
+    // Disable controls in satellite mode
+    function updateControlsVisibility() {
+      if (isSatelliteMode) {
+        // 在卫星模式下禁用pitch控制
+        pitchSlider.disabled = true;
+        pitchSlider.style.opacity = '0.5';
+
+        // 确保卫星模式下pitch为0
+        if (map.getPitch() > 0) {
+          map.easeTo({
+            pitch: 0,
+            duration: 1000
+          });
+          pitchSlider.value = 0;
+          pitchValue.textContent = 0;
+        }
+      } else {
+        // 在非卫星模式下启用pitch控制
+        pitchSlider.disabled = false;
+        pitchSlider.style.opacity = '1';
+
+        // 如果从卫星模式切换回来，恢复之前保存的pitch
+        if (originalPitch > 0) {
+          map.easeTo({
+            pitch: originalPitch,
+            duration: 1000
+          });
+          pitchSlider.value = originalPitch;
+          pitchValue.textContent = originalPitch;
+          originalPitch = 0; // 重置保存的值
+        }
+      }
+    }
+
+    // 定义建筑点击处理函数 - 将匿名函数改为命名函数以便后续移除
+    function onBuildingClick(e) {
+      const features = map.queryRenderedFeatures(e.point, { layers: ['buildings'] });
+      if (features.length > 0) {
+        // 打印特性信息到控制台
+        console.log("Building Feature:", features[0]);
+
+        const buildingID = features[0].id;
+
+        map.setPaintProperty('buildings', 'fill-extrusion-color', [
+          'case',
+          ['==', ['id'], buildingID], 'red',
+          [
+            'match',
+            ['get', 'type'],
+            // 住宅类
+            ["apartments", "house", "detached", "semidetached_house", "residential", "terrace", "bungalow", "cabin", "dormitory", "static_caravan", "houseboat"],
+            "#FFD966",
+            // 商业类
+            ["commercial", "office", "retail", "supermarket", "hotel", "kiosk", "hostel"],
+            "#FF7F0E",
+            // 工业类
+            ["industrial", "factory", "warehouse", "works", "hangar"],
+            "#9467BD",
+            // 农业类
+            ["farm", "barn", "farm_auxiliary", "cowshed", "greenhouse", "stable"],
+            "#BCBD22",
+            // 教育类
+            ["school", "university", "college", "kindergarten", "library"],
+            "#17BECF",
+            // 医疗类
+            ["hospital"],
+            "#AEC7E8",
+            // 政府/公共类
+            ["government", "civic", "public", "townhall", "embassy", "police", "fire_station", "prison", "guardhouse"],
+            "#1F77B4",
+            // 文化娱乐类
+            ["museum", "gallery", "arts_centre", "theatre", "cinema", "stadium", "grandstand", "sports_hall", "sports_centre", "pavilion"],
+            "#2CA02C",
+            // 宗教类
+            ["cathedral", "temple", "chapel", "church", "mosque", "synagogue", "shrine"],
+            "#E377C2",
+            // 交通类
+            ["train_station", "bus_station", "terminal", "parking", "garage", "garages", "carport"],
+            "#A0522D",
+            // 设施/基础设施类
+            ["bridge", "roof", "shed", "hut", "bunker", "water_tower", "transformer_tower", "service", "construction", "conservatory", "garbage_shed"],
+            "#7F7F7F",
+            // Unclassified (default)
+            "#B0B0B0"
+          ]
+        ]);
+
+        new mapboxgl.Popup({ closeOnClick: true, closeButton: false })
+          .setLngLat(e.lngLat)
+          .setHTML(`
+            <b>Type</b>: ${features[0].properties.type || 'Unknown'}<br>
+            <b>Height</b>: ${features[0].properties.height || 'N/A'} m
+          `)
+          .addTo(map);
+      }
+    }
+
+    // 移除hover相关代码
+    let hoveredBuildingId = null;
+
+    function addBuildingLayers() {
+      try {
+        // 如果建筑图层已存在，则不重复添加
+        if (map.getLayer('buildings')) {
+          console.log("Building layer already exists");
+          return;
+        }
+
+        // Get labelLayerId for inserting the layer beneath
+        const layers = map.getStyle().layers;
+        const labelLayerId = layers.find(
+          (layer) => layer.type === 'symbol' && layer.layout['text-field']
+        ).id;
+
+        // Add 3D buildings layer
+        map.addLayer(
+          {
+            'id': 'buildings',
+            'source': 'composite',
+            'source-layer': 'building',
+            'filter': ['!=', ['get', 'type'], 'building:part'],
+            'type': 'fill-extrusion',
+            'minzoom': 14,
+            'paint': {
+              'fill-extrusion-color': [
+                'match',
+                ['get', 'type'],
+                // 住宅类
+                'apartments', '#FFD966',
+                'house', '#FFD966',
+                'detached', '#FFD966',
+                'semidetached_house', '#FFD966',
+                'residential', '#FFD966',
+                'terrace', '#FFD966',
+                'bungalow', '#FFD966',
+                'cabin', '#FFD966',
+                'dormitory', '#FFD966',
+                'static_caravan', '#FFD966',
+                'houseboat', '#FFD966',
+
+                // 商业类
+                'commercial', '#FF7F0E',
+                'office', '#FF7F0E',
+                'retail', '#FF7F0E',
+                'supermarket', '#FF7F0E',
+                'hotel', '#FF7F0E',
+                'kiosk', '#FF7F0E',
+                'hostel', '#FF7F0E',
+
+                // 工业类
+                'industrial', '#9467BD',
+                'factory', '#9467BD',
+                'warehouse', '#9467BD',
+                'works', '#9467BD',
+                'hangar', '#9467BD',
+
+                // 农业类
+                'farm', '#BCBD22',
+                'barn', '#BCBD22',
+                'farm_auxiliary', '#BCBD22',
+                'cowshed', '#BCBD22',
+                'greenhouse', '#BCBD22',
+                'stable', '#BCBD22',
+
+                // 教育类
+                'school', '#17BECF',
+                'university', '#17BECF',
+                'college', '#17BECF',
+                'kindergarten', '#17BECF',
+                'library', '#17BECF',
+
+                // 医疗类
+                'hospital', '#AEC7E8',
+
+                // 政府/公共类
+                'government', '#1F77B4',
+                'civic', '#1F77B4',
+                'public', '#1F77B4',
+                'townhall', '#1F77B4',
+                'embassy', '#1F77B4',
+                'police', '#1F77B4',
+                'fire_station', '#1F77B4',
+                'prison', '#1F77B4',
+                'guardhouse', '#1F77B4',
+
+                // 文化娱乐类
+                'museum', '#2CA02C',
+                'gallery', '#2CA02C',
+                'arts_centre', '#2CA02C',
+                'theatre', '#2CA02C',
+                'cinema', '#2CA02C',
+                'stadium', '#2CA02C',
+                'grandstand', '#2CA02C',
+                'sports_hall', '#2CA02C',
+                'sports_centre', '#2CA02C',
+                'pavilion', '#2CA02C',
+
+                // 宗教类
+                'cathedral', '#E377C2',
+                'temple', '#E377C2',
+                'chapel', '#E377C2',
+                'church', '#E377C2',
+                'mosque', '#E377C2',
+                'synagogue', '#E377C2',
+                'shrine', '#E377C2',
+                'religious', '#E377C2',
+
+                // 交通类
+                'train_station', '#A0522D',
+                'bus_station', '#A0522D',
+                'terminal', '#A0522D',
+                'parking', '#A0522D',
+                'garage', '#A0522D',
+                'garages', '#A0522D',
+                'carport', '#A0522D',
+                'transportation', '#A0522D',
+
+                // 设施/基础设施类
+                'bridge', '#7F7F7F',
+                'roof', '#7F7F7F',
+                'shed', '#7F7F7F',
+                'hut', '#7F7F7F',
+                'bunker', '#7F7F7F',
+                'water_tower', '#7F7F7F',
+                'transformer_tower', '#7F7F7F',
+                'service', '#7F7F7F',
+                'construction', '#7F7F7F',
+                'conservatory', '#7F7F7F',
+                'garbage_shed', '#7F7F7F',
+
+                // Unclassified (default)
+                '#B0B0B0'
+              ],
+              'fill-extrusion-height': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                13.5, 0,
+                14, 5,
+                15.5, ['get', 'height']
+              ],
+              'fill-extrusion-base': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                13.5, 0,
+                14, 0,
+                15.5, ['get', 'min_height']
+              ],
+              'fill-extrusion-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                13.5, 0,
+                14, 0.3,
+                15.5, 0.8
+              ]
+            }
+          },
+          labelLayerId
+        );
+
+        // 仅添加点击事件监听器，移除hover相关监听器
+        map.on('click', 'buildings', onBuildingClick);
+      } catch (err) {
+        console.error("Error adding building layers:", err);
+      }
+    }
+
+    function addLandmarks() {
+      // 不再添加地标数据
+      return;
+    }
+
+    function loadSchoolsData() {
+      // 不再加载学校数据
+    }
+
+    const chapters = {
+      bigben: { center: [-0.1246, 51.5007], zoom: 17, pitch: 60, bearing: -90 },
+      towerbridge: { center: [-0.0753, 51.5055], zoom: 16.5, pitch: 60, bearing: -30 },
+      londoneye: { center: [-0.1195, 51.5033], zoom: 17, pitch: 58, bearing: 97 },
+      buckingham: { center: [-0.1419, 51.5014], zoom: 17, pitch: 50, bearing: -30 },
+      britishmuseum: { center: [-0.1269, 51.5194], zoom: 17, pitch: 70, bearing: -33 },
+      stpaul: { center: [-0.0983, 51.5138], zoom: 17, pitch: 50, bearing: 82 },
+      towerof: { center: [-0.0756, 51.5081], zoom: 17, pitch: 55, bearing: 25 },
+      trafalgar: { center: [-0.1281, 51.5080], zoom: 17, pitch: 55, bearing: -12 },
+      hydepark: { center: [-0.1662, 51.5073], zoom: 14, pitch: 35, bearing: 10 },
+      kensington: { center: [-0.1877, 51.5058], zoom: 17, pitch: 50, bearing: 20 },
+      greenwich: { center: [0.0005, 51.4769], zoom: 15, pitch: 20, bearing: -30 },
+      shard: { center: [-0.0865, 51.5045], zoom: 16, pitch: 35, bearing: -154 },
+      globe: { center: [-0.0974, 51.5081], zoom: 17.5, pitch: 60, bearing: -170 },
+      camden: { center: [-0.1420, 51.5413], zoom: 16.5, pitch: 50, bearing: -10 },
+      oxford: { center: [-0.1425, 51.5154], zoom: 16.5, pitch: 40, bearing: -12 }
+    };
+
+
+    let activeChapterName = null; // 初始状态下没有任何章节被激活
+
+    function setActiveChapter(chapterName) {
+      if (chapterName === activeChapterName) return;
+
+      // 定义要应用的视图配置
+      const flyToOptions = {
+        center: chapters[chapterName].center,
+        zoom: chapters[chapterName].zoom,
+        bearing: chapters[chapterName].bearing,
+        duration: 1500 // 动画持续时间
+      };
+
+      // 确保卫星模式下pitch为0，非卫星模式时使用章节指定的pitch
+      if (isSatelliteMode) {
+        flyToOptions.pitch = 0;
+      } else {
+        flyToOptions.pitch = chapters[chapterName].pitch;
+      }
+
+      // 应用视图配置
+      map.flyTo(flyToOptions);
+
+      // 更新控制滑块位置到对应章节设置
+      updateSliders(flyToOptions.pitch, flyToOptions.bearing);
+
+      activeChapterName = chapterName;
+    }
+
+    // 更新控制滑块显示
+    function updateSliders(pitch, bearing) {
+      // 设置pitch滑块
+      pitchSlider.value = pitch;
+      pitchValue.textContent = pitch;
+
+      // 设置bearing滑块
+      bearingSlider.value = bearing;
+      bearingValue.textContent = bearing;
+    }
+
+    // 点击下拉菜单时设置章节
+    document.querySelectorAll('.dropdown-item').forEach((item) => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        const href = item.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          const chapterName = href.substring(1);
+          setActiveChapter(chapterName);
+        }
+      });
+    });
+  </script>
+  <!-- Bootstrap core JS-->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

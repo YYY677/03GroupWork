@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Map 9</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.js"></script>
+
+  <!-- geocoder -->
+  <script
+    src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.min.js"></script>
+  <link rel="stylesheet"
+    href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.css" type="text/css">
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- Core theme CSS (includes Bootstrap)-->
+  <!-- <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet"> -->
+  <link href="../css/styles.css" rel="stylesheet" />
+
+  <!-- ECharts -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .map-overlay {
+      position: absolute;
+      width: 300px;
+      top: 0;
+      left: 0;
+      padding: 10px;
+    }
+
+    .info {
+      padding: 12px 16px;
+      font: 14px/18px sans-serif;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      width: 300px;
+      top: 10px;
+      left: 10px;
+      margin-bottom: 15px;
+      z-index: 10;
+    }
+
+    .info table {
+      border-spacing: 0 15px;
+      border-collapse: separate;
+    }
+
+    .info table tr td {
+      padding-top: 8px;
+    }
+
+    .info input[type="checkbox"] {
+      margin-right: 8px;
+      transform: scale(1.1);
+    }
+
+    .info label {
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .info select {
+      width: 100%;
+      padding: 6px;
+      font-size: 14px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .legend2 {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px;
+      border-radius: 8px;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      z-index: 1;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .legend2 div {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend2 span:first-child {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      margin-right: 5px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      /* 防止颜色方块缩小 */
+    }
+
+    .legend2 span:last-child {
+      flex-grow: 1;
+      white-space: nowrap;
+      text-align: left;
+    }
+
+    .mapboxgl-popup {
+      width: 200px;
+      font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    }
+
+    .echart-popup {
+      width: 400px;
+      height: 300px;
+    }
+
+    .mapboxgl-popup-content {
+      padding: 4px;
+      width: 200px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      box-shadow: cadetblue 0px 0px 10px;
+      transition: width 0.3s ease;
+    }
+
+    .mapboxgl-popup-close-button {
+      font-size: 16px;
+      color: #333;
+      top: 5px;
+      right: 5px;
+    }
+
+    /* Control the style of input box */
+    .mapboxgl-ctrl-geocoder {
+      width: 350px !important;
+      margin: 20px !important;
+      background-color: white !important;
+      border: 2px solid #f4623a !important;
+      box-shadow: 0 0 6px rgba(244, 98, 58, 0.4) !important;
+      border-radius: 8px !important;
+      z-index: 10 !important;
+      transition: box-shadow 0.2s, border 0.2s;
+    }
+
+    .mapboxgl-ctrl-geocoder input {
+      font-size: 16px !important;
+      font-weight: 500 !important;
+      color: #333 !important;
+      background-color: #fff !important;
+      border-radius: 6px !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .mapboxgl-ctrl-geocoder:hover,
+    .mapboxgl-ctrl-geocoder input:focus {
+      border: 2px solid #f4623a !important;
+      box-shadow: 0 0 14px rgba(244, 98, 58, 0.75) !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <div class="map-overlay">
+    <div class="info">
+      <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button collapsed fs-6" type="button" data-bs-toggle="collapse"
+              data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+              What're Borough & LSOA?
+            </button>
+          </h2>
+          <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+            data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              <strong>Boroughs and LSOAs Explained:</strong><br><br>
+              In London, a borough is a large administrative area, totally 32 boroughs in London.<br><br>
+              While an LSOA (LowerLayer Super Output Area) is a smaller geographic unit used for statistical analysis,
+              totally around 5000 LSOAs in London.
+            </div>
+          </div>
+        </div>
+      </div>
+      <table>
+        <tbody>
+          <tr id="rental-row">
+            <td>
+              <input type="checkbox" id="toggle-rental">
+              <label for="toggle-rental">Monthly rental price (Borough)</label>
+            </td>
+          </tr>
+          <tr id="boroughs-row">
+            <td>
+              <input type="checkbox" id="toggle-boroughs-housing">
+              <label for="toggle-boroughs-housing">Median property price (Borough)</label>
+            </td>
+          </tr>
+          <tr id="lsoa-row">
+            <td>
+              <input type="checkbox" id="toggle-housing">
+              <label for="toggle-housing">Median property price (LSOA)</label>
+            </td>
+          </tr>
+          <tr id="slider-row" style="display: none;">
+            <td>
+              <input id='slider' type='range' min='2010' max='2024' step='1' value='2010' list='tickmarks'
+                style="width: 230px; height: 30px;" />
+              <datalist id="tickmarks">
+                <option value="2010" label="2010"></option>
+                <option value="2011"></option>
+                <option value="2012"></option>
+                <option value="2013"></option>
+                <option value="2014" label="2014"></option>
+                <option value="2015"></option>
+                <option value="2016"></option>
+                <option value="2017"></option>
+                <option value="2018"></option>
+                <option value="2019"></option>
+                <option value="2020"></option>
+                <option value="2021"></option>
+                <option value="2022"></option>
+                <option value="2023"></option>
+                <option value="2024" label="2024"></option>
+              </datalist>
+            </td>
+            <td>
+              <label id='year'><b>2010</b></label>
+            </td>
+          </tr>
+          <tr class="slider-select-row" style="display: none;">
+            <td>
+              <input id='slider2' type='range' min='2015' max='2025' step='1' value='2015' list='tickmarks2'
+                style="width: 230px; height: 30px;" />
+              <datalist id="tickmarks2">
+                <option value="2015" label="2015"></option>
+                <option value="2016"></option>
+                <option value="2017"></option>
+                <option value="2018"></option>
+                <option value="2019"></option>
+                <option value="2020"></option>
+                <option value="2021"></option>
+                <option value="2022"></option>
+                <option value="2023"></option>
+                <option value="2024"></option>
+                <option value="2025" label="2025"></option>
+              </datalist>
+            </td>
+            <td>
+              <label id='year2'><b>2015</b></label>
+            </td>
+          </tr>
+          <tr class="slider-select-row" style="display: none;">
+            <td>
+              <select id="rent-select" class="form-select form-select-sm" aria-label="Default select example">
+                <option value="Rental price">Average Rental Price</option>
+                <option value="Rental price one bed">Rental Price for 1 bed</option>
+                <option value="Rental price two bed">Rental Price for 2 bed</option>
+                <option value="Rental price three bed">Rental Price for 3 bed</option>
+                <option value="Rental price four or more bed">Rental Price for 4 or more bed</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-left: 10px;">
+      <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample"
+        aria-expanded="false" aria-controls="collapseWidthExample">
+        Check Source
+      </button>
+    </p>
+    <div style="min-height: 120px; margin-left: 10px;">
+      <div class="collapse collapse-horizontal" id="collapseWidthExample">
+        <div class="card card-body" style="width: 280px; font-size: 16px; line-height: 1.6;">
+          <div>
+            <strong>Boroughs rental data: </strong> <br>
+            <a href="https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics"
+              target="_blank">
+              Office for National Statistics
+            </a>
+          </div>
+          <div>
+            <strong> Boroughs property data: </strong> <br>
+            <a href="https://data.london.gov.uk/dataset/uk-house-price-index/" target="_blank">
+              London Data Store
+            </a>
+          </div>
+          <div>
+            <strong>LSOAs property data: </strong> <br>
+            <a href="https://www.ons.gov.uk/peoplepopulationandcommunity/housing/datasets/medianpricepaidbylowerlayersuperoutputareahpssadataset46/"
+              target="_blank">
+              Office for National Statistics
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="lsoa-legend" class="legend2" style="display: none;">
+    <b>LSOA Price Legend</b>
+    <div><span style="background-color: #b2182b; opacity: 1;"></span> <span id="legend-highest">Highest Price</span>
+    </div>
+    <div><span style="background-color: #d6604d; opacity: 1;"></span> <span id="legend-quantile5"></span></div>
+    <div><span style="background-color: #f4a582; opacity: 1;"></span> <span id="legend-quantile4"></span></div>
+    <div><span style="background-color: #fddbc7; opacity: 1;"></span> <span id="legend-quantile3"></span></div>
+    <div><span style="background-color: #d1e5f0; opacity: 1;"></span> <span id="legend-quantile2"></span></div>
+    <div><span style="background-color: #92c5de; opacity: 1;"></span> <span id="legend-quantile1"></span></div>
+    <div><span style="background-color: #2166AC; opacity: 1;"></span> <span id="legend-lowest">Lowest Price</span>
+    </div>
+  </div>
+
+  <div id="boroughs-legend" class="legend2" style="display: none;">
+    <b>Boroughs Price Legend</b>
+    <div><span style="background-color: #b2182b; opacity: 0.7;"></span> <span id="legend-year-highest">Highest
+        Price</span>
+    </div>
+    <div><span style="background-color: #d6604d; opacity: 0.7;"></span> <span id="legend-year-quantile5"></span></div>
+    <div><span style="background-color: #f4a582; opacity: 0.7;"></span> <span id="legend-year-quantile4"></span></div>
+    <div><span style="background-color: #fddbc7; opacity: 0.7;"></span> <span id="legend-year-quantile3"></span></div>
+    <div><span style="background-color: #d1e5f0; opacity: 0.7;"></span> <span id="legend-year-quantile2"></span></div>
+    <div><span style="background-color: #92c5de; opacity: 0.7;"></span> <span id="legend-year-quantile1"></span></div>
+    <div><span style="background-color: #2166AC; opacity: 0.7;"></span> <span id="legend-year-lowest">Lowest
+        Price</span>
+    </div>
+  </div>
+
+  <div id="boroughs-legend2" class="legend2" style="display: none;">
+    <b>Boroughs Price Legend</b>
+    <div><span style="background-color: #b2182b; opacity: 0.7;"></span> <span id="legend-year-rental-highest">Highest
+        Price</span>
+    </div>
+    <div><span style="background-color: #d6604d; opacity: 0.7;"></span> <span id="legend-year-rental-quantile5"></span>
+    </div>
+    <div><span style="background-color: #f4a582; opacity: 0.7;"></span> <span id="legend-year-rental-quantile4"></span>
+    </div>
+    <div><span style="background-color: #fddbc7; opacity: 0.7;"></span> <span id="legend-year-rental-quantile3"></span>
+    </div>
+    <div><span style="background-color: #d1e5f0; opacity: 0.7;"></span> <span id="legend-year-rental-quantile2"></span>
+    </div>
+    <div><span style="background-color: #92c5de; opacity: 0.7;"></span> <span id="legend-year-rental-quantile1"></span>
+    </div>
+    <div><span style="background-color: #2166AC; opacity: 0.7;"></span> <span id="legend-year-rental-lowest">Lowest
+        Price</span>
+    </div>
+  </div>
+
+  <script>
+    let geojson = null;
+    let areas = null;
+    let searchTree = null;
+    let hoveredFeatureId = null;
+    let price = null;
+    let coordinates = null;
+    // 颜色渐变（从蓝到红）
+    let colors = ['#2166ac', '#92c5de', '#d1e5f0', '#fddbc7', '#f4a582', '#d6604d', '#b2182b'];
+
+    let searchMarker; 
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoieXV1eSIsImEiOiJjbTV6Nm9oMTgwMTZoMmpzZHNreGVrc3VsIn0.ohpsCdG3ASwD2ViFYw4e9g';
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/light-v9',
+      center: [-0.12, 51.5],
+      zoom: 9.5
+    });
+
+    map.on('load', () => {
+      //#region boroughs price
+      fetch('./data/housing/boroughs_price.geojson')
+        .then(response => response.json())
+        .then(data => {
+          map.addSource('boroughs_price_data', {
+            type: 'geojson',
+            data: data,
+            generateId: true
+          });
+
+          // 添加填充图层
+          map.addLayer({
+            id: 'boroughs_price',
+            type: 'fill',
+            source: 'boroughs_price_data',
+            layout: {
+              visibility: 'none'
+            },
+            paint: {
+              'fill-outline-color': '#000',
+            }
+          });
+          updateBoroughsPriceLayer(2010);
+
+          map.on('mouseenter', 'boroughs_price', (e) => {
+            if (e.features.length == 0) return;
+            map.getCanvas().style.cursor = 'pointer';
+          })
+          map.on('mouseleave', 'boroughs_price', () => {
+            map.getCanvas().style.cursor = '';
+          })
+          map.on('click', 'boroughs_price', (e) => {
+            if (!e.features || e.features.length === 0) return;
+
+            const name = e.features[0].properties.NAME;
+            let prices = {};
+            for (let year = 2010; year <= 2024; year++) {
+              prices[year] = e.features[0].properties[String(year)];
+            }
+
+            // 创建 Popup
+            const popup = new mapboxgl.Popup({ closeOnClick: true })
+              .setLngLat(e.lngLat)
+              .setHTML(`<div id="popup-chart" class="echart-popup"></div>`)
+              .addTo(map);
+
+            // 等待 DOM 渲染完成后加载 ECharts
+            setTimeout(() => updateBarChart(name, prices), 100);
+          });
+
+          function updateBarChart(boroughName, prices) {
+            let chartDom = document.getElementById('popup-chart');
+            if (!chartDom) return; // 防止 Popup 关闭后仍尝试渲染
+
+            let myChart = echarts.init(chartDom);
+
+            let years = Object.keys(prices);
+            let priceValues = Object.values(prices);
+
+            let option = {
+              tooltip: { trigger: 'axis' },
+              title: { text: boroughName + '(Median property price)', left: 'center' },
+              grid: {
+                left: '15%',   // **左右留白**
+                right: '10%',
+                bottom: '15%'  // **留空间给 X 轴**
+              },
+              xAxis: { type: 'category', data: years, axisLabel: { interval: 0, rotate: 30 } },
+              yAxis: { type: 'value', name: 'Price (£)' },
+              series: [{ name: 'Price', type: 'bar', data: priceValues, color: '#5b8ff9', barWidth: '80%' }]
+            };
+
+            myChart.setOption(option);
+
+            // **动态调整 Popup 大小**
+            let popupContent = document.querySelector('.mapboxgl-popup-content');
+            let popupContainer = document.querySelector('.mapboxgl-popup');
+
+            if (popupContent && popupContainer) {
+              popupContent.style.width = '400px';
+              popupContainer.style.width = '400px';
+            }
+          }
+        });
+      //#endregion
+
+      //#region boroughs rent
+      fetch('./data/housing/boroughs_rent.geojson')
+        .then(response => response.json())
+        .then(data => {
+          map.addSource('boroughs_rent_data', {
+            type: 'geojson',
+            data: data,
+            generateId: true
+          });
+          map.addLayer({
+            id: 'boroughs_rent',
+            type: 'fill',
+            source: 'boroughs_rent_data',
+            layout: {
+              visibility: 'none'
+            },
+            paint: {
+              'fill-outline-color': '#000',
+            }
+          });
+          updateBoroughsRentLayer(2015, 'Rental price');
+          map.on('mouseenter', 'boroughs_rent', (e) => {
+            if (e.features.length == 0) return;
+            map.getCanvas().style.cursor = 'pointer';
+          })
+          map.on('mouseleave', 'boroughs_rent', () => {
+            map.getCanvas().style.cursor = '';
+          })
+          map.on('click', 'boroughs_rent', (e) => {
+            if (!e.features || e.features.length === 0) return;
+
+            const name = e.features[0].properties.NAME;
+
+            // 创建 Popup
+            const popup = new mapboxgl.Popup({ closeOnClick: true })
+              .setLngLat(e.lngLat)
+              .setHTML(`<div id="popup-chart" class="echart-popup"></div>`)
+              .addTo(map);
+
+            // 等待 DOM 渲染完成后加载 ECharts
+            setTimeout(() => updateChart(name), 100);
+          });
+
+          function updateChart(boroughName) {
+            if (!data) return;
+
+            let filteredData = data.features.filter(f => f.properties.NAME === boroughName);
+            filteredData.sort((a, b) => a.properties.Year - b.properties.Year);
+
+            let years = filteredData.map(f => f.properties.Year);
+            let rentalPrice = filteredData.map(f => f.properties["Rental price"]);
+            let rentalOneBed = filteredData.map(f => f.properties["Rental price one bed"]);
+            let rentalTwoBed = filteredData.map(f => f.properties["Rental price two bed"]);
+            let rentalThreeBed = filteredData.map(f => f.properties["Rental price three bed"]);
+            let rentalFourBed = filteredData.map(f => f.properties["Rental price four or more bed"]);
+
+            let chartDom = document.getElementById('popup-chart');
+            if (!chartDom) return; // 防止 Popup 关闭后仍尝试渲染
+            let myChart = echarts.init(chartDom);
+
+            let option = {
+              tooltip: { trigger: 'axis' },
+              title: { text: boroughName + '(Monthly rental price)', left: 'center' },
+              legend: { bottom: 0, data: ['Overall', 'One Bed', 'Two Bed', 'Three Bed', 'Four or More Bed'] },
+              xAxis: { type: 'category', data: years },
+              yAxis: { type: 'value', name: 'Price (£)' },
+              series: [
+                { name: 'Overall', type: 'line', data: rentalPrice },
+                { name: 'One Bed', type: 'line', data: rentalOneBed },
+                { name: 'Two Bed', type: 'line', data: rentalTwoBed },
+                { name: 'Three Bed', type: 'line', data: rentalThreeBed },
+                { name: 'Four or More Bed', type: 'line', data: rentalFourBed }
+              ]
+            };
+
+            myChart.setOption(option);
+
+            // **动态调整 Popup 大小**
+            let popupContent = document.querySelector('.mapboxgl-popup-content');
+            let popupContainer = document.querySelector('.mapboxgl-popup');
+
+            if (popupContent && popupContainer) {
+              popupContent.style.width = '400px';
+              popupContainer.style.width = '400px';
+            }
+          }
+        })
+
+      //#endregion
+
+      //#region lsoa price
+      fetch('./data/housing/lsoa21_median.geojson')
+        .then(response => response.json())
+        .then(data => {
+          map.addSource('lsoa_price_data', {
+            type: 'geojson',
+            data: data,
+            generateId: true
+          });
+
+          let medians = data.features
+            .map(f => f.properties.median)
+            .filter(v => v !== null && !isNaN(v)); // 过滤掉缺失值和NaN
+
+          // 检查 medians 数组是否为空
+          if (medians.length === 0) {
+            console.error("Medians array is empty. Check for missing or invalid data.");
+            return;
+          }
+
+          // 排序 medians 数组
+          medians.sort((a, b) => a - b);
+
+          // 计算分位数 (6 个分位数)
+          let quantiles = [];
+          for (let i = 1; i <= 6; i++) {
+            let index = Math.floor(i * medians.length / 7); // 计算索引位置
+            quantiles.push(medians[index]);
+          }
+
+          // 确保 quantiles 数组是严格递增的
+          quantiles = [...new Set(quantiles)]; // 移除重复项
+          quantiles.sort((a, b) => a - b); // 确保是严格递增的
+
+          console.log("Quantile Breaks:", quantiles);
+
+
+
+          // 创建 step 颜色表达式
+          let colorExpression = ['step', ['get', 'median'], colors[0]]; // 默认颜色
+
+          // 为每个 quantile 赋值颜色
+          for (let i = 0; i < quantiles.length; i++) {
+            colorExpression.push(quantiles[i]); // 值
+            colorExpression.push(colors[i + 1]); // 颜色
+          }
+
+          console.log("Color Expression:", colorExpression);
+
+          // 更新图例
+          document.getElementById('legend-lowest').textContent = `£${medians[0].toLocaleString()} - £${quantiles[0].toLocaleString()}`;
+          document.getElementById('legend-quantile1').textContent = `£${quantiles[0].toLocaleString()} - £${quantiles[1].toLocaleString()}`;
+          document.getElementById('legend-quantile2').textContent = `£${quantiles[1].toLocaleString()} - £${quantiles[2].toLocaleString()}`;
+          document.getElementById('legend-quantile3').textContent = `£${quantiles[2].toLocaleString()} - £${quantiles[3].toLocaleString()}`;
+          document.getElementById('legend-quantile4').textContent = `£${quantiles[3].toLocaleString()} - £${quantiles[4].toLocaleString()}`;
+          document.getElementById('legend-quantile5').textContent = `£${quantiles[4].toLocaleString()} - £${quantiles[5].toLocaleString()}`;
+          document.getElementById('legend-highest').textContent = `£${quantiles[5].toLocaleString()} - £${medians[medians.length - 1].toLocaleString()}`;
+
+          // 添加填充图层
+          map.addLayer({
+            id: 'lsoa_price',
+            type: 'fill',
+            source: 'lsoa_price_data',
+            layout: {
+              visibility: 'none'
+            },
+            paint: {
+              'fill-color': colorExpression,
+              'fill-outline-color': '#000',
+              'fill-opacity': 1,
+            }
+          });
+        });
+
+      map.on('click', 'lsoa_price', (e) => {
+        if (!e.features) return;
+
+        coordinates = e.lngLat;
+        price = e.features[0].properties.median;
+        const lsoa = e.features[0].properties.lsoa21cd;
+        new mapboxgl.Popup({ closeButton: true, closeOnMove: true, closeOnClick: true })
+          .setLngLat(coordinates)
+          .setHTML(`<b>LSOA: ${lsoa}</b><br><b>Time:2022&2023</b><br>Median Price: £${price}`)
+          .addTo(map);
+      });
+      map.on('mouseenter', 'lsoa_price', function (e) {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+
+      map.on('mouseleave', 'lsoa_price', function () {
+        map.getCanvas().style.cursor = '';
+      });
+
+      //#endregion
+    })
+
+    //#region local geocoder and controls
+    const geocoder = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      placeholder: 'Enter a postcode (recommended)',
+      mapboxgl: mapboxgl,
+      marker: false,
+      language: 'en',
+      bbox: [-9.0, 49.75, 2.01, 61.01], // 限制搜索范围（英国）
+    });
+    geocoder.on('result', function (e) {
+      const lon = e.result.center[0];
+      const lat = e.result.center[1];
+      const placeName = e.result.place_name;
+      if (searchMarker) {
+        searchMarker.remove();
+      }
+      searchMarker = new mapboxgl.Marker({ color: '#f4623a' })
+        .setLngLat([lon, lat])
+        .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(placeName))
+        .addTo(map);
+    });
+    map.addControl(geocoder, 'top-right');
+    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+    //#endregion
+
+    document.getElementById('toggle-boroughs-housing').addEventListener('change', (e) => {
+      map.setLayoutProperty('boroughs_price', 'visibility', e.target.checked ? 'visible' : 'none');
+      document.getElementById('boroughs-legend').style.display = e.target.checked ? 'block' : 'none';
+      document.getElementById('slider-row').style.display = e.target.checked ? 'block' : 'none';
+      document.getElementById('lsoa-row').style.display = e.target.checked ? 'none' : 'block';
+      document.getElementById('rental-row').style.display = e.target.checked ? 'none' : 'block';
+    })
+    document.getElementById('toggle-housing').addEventListener('change', (e) => {
+      map.setLayoutProperty('lsoa_price', 'visibility', e.target.checked ? 'visible' : 'none');
+      document.getElementById('lsoa-legend').style.display = e.target.checked ? 'block' : 'none';
+      document.getElementById('boroughs-row').style.display = e.target.checked ? 'none' : 'block';
+      document.getElementById('rental-row').style.display = e.target.checked ? 'none' : 'block';
+    })
+    document.getElementById('slider').addEventListener('input', (e) => {
+      let year = parseInt(e.target.value);
+      updateBoroughsPriceLayer(year);
+    })
+
+    function updateBoroughsPriceLayer(year) {
+      console.log(year);
+      document.getElementById('year').innerHTML = `<b>${year}</b>`;
+
+      let source = map.getSource('boroughs_price_data');
+      if (!source) {
+        console.error("Source 'boroughs_price_data' not found.");
+        return;
+      }
+
+      let features = source._data.features; // 获取已有的数据
+      let prices = features.map(f => f.properties[year]).filter(v => v !== null && !isNaN(v));
+
+      if (prices.length === 0) {
+        console.error("Prices array is empty. Check for missing or invalid data.");
+        return;
+      }
+
+      // 计算分位数
+      let quantiles = calculateQuantiles(prices, 7);
+      console.log("Quantiles:", quantiles);
+      if (!quantiles || quantiles.length < 6) {
+        console.error("Quantile calculation failed.");
+        return;
+      }
+
+      // 创建 step 颜色表达式
+      let colorExpression = ['step', ['get', String(year)], colors[0]];
+
+      // 为每个 quantile 赋值颜色
+      for (let i = 0; i < quantiles.length; i++) {
+        colorExpression.push(quantiles[i]); // 值
+        colorExpression.push(colors[i + 1]); // 颜色
+      }
+
+      console.log("Color Expression:", colorExpression); // 调试输出
+
+      map.setPaintProperty('boroughs_price', 'fill-color', colorExpression);
+      map.setPaintProperty('boroughs_price', 'fill-opacity', 0.7);
+
+      // 更新图例
+      document.getElementById('legend-year-lowest').textContent = `£${prices[0].toLocaleString()} - £${quantiles[0].toLocaleString()}`;
+      document.getElementById('legend-year-quantile1').textContent = `£${quantiles[0].toLocaleString()} - £${quantiles[1].toLocaleString()}`;
+      document.getElementById('legend-year-quantile2').textContent = `£${quantiles[1].toLocaleString()} - £${quantiles[2].toLocaleString()}`;
+      document.getElementById('legend-year-quantile3').textContent = `£${quantiles[2].toLocaleString()} - £${quantiles[3].toLocaleString()}`;
+      document.getElementById('legend-year-quantile4').textContent = `£${quantiles[3].toLocaleString()} - £${quantiles[4].toLocaleString()}`;
+      document.getElementById('legend-year-quantile5').textContent = `£${quantiles[4].toLocaleString()} - £${quantiles[5].toLocaleString()}`;
+      document.getElementById('legend-year-highest').textContent = `£${quantiles[5].toLocaleString()} - £${prices[prices.length - 1].toLocaleString()}`;
+    }
+
+    document.getElementById('toggle-rental').addEventListener('change', (e) => {
+      map.setLayoutProperty('boroughs_rent', 'visibility', e.target.checked ? 'visible' : 'none');
+      document.querySelectorAll('.slider-select-row').forEach(row => row.style.display = e.target.checked ? 'block' : 'none');
+      document.getElementById('boroughs-legend2').style.display = e.target.checked ? 'block' : 'none';
+      document.getElementById('lsoa-row').style.display = e.target.checked ? 'none' : 'block';
+      document.getElementById('boroughs-row').style.display = e.target.checked ? 'none' : 'block';
+    })
+
+    document.getElementById('slider2').addEventListener('input', (e) => {
+      let year = parseInt(e.target.value);
+      updateBoroughsRentLayer(year, document.getElementById('rent-select').value);
+    });
+
+    document.getElementById('rent-select').addEventListener('change', (e) => {
+      let rentType = e.target.value;
+      updateBoroughsRentLayer(document.getElementById('slider2').value, rentType);
+    });
+
+    function updateBoroughsRentLayer(year, rentType) {
+      console.log(year, rentType);
+      document.getElementById('year2').innerHTML = `<b>${year}</b>`;
+
+      let source = map.getSource('boroughs_rent_data');
+      if (!source) {
+        console.error("Source 'boroughs_rent_data' not found.");
+        return;
+      }
+
+      let features = source._data.features; // 获取已有的数据
+      let prices = features
+        .filter(f => f.properties['Year'] == year) // 只获取当前年份的数据
+        .map(f => f.properties[rentType])
+        .filter(v => v !== null && !isNaN(v));
+
+      if (prices.length === 0) {
+        console.error("Prices array is empty. Check for missing or invalid data.");
+        return;
+      }
+
+      // 计算分位数
+      let quantiles = calculateQuantiles(prices, 7);
+      console.log("Quantiles:", quantiles);
+      if (!quantiles || quantiles.length < 6) {
+        console.error("Quantile calculation failed.");
+        return;
+      }
+
+      // 创建 step 颜色表达式
+      let colorExpression = ['step', ['get', rentType], colors[0]];
+
+      // 为每个 quantile 赋值颜色
+      for (let i = 0; i < quantiles.length; i++) {
+        colorExpression.push(quantiles[i]); // 值
+        colorExpression.push(colors[i + 1]); // 颜色
+      }
+
+      console.log("Color Expression:", colorExpression); // 调试输出
+
+      // ✅ **只用 `map.setFilter()` 过滤 Year**
+      map.setFilter('boroughs_rent', ['==', ['get', 'Year'], String(year)]);
+
+      map.setPaintProperty('boroughs_rent', 'fill-color', colorExpression);
+      map.setPaintProperty('boroughs_rent', 'fill-opacity', 0.7);
+
+      // 更新图例
+      document.getElementById('legend-year-rental-lowest').textContent = `£${prices[0].toLocaleString()} - £${quantiles[0].toLocaleString()}`;
+      document.getElementById('legend-year-rental-quantile1').textContent = `£${quantiles[0].toLocaleString()} - £${quantiles[1].toLocaleString()}`;
+      document.getElementById('legend-year-rental-quantile2').textContent = `£${quantiles[1].toLocaleString()} - £${quantiles[2].toLocaleString()}`;
+      document.getElementById('legend-year-rental-quantile3').textContent = `£${quantiles[2].toLocaleString()} - £${quantiles[3].toLocaleString()}`;
+      document.getElementById('legend-year-rental-quantile4').textContent = `£${quantiles[3].toLocaleString()} - £${quantiles[4].toLocaleString()}`;
+      document.getElementById('legend-year-rental-quantile5').textContent = `£${quantiles[4].toLocaleString()} - £${quantiles[5].toLocaleString()}`;
+      document.getElementById('legend-year-rental-highest').textContent = `£${quantiles[5].toLocaleString()} - £${prices[prices.length - 1].toLocaleString()}`;
+    }
+
+    function calculateQuantiles(prices, numQuantiles) {
+      if (prices.length < numQuantiles) {
+        console.warn(`Not enough data points (${prices.length}) for ${numQuantiles} quantiles.`);
+        return prices.length > 0 ? [prices[0], ...prices, prices[prices.length - 1]] : [];
+      }
+
+      prices.sort((a, b) => a - b);
+      let quantiles = [];
+
+      for (let i = 1; i < numQuantiles; i++) {
+        let index = Math.floor(i * prices.length / numQuantiles);
+        quantiles.push(prices[index]);
+      }
+
+      // 确保分位数数组完整
+      quantiles = [...new Set(quantiles)];
+
+      if (quantiles.length < numQuantiles - 1) {
+        console.warn("Quantiles set has too few unique values, adding min/max.");
+        if (!quantiles.includes(prices[0])) quantiles.unshift(prices[0]);
+        if (!quantiles.includes(prices[prices.length - 1])) quantiles.push(prices[prices.length - 1]);
+      }
+
+      quantiles.sort((a, b) => a - b);
+      return quantiles;
+    }
+  </script>
+  <!-- Bootstrap core JS-->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

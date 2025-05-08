@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Map 8</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.js"></script>
+  <script src="https://unpkg.com/@turf/turf/turf.min.js"></script>
+  <!-- kd-tree -->
+  <script src="https://unpkg.com/kd-tree-javascript@1.0.3/kdTree-min.js"></script>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <!-- geocoder -->
+  <script
+    src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.min.js"></script>
+  <link rel="stylesheet"
+    href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.css" type="text/css">
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- Core theme CSS (includes Bootstrap)-->
+  <!-- <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet"> -->
+  <link href="../css/styles.css" rel="stylesheet" />
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .container1 {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+    }
+
+    #map {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .legend {
+      padding: 10px 12px;
+      font: 16px Arial, Helvetica, sans-serif;
+      background: white;
+      background: rgba(255, 255, 255, 0.8);
+      line-height: 28px;
+      color: #555;
+      position: absolute;
+      bottom: 30px;
+      left: 10px;
+      z-index: 1;
+    }
+
+    .legend h4 {
+      text-align: left;
+      font-size: 18px;
+      margin: 6px 0px;
+      color: #777;
+    }
+
+    .legend span {
+      position: relative;
+      bottom: 3px;
+    }
+
+    .legend i {
+      width: 22px;
+      height: 22px;
+      float: left;
+      margin: 0 10px 0 0;
+      opacity: 0.7;
+    }
+
+    .map-overlay {
+      position: absolute;
+      width: 250px;
+      top: 0;
+      left: 0;
+      padding: 10px;
+    }
+
+    .info {
+      padding: 6px 8px;
+      /* font: 14px/16px sans-serif; */
+      background: white;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+      width: 250px;
+      top: 10px;
+      left: 10px;
+      margin-bottom: 20px;
+      z-index: 1;
+    }
+
+    /* Control the style of input box */
+    .mapboxgl-ctrl-geocoder {
+      width: 350px !important;
+      margin: 20px !important;
+      background-color: white !important;
+      border: 2px solid #f4623a !important;
+      box-shadow: 0 0 6px rgba(244, 98, 58, 0.4) !important;
+      border-radius: 8px !important;
+      z-index: 10 !important;
+      transition: box-shadow 0.2s, border 0.2s;
+    }
+
+    .mapboxgl-ctrl-geocoder input {
+      font-size: 16px !important;
+      font-weight: 500 !important;
+      color: #333 !important;
+      background-color: #fff !important;
+      border-radius: 6px !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .mapboxgl-ctrl-geocoder:hover,
+    .mapboxgl-ctrl-geocoder input:focus {
+      border: 2px solid #f4623a !important;
+      box-shadow: 0 0 14px rgba(244, 98, 58, 0.75) !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container1">
+    <div id="map"></div>
+    <div class="map-overlay">
+      <div class="info">
+        <div id="info">
+          <b>Two ways to search</b> <i class="bi bi-search"></i> <br />
+          <span class="badge text-bg-secondary me-1">1</span> Use the search box above<br />
+          <span class="badge text-bg-secondary me-1">2</span> Click the button below, then click the map<br />
+        </div>
+        <div style="margin-top: 20px;">
+          <b>Control Isochrone Map: </b>
+          <button id="Isoch_click" class="btn btn-primary btn-sm mt-2">Click to display Isochrone Map</button> <br><br>
+          <button id="Isoch_remove" class="btn btn-danger btn-sm">Remove current Isochrone Map</button> <br><br>
+        </div>
+      </div>
+
+      <p style="margin-left: 10px;">
+        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample"
+          aria-expanded="false" aria-controls="collapseWidthExample">
+          Check Source
+        </button>
+      </p>
+      <div style="min-height: 120px; margin-left: 10px;">
+        <div class="collapse collapse-horizontal" id="collapseWidthExample">
+          <div class="card card-body" style="width: 250px; font-size: 16px; line-height: 1.6;">
+            <div>
+              <strong>UK Travel Area Isochrones: </strong>
+              <a href="https://geoportal.statistics.gov.uk/search?collection=Dataset&q=UK%20Travel%20Area%20Isochrones" target="_blank">
+                ONS
+              </a>
+            </div>
+            <div>
+              <strong>Reference project: </strong>
+              <a href="https://github.com/pbarber/uk-isochrones-map" target="_blank">
+                pbarber
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          <i class="bi bi-bell-fill text-primary me-2"></i> <!-- Bootstrap 官方铃铛图标 -->
+          <strong class="me-auto">Notification</strong>
+          <small id="toastTime"></small> <!-- 这里会填充时间 -->
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          Welcome to use Isochrone Map! <br> Click legend to filter!
+        </div>
+      </div>
+    </div>
+
+
+    <div class="legend" id="legend">
+      <h4>Area accessible in:</h4>
+      <b>click to filter</b><br>
+      <i onclick="legendClicked(this, 15)" style="background: rgb(254, 203, 28);"></i><span
+        onclick="legendClicked(this, 15)">15 minutes</span><br>
+      <i onclick="legendClicked(this, 30)" style="background: rgb(253, 105, 12);"></i><span
+        onclick="legendClicked(this, 30)">30 minutes</span><br>
+      <i onclick="legendClicked(this, 45)" style="background: rgb(191, 0, 23);"></i><span
+        onclick="legendClicked(this, 45)">45 minutes</span><br>
+      <i onclick="legendClicked(this, 60)" style="background: rgb(85, 0, 77);"></i><span
+        onclick="legendClicked(this, 60)">60 minutes</span><br>
+    </div>
+  </div>
+
+  <script>
+    let geojson = null;
+    let areas = null;
+    let searchTree = null;
+    let customData = null;
+    let hoveredFeatureId = null;
+    let price = null;
+    let coordinates = null;
+    let searchMarker;
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoieXV1eSIsImEiOiJjbTV6Nm9oMTgwMTZoMmpzZHNreGVrc3VsIn0.ohpsCdG3ASwD2ViFYw4e9g';
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/light-v9',
+      center: [-0.132231, 51.524821],
+      zoom: 10
+    });
+
+    map.on('load', () => {
+
+    })
+
+    //#region isochrone 
+
+    const opacity = 150;
+    const colours = { 15: "rgb(254, 203, 28)", 30: "rgb(253, 105, 12)", 45: "rgb(191, 0, 23)", 60: "rgb(85, 0, 77)" };
+    const opacities = { 15: (opacity / 255.0), 30: (opacity / 255.0), 45: (opacity / 255.0), 60: (opacity / 255.0) };
+
+    function isochroneGetColor(d) {
+      return colours[d];
+    }
+
+    function isochroneGetOpacity(d) {
+      return opacities[d];
+    }
+
+    function isochroneStyle(feature) {
+      return {
+        'fill-color': isochroneGetColor(feature.properties['Travel Minutes']),
+        'fill-opacity': isochroneGetOpacity(feature.properties['Travel Minutes']),
+        'fill-outline-color': '#000'
+      };
+    }
+
+    function legendClicked(element, num) {
+      if (geojson) {
+        const is = document.querySelectorAll('.legend i');
+        for (let n = 0; n <= 3; n++) {
+          let mins = (n + 1) * 15;
+          //如果是，则将对应时间段的透明度设置为 opacity / 255.0，并将图例项的透明度设置为 1
+          if (mins <= num) {
+            opacities[mins] = (opacity / 255.0);
+            is[n].style.opacity = 1;
+          } else {
+            opacities[mins] = 0;
+            is[n].style.opacity = 0.2;
+          }
+        }
+        geojson.features.forEach(feature => {
+          const layerId = `isochrone-${feature.properties['Travel Minutes']}`;
+          if (map.getLayer(layerId)) {
+            // 更新该图层的填充透明度。
+            map.setPaintProperty(layerId, 'fill-opacity', isochroneGetOpacity(feature.properties['Travel Minutes']));
+          }
+        });
+      }
+    }
+
+    function loadJson(url, callback) {
+      return fetch(url) // 发起一个网络请求，获取指定 URL 的数据
+        .then(response => response.json()) // 将响应解析为 JSON 对象
+        .then(data => callback(data)) // 将解析后的 JSON 数据传递给回调函数
+        .catch(error => console.error('Error loading JSON:', error)); // 如果请求失败，输出错误信息
+    }
+
+    function distance(a, b) {
+      return turf.distance(turf.point([a.lng, a.lat]), turf.point([b.lng, b.lat]));
+    }
+
+    window.onload = function () {
+      loadJson('https://ni-travel-isochrones.s3.eu-west-2.amazonaws.com/all-area-centres.geojson', function (data) {
+        areas = turf.featureCollection(data.features);
+        //kdTree 是一种用于多维空间中快速搜索的树形数据结构。在这里，它用于地理空间搜索。
+        searchTree = new kdTree(data.features.map(feature => ({
+          lat: feature.geometry.coordinates[1],
+          lng: feature.geometry.coordinates[0],
+          areaname: feature.properties.areaname
+        })), distance, ["lat", "lng"]);
+
+        const searchParam = new URLSearchParams(location.search).get('sa');
+        if (searchParam) {
+          const feature = data.features.find(f => f.properties.areaname === searchParam);
+          if (feature) {
+            updateInfo([], searchParam);
+            displayIsochrone(searchParam);
+          }
+        }
+      });
+    };
+
+    function displayIsochrone(sa) {
+      loadJson(`https://ni-travel-isochrones.s3.eu-west-2.amazonaws.com/${sa}.geojson`, function (out) {
+        console.log(out);
+        out.features.sort((a, b) => b.properties['Travel Minutes'] - a.properties['Travel Minutes']);
+        if (geojson) {
+          out.features.forEach(feature => {
+            const layerId = `isochrone-${feature.properties['Travel Minutes']}`;
+            if (map.getLayer(layerId)) {
+              map.removeLayer(layerId);
+            }
+          });
+          if (map.getSource('isochrones')) {
+            map.removeSource('isochrones');
+          }
+        }
+        geojson = out;
+        map.addSource('isochrones', { type: 'geojson', data: out });
+        out.features.forEach(feature => {
+          map.addLayer({
+            id: `isochrone-${feature.properties['Travel Minutes']}`,
+            type: 'fill',
+            source: 'isochrones',
+            paint: isochroneStyle(feature),
+            filter: ['==', ['get', 'Travel Minutes'], feature.properties['Travel Minutes']]
+          });
+        });
+      });
+    }
+
+    const info = document.getElementById('info');
+
+    function updateInfo(address, sa) {
+      const url = `${location.protocol}//${location.host}${location.pathname}?sa=${sa ? sa : ''}`;
+      info.innerHTML = (
+        (address.length > 0 ? `<b>${address[0].trim()}</b></br>` : '<b>Two ways to search</b> <i class="bi bi-search"></i> <br/><span class="badge text-bg-secondary me-1">1</span> Use the search box above<br /><span class="badge text-bg-secondary me-1">2</span> Click the button below, then click the map<br />') +
+        (address.length > 1 ? `${address[1].trim()}<br />` : '') +
+        (address.length > 2 ? `${address[2].trim()}<br />` : '') +
+        (address.length > 3 ? `${address[3].trim()}<br />` : '') +
+        (address.length > 4 ? `${address[4].trim()}<br />` : '')
+      )
+    }
+
+
+
+
+    // 处理搜索结果
+    function handleSearchResult(lon, lat, placeName) {
+      if (isNaN(lon) || isNaN(lat)) {
+        console.error("Invalid coordinates:", lon, lat);
+        return;
+      }
+      // 构造搜索点
+      const search = { lng: lon, lat: lat };
+      const found = searchTree.nearest(search, 1, 20000);
+      if (found && found.length > 0) {
+        const sa = found[0][0].areaname;
+        console.log("Found:", sa);
+        updateInfo(placeName.split(','), sa);
+        displayIsochrone(sa);
+      }
+    }
+
+    //#endregion
+
+    //#region geocoder and controls
+    const geocoder = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      placeholder: 'Enter a postcode (recommended)',
+      mapboxgl: mapboxgl,
+      // types: 'address,postcode,place,neighborhood,locality,poi',
+      language: 'en',
+      marker: false,
+      bbox: [-9.0, 49.75, 2.01, 61.01], // 限制搜索范围（英国）
+    });
+    map.addControl(geocoder, 'top-right');
+    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    map.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+
+    geocoder.on('result', function (e) {
+      const lon = e.result.center[0];
+      const lat = e.result.center[1];
+      const placeName = e.result.place_name;
+      console.log(e, lon, lat, placeName);
+
+      if (searchMarker) {
+        searchMarker.remove();
+      }
+
+      searchMarker = new mapboxgl.Marker({ color: '#f4623a' }) 
+        .setLngLat([lon, lat])
+        .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(placeName))
+        .addTo(map);
+
+      handleSearchResult(lon, lat, placeName);
+    });
+    //#endregion
+
+    document.getElementById('Isoch_click').addEventListener('click', () => {
+      map.once('click', function (e) {
+        const search = { lng: e.lngLat.lng, lat: e.lngLat.lat };
+        const found = searchTree.nearest(search, 1, 20000);
+        if (found && found.length > 0) {
+          const sa = found[0][0].areaname;
+          console.log("Found:", sa);
+          updateInfo([`Location: ${e.lngLat.lng.toFixed(4)}, ${e.lngLat.lat.toFixed(4)}`], sa);
+          displayIsochrone(sa);
+        }
+      });
+    });
+
+    document.getElementById('Isoch_remove').addEventListener('click', () => {
+      if (geojson) {
+        geojson.features.forEach(feature => {
+          const layerId = `isochrone-${feature.properties['Travel Minutes']}`;
+          if (map.getLayer(layerId)) {
+            map.removeLayer(layerId);
+          }
+        });
+        if (map.getSource('isochrones')) {
+          map.removeSource('isochrones');
+        }
+        geojson = null;
+      }
+      updateInfo('', '')
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const toastLiveExample = document.getElementById('liveToast');
+      const toastTime = document.getElementById("toastTime");
+
+      // 获取当前时间并格式化
+      const now = new Date();
+      const options = { year: "numeric", month: "long", day: "numeric", hour: "2-digit" };
+      toastTime.innerText = now.toLocaleDateString("en-US", options);
+
+      const toast = new bootstrap.Toast(toastLiveExample, {
+        autohide: false // 禁用自动隐藏
+      });
+      toast.show(); // 页面加载时自动显示
+    });
+
+  </script>
+
+  <!-- Bootstrap core JS-->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

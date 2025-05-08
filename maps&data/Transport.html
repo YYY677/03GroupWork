@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Map7</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.9.3/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.9.3/mapbox-gl.js"></script>
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- Core theme CSS (includes Bootstrap)-->
+  <!-- <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet"> -->
+  <link href="../css/styles.css" rel="stylesheet" />
+
+  <!-- geocoder -->
+  <script
+    src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.min.js"></script>
+  <link rel="stylesheet"
+    href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.css" type="text/css">
+
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .container1 {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+    }
+
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .map-overlay {
+      font:
+        12px/20px 'Helvetica Neue',
+        Arial,
+        Helvetica,
+        sans-serif;
+      position: absolute;
+      width: 200px;
+      top: 0;
+      left: 0;
+      padding: 10px;
+    }
+
+    .map-overlay .map-overlay-inner {
+      background-color: #fff;
+      box-shadow: #9da3aa 0px 0px 10px;
+      padding: 10px;
+      margin-bottom: 3vh;
+      border-radius: 10%;
+      background-color: rgba(255, 255, 255, 0.9);
+    }
+
+    .map-overlay-inner fieldset {
+      display: block;
+      justify-content: space-between;
+      border: none;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .map-overlay-inner label {
+      font-weight: bold;
+      margin-right: 10px;
+      color: #333;
+      font-size: 14px;
+      margin: 0.5vh 0;
+    }
+
+    .map-overlay-inner .select-fieldset select {
+      height: 3vh;
+      width: 100%;
+    }
+
+    .card .card-text:hover {
+      background-color: rgba(200, 200, 200, 0.8);
+      border-radius: 5px;
+    }
+
+    #legend {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+      border-radius: 8px;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      z-index: 1;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      font-size: 14px;
+    }
+
+    .legend-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .select-all-btn {
+      padding: 6px 10px;
+      font-size: 14px;
+      background-color: #007BFF;
+      opacity: 0.9;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .select-all-btn:hover {
+      opacity: 1;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .legend-color {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+      border-radius: 4px;
+    }
+
+    .legend-item input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(1);
+    }
+
+    .mapboxgl-popup {
+      max-width: 300px;
+      font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    }
+
+    .mapboxgl-popup-content {
+      padding: 4px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      box-shadow: cadetblue 0px 0px 10px;
+    }
+
+    .mapboxgl-popup-close-button {
+      font-size: 16px;
+      color: #333;
+      top: 5px;
+      right: 5px;
+    }
+
+    /* Control the style of input box */
+    .mapboxgl-ctrl-geocoder {
+      width: 350px !important;
+      margin: 20px !important;
+      background-color: white !important;
+      border: 2px solid #f4623a !important;
+      box-shadow: 0 0 6px rgba(244, 98, 58, 0.4) !important;
+      border-radius: 8px !important;
+      z-index: 10 !important;
+      transition: box-shadow 0.2s, border 0.2s;
+    }
+
+    .mapboxgl-ctrl-geocoder input {
+      font-size: 16px !important;
+      font-weight: 500 !important;
+      color: #333 !important;
+      background-color: #fff !important;
+      border-radius: 6px !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .mapboxgl-ctrl-geocoder:hover,
+    .mapboxgl-ctrl-geocoder input:focus {
+      border: 2px solid #f4623a !important;
+      box-shadow: 0 0 14px rgba(244, 98, 58, 0.75) !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container1">
+    <div id="map"></div>
+    <div class="map-overlay top">
+      <div class="map-overlay-inner">
+        <fieldset class="select-fieldset">
+          <label>Select light preset</label>
+          <select id="lightPreset" name="lightPreset">
+            <!-- Each value matches a light preset -->
+            <option value="dawn">Dawn</option>
+            <option value="day" selected>Day</option>
+            <option value="dusk">Dusk</option>
+            <option value="night">Night</option>
+          </select>
+        </fieldset>
+        <table>
+          <tr>
+            <td>
+              <input type="checkbox" id="toggle-underground" checked>
+              <label for="toggle-underground">Trains</label>
+              <div class="spinner-grow spinner-grow-sm" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="toggle-bus">
+              <label for="toggle-bus">Bus</label>
+              <div class="spinner-grow spinner-grow-sm" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="toggle-cycle">
+              <label for="toggle-cycle">Cycle</label>
+              <div class="spinner-grow spinner-grow-sm" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="card border-dark mb-3" style="max-width: 18rem;">
+        <div class="card-header fs-6">Hints <i class="bi bi-emoji-sunglasses"></i></div>
+        <div class="card-body px-2">
+          <p class="card-text fw-bold tube_notif">Hover to see each train line and station.</p>
+          <p class="card-text fw-bold tube_notif">Hover effect on lines is disabled near stations.</p>
+          <p class="card-text fw-bold tube_notif">Use legend to filter trains.</p>
+          <p class="card-text fw-bold bus_notif" style="display: none;">Hover to see each bus lane.</p>
+          <p class="card-text fw-bold bus_notif" style="display: none;">Zoom in to see bus stops</p>
+          <p class="card-text fw-bold bus_notif" style="display: none;">Click bus stop for detail.</p>
+          <p class="card-text fw-bold cycle_notif" style="display: none;">Hover to see each cycle lane.</p>
+        </div>
+      </div>
+      <p>
+        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample"
+          aria-expanded="false" aria-controls="collapseWidthExample">
+          Check Source
+        </button>
+      </p>
+      <div style="min-height: 120px;">
+        <div class="collapse collapse-horizontal" id="collapseWidthExample">
+          <div class="card card-body" style="width: 320px; font-size: 16px; line-height: 1.6;">
+            <div>
+              <strong>Trains Data: </strong>
+              <a href="https://github.com/oobrien/vis/tree/master/tubecreature/data" target="_blank">
+                Oliver O'Brien
+              </a>
+            </div>
+            <div>
+              <strong>Bus and Cycle Data: </strong>
+              <a href="https://gis-tfl.opendata.arcgis.com/" target="_blank">
+                TfL Open Data
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="legend">
+      <div class="legend-header">
+        <button id="select-all" class="select-all-btn">Deselect All</button>
+      </div>
+      <!-- 地铁线路勾选框将由 JavaScript 动态创建 -->
+    </div>
+  </div>
+
+  <script>
+    // Declare variables
+    let coordinates = null;
+    // Legend
+    const legend = document.getElementById('legend');
+    const selectAllButton = document.getElementById('select-all');
+    const lineIDs = ['Bakerloo', 'Central', 'Circle', 'District', 'HammCity', 'Jubilee', 'Metropol', 'Northern', 'Piccadilly', 'Victoria', 'WaterlooCity', 'Tramlink', 'DLR', 'Elizabeth', 'Overground'];
+    let hoveredFeatureId = null;  // 记录当前高亮的 feature ID
+    let searchMarker;
+
+    // 存储当前选中的线路
+    const selectedLines = new Set(lineIDs);  // 初始全选
+
+    //#region 地图初始化
+    mapboxgl.accessToken = 'pk.eyJ1IjoieXV1eSIsImEiOiJjbTV6Nm9oMTgwMTZoMmpzZHNreGVrc3VsIn0.ohpsCdG3ASwD2ViFYw4e9g';
+    const map = new mapboxgl.Map({
+      container: 'map',
+      center: [-0.134039, 51.524514],
+      zoom: 10,
+      // bearing: 53, //设置地图的旋转角度
+      style: 'mapbox://styles/yuuy/cm683gzb700ab01s229c20ar5',
+      minZoom: 9,
+      maxZoom: 17,
+
+      // cooperativeGestures: true //地图需要ctrl+scroll来缩放
+    });
+    //#endregion
+
+    //#region controls
+    const geocoder = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      placeholder: 'Enter a postcode (recommended)',
+      mapboxgl: mapboxgl,
+      marker: false,
+      language: 'en',
+      bbox: [-9.0, 49.75, 2.01, 61.01], // 限制搜索范围（英国）
+    });
+
+    geocoder.on('result', function (e) {
+      const lon = e.result.center[0];
+      const lat = e.result.center[1];
+      const placeName = e.result.place_name;
+      if (searchMarker) {
+        searchMarker.remove();
+      }
+      searchMarker = new mapboxgl.Marker({ color: '#f4623a' })
+        .setLngLat([lon, lat])
+        .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(placeName))
+        .addTo(map);
+    });
+    map.addControl(geocoder, 'top-right');
+    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+    //#endregion
+
+    //#region 选择不同的主题
+    document
+      .getElementById('lightPreset')
+      .addEventListener('change', function () {
+        map.setConfigProperty('basemap', 'lightPreset', this.value);
+      });
+    //#endregion
+
+
+    map.on('load', () => {
+      //#region 地铁及其站点
+      // 地铁样式和数据来自mapbox studio云仓库
+      // 监听地铁线路的 hover 交互
+      lineIDs.forEach(line => {
+        
+        map.setLayoutProperty(line, 'visibility', 'visible');
+
+        const layerID = line; // 每条线路的图层 ID
+        map.on('mouseenter', layerID, (e) => {
+          // 查询鼠标附近是否有地铁站点，如果有，则不触发地铁线的交互
+          const features = map.queryRenderedFeatures([[e.point.x - 4, e.point.y - 4], [e.point.x + 4, e.point.y + 4]], { layers: ['stations2'] }); //'TubeEntryExit', 
+          if (features.length > 0) return;
+
+          map.getCanvas().style.cursor = 'pointer';
+          map.setPaintProperty(layerID, 'line-width', ['interpolate', ['linear'], ['zoom'], 10, 4, 15, 6]); // 鼠标悬停时加粗
+
+          // 显示 Tooltip
+          coordinates = e.lngLat;
+          const lineName = `${layerID} line`;
+
+          const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
+            .setLngLat(coordinates)
+            .setHTML(`<strong>${lineName}</strong>`)
+            .addTo(map);
+        });
+        map.on('mouseleave', layerID, () => {
+          map.setPaintProperty(layerID, 'line-width', ['interpolate', ['linear'], ['zoom'], 10, 2, 15, 4]);
+          map.getCanvas().style.cursor = 'default';
+          //rempve all popups
+          document.querySelectorAll('.mapboxgl-popup').forEach(popup => popup.remove());
+        })
+      });
+
+      // 添加 TfL 地铁站点，仅渲染 'London Overground' 列为 1 的点
+      map.addSource('stations2', {
+        type: 'geojson',
+        data: './data/transport/london_stations2.geojson'
+      });
+
+      map.addLayer({
+        id: 'stations2',
+        type: 'circle',
+        source: 'stations2',
+        paint: {
+          'circle-color': '#fffef7',
+          'circle-opacity': 0.95,
+          'circle-stroke-width': { stops: [[8, 0.5], [16, 2]] },
+          'circle-stroke-color': '#000',
+          'circle-radius': [
+            'interpolate', ['linear'], ['zoom'],
+            10, 2, // zoom 10 时，半径为 2
+            15, 6  // zoom 15 时，半径为 6
+          ]
+        },
+        filter: ['any', ...lineIDs.map(line => ['==', ['get', line], 1])] // 渲染 lineIDs 任意字段为 1 的点
+      });
+
+      // 监听 stations2 站点 hover 交互
+      map.on('mouseenter', 'stations2', (e) => {
+        map.getCanvas().style.cursor = 'pointer';
+
+        coordinates = e.features[0].geometry.coordinates.slice();
+        const name = e.features[0].properties.name;
+
+        const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
+          .setLngLat(coordinates)
+          .setHTML(`<b>${name} Station</b>`)
+          .addTo(map);
+      });
+
+      map.on('mouseleave', 'stations2', () => {
+        map.getCanvas().style.cursor = '';
+        // 移除所有弹窗
+        document.querySelectorAll('.mapboxgl-popup').forEach(popup => popup.remove());
+      });
+
+      // 图例
+      const selectedLinesColor = {
+        'Victoria': '#0098D4',
+        'Piccadilly': '#003688',
+        'Northern': '#000000',
+        'Metropol': '#9B0056',
+        'Jubilee': '#868F98',
+        'HammCity': '#D799AF',
+        'District': '#00782A',
+        'Circle': '#FFD300',
+        'Central': '#DC241F',
+        'Bakerloo': '#B36305',
+        'WaterlooCity': '#4eb7b5',
+        'Tramlink': '#5dcb2a',
+        'DLR': '#70c2db',
+        'Elizabeth': '#bd7dca',
+        'Overground': '#d19561'
+      };
+
+      // 添加图例具体内容
+      lineIDs.forEach(line => {
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+
+        const colorBox = document.createElement('span');
+        colorBox.className = 'legend-color';
+        colorBox.style.backgroundColor = selectedLinesColor[line];
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'line-checkbox';
+        checkbox.checked = true; // 默认全选
+
+        checkbox.addEventListener('change', (e) => {
+          const visible = e.target.checked;
+          // 设置线路线图层可见性
+          map.setLayoutProperty(line, 'visibility', visible ? 'visible' : 'none');
+
+          // 更新当前选中线路集合
+          if (visible) {
+            selectedLines.add(line);
+          } else {
+            selectedLines.delete(line);
+          }
+
+          // ✅ 如果还有至少一个线路被选中，就让站点图层可见
+          const stationVisible = selectedLines.size > 0;
+          map.setLayoutProperty('stations2', 'visibility', stationVisible ? 'visible' : 'none');
+
+          // 更新站点图层的 filter
+          const newFilter = ['any', ...Array.from(selectedLines).map(line => ['==', ['get', line], 1])];
+          map.setFilter('stations2', newFilter);  //
+
+          // 可选：更新 Select All 按钮状态
+          if (selectedLines.size !== lineIDs.length) {
+            selectAllButton.textContent = 'Select All';
+          } else {
+            selectAllButton.textContent = 'Deselect All';
+          }
+        });
+
+        const text = document.createElement('span');
+        text.textContent = line;
+
+        item.appendChild(checkbox);
+        item.appendChild(colorBox);
+        item.appendChild(text);
+        legend.appendChild(item);
+      });
+
+      // 添加全选/全不选功能
+      selectAllButton.addEventListener('click', () => {
+        const allChecked = Array.from(document.querySelectorAll('.line-checkbox'))
+          .every(checkbox => checkbox.checked);
+
+        // 反转所有勾选框的状态
+        const checkboxes = document.querySelectorAll('.line-checkbox');
+        checkboxes.forEach(checkbox => checkbox.checked = !allChecked);
+
+        if (allChecked) {
+          selectAllButton.textContent = 'Select All';
+        } else {
+          selectAllButton.textContent = 'Deselect All';
+        }
+
+        // 更新地图图层显示状态
+        lineIDs.forEach(line => {
+          const visible = !allChecked;
+          map.setLayoutProperty(line, 'visibility', visible ? 'visible' : 'none');
+        });
+
+        map.setLayoutProperty('stations2', 'visibility', !allChecked ? 'visible' : 'none');
+
+        selectedLines.clear();
+        if (!allChecked) {
+          lineIDs.forEach(line => selectedLines.add(line));
+        }
+
+        const newFilter = ['any', ...Array.from(selectedLines).map(line => ['==', ['get', line], 1])];
+        map.setFilter('stations2', newFilter);
+      });
+
+      //#endregion
+
+      //#region cycle line
+      map.addSource('cycle', {
+        type: 'geojson',
+        data: './data/transport/Cycle_Routes.geojson',
+        generateId: true // 为每个 feature 生成唯一的 ID
+      });
+
+      map.addLayer({
+        id: 'cycle',
+        type: 'line',
+        source: 'cycle',
+        layout: {
+          'visibility': 'none'
+        },
+        paint: {
+          'line-color': '#FF0000',
+          'line-width': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false], // 检查 hover 状态
+            4,  // 高亮时加粗
+            2   // 默认宽度
+          ]
+        }
+      });
+
+      // 鼠标悬停时
+      map.on('mouseenter', 'cycle', (e) => {
+        if (!e.features) return;
+
+        map.getCanvas().style.cursor = 'pointer';
+        const feature = e.features[0];
+        const featureId = feature.id;
+
+        if (hoveredFeatureId !== null) {
+          // 先清除之前的高亮状态
+          map.setFeatureState({ source: 'cycle', id: hoveredFeatureId }, { hover: false });
+        }
+
+        hoveredFeatureId = featureId; // 记录当前高亮的 feature
+
+        map.setFeatureState({ source: 'cycle', id: featureId }, { hover: true });
+
+        // 显示弹窗
+        new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
+          .setLngLat(e.lngLat)
+          .setHTML(`<b>${feature.properties.ROUTE}<br>Length: ${feature.properties.ROUTE_LENGTH_KM} km</p>`)
+          .addTo(map);
+      });
+
+      // 鼠标离开 map 时，确保清除高亮
+      map.on('mouseleave', 'cycle', () => {
+        if (hoveredFeatureId !== null) {
+          map.setFeatureState({ source: 'cycle', id: hoveredFeatureId }, { hover: false });
+          hoveredFeatureId = null;
+        }
+        document.querySelectorAll('.mapboxgl-popup').forEach(popup => popup.remove());
+        map.getCanvas().style.cursor = '';
+      });
+
+      //#endregion
+
+      //#region bus line
+      map.addSource('bus', {
+        type: 'geojson',
+        data: './data/transport/Bus_Routes.geojson',
+        generateId: true
+      });
+      map.addLayer({
+        id: 'bus',
+        type: 'line',
+        source: 'bus',
+        layout: {
+          'visibility': 'none'
+        },
+        paint: {
+          'line-color': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false],
+            '#0000FF', // 深蓝色
+            '#ADD8E6'  // 浅蓝色
+          ],
+          'line-width': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false],
+            4,
+            2
+          ]
+        }
+      });
+      map.on('mouseenter', 'bus', (e) => {
+        if (!e.features) return;
+
+        map.getCanvas().style.cursor = 'pointer';
+        coordinates = e.lngLat;
+        const route = e.features[0].properties.ROUTE;
+        const length = e.features[0].properties.RUN_LENGTH;
+        const direction = e.features[0].properties.DIRECTION;
+        const featureId = e.features[0].id;
+
+        // 高亮当前 feature
+        hoveredFeatureId = featureId;
+        map.setFeatureState({ source: 'bus', id: hoveredFeatureId }, { hover: true });
+
+        new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
+          .setLngLat(coordinates)
+          .setHTML(`<b>Bus line: ${route}</b><p>Length: ${length} km <br> Direction: ${direction}</p>`)
+          .addTo(map);
+      })
+      map.on('mouseleave', 'bus', () => {
+        map.getCanvas().style.cursor = '';
+        document.querySelectorAll('.mapboxgl-popup').forEach(popup => popup.remove());
+
+        if (hoveredFeatureId !== null) {
+          map.setFeatureState({ source: 'bus', id: hoveredFeatureId }, { hover: false });
+          hoveredFeatureId = null;
+        }
+      })
+
+      // bus stops
+      map.addSource('bus-stops', {
+        type: 'geojson',
+        data: './data/transport/Bus_Stops.geojson'
+      });
+      map.addLayer({
+        id: 'bus-stops',
+        type: 'circle',
+        source: 'bus-stops',
+        layout: {
+          'visibility': 'none'
+        },
+        paint: {
+          'circle-color': '#000',
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            11, 0,
+            12, 2,
+            16, 7
+          ]
+        }
+      })
+      map.on('mouseenter', 'bus-stops', () => {
+        map.getCanvas().style.cursor = 'pointer';
+      })
+      map.on('mouseleave', 'bus-stops', () => {
+        map.getCanvas().style.cursor = '';
+      })
+      map.on('click', 'bus-stops', (e) => {
+        if (!e.features) return;
+        coordinates = e.features[0].geometry.coordinates.slice()
+        const stop_name = e.features[0].properties.STOP_NAME;
+        new mapboxgl.Popup({ closeButton: true, closeOnClick: true })
+          .setLngLat(coordinates)
+          .setHTML(`Stop Name:<b><p>${stop_name}</p></b>`)
+          .addTo(map);
+      })
+      //#endregion
+    });
+
+    //#region 图层控制面板
+    document.getElementById('toggle-underground').addEventListener('change', (e) => {
+      const visible = e.target.checked;
+      // 设置地铁线路图层可见性
+      lineIDs.forEach((line) => {
+        map.setLayoutProperty(line, 'visibility', visible ? 'visible' : 'none');
+      });
+      // 设置图例勾选框状态
+      document.querySelectorAll('.line-checkbox').forEach(checkbox => checkbox.checked = visible);
+      selectAllButton.textContent = visible ? 'Deselect All' : 'Select All';
+      // 设置站点图层可见性
+      map.setLayoutProperty('stations2', 'visibility', visible ? 'visible' : 'none');
+      // 设置图例和通知栏显示状态
+      document.getElementById('legend').style.display = visible ? 'block' : 'none';
+      document.querySelectorAll('.tube_notif').forEach(notif => notif.style.display = visible ? 'block' : 'none');
+      // ✅ 更新 selectedLines
+      selectedLines.clear();
+      if (visible) {
+        lineIDs.forEach(line => selectedLines.add(line));
+      }
+      // ✅ 更新 filter（防止站点显示错误）
+      const newFilter = ['any', ...Array.from(selectedLines).map(line => ['==', ['get', line], 1])];
+      map.setFilter('stations2', newFilter);
+    });
+    document.getElementById('toggle-bus').addEventListener('change', (e) => {
+      map.setLayoutProperty('bus', 'visibility', e.target.checked ? 'visible' : 'none')
+      map.setLayoutProperty('bus-stops', 'visibility', e.target.checked ? 'visible' : 'none')
+      document.querySelectorAll('.bus_notif').forEach(notif => notif.style.display = e.target.checked ? 'block' : 'none')
+    })
+    document.getElementById('toggle-cycle').addEventListener('change', (e) => {
+      map.setLayoutProperty('cycle', 'visibility', e.target.checked ? 'visible' : 'none')
+      document.querySelectorAll('.cycle_notif').forEach(notif => notif.style.display = e.target.checked ? 'block' : 'none')
+    })
+    //#endregion
+
+  </script>
+  <!-- Bootstrap core JS-->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

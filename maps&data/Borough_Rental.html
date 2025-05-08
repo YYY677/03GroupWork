@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rental Prices Visualization</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+  <style>
+
+    /* 控制区域容器 */
+    .controls {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    /* 下拉框标签 */
+    label[for="boroughSelect"] {
+      font-size: 18px;
+      font-weight: bold;
+      margin-right: 10px;
+      color: #333;
+    }
+    /* 下拉选择框 */
+    #boroughSelect {
+      padding: 8px 12px;
+      font-size: 16px;
+      border: 3px solid #ccc;
+      border-radius: 4px;
+      background: #fff;
+      color: #333;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    #boroughSelect:hover, #boroughSelect:focus {
+      border-color: #007acc ;
+    }
+    /* 图表容器居中 */
+    #main {
+      width: 600px;
+      height: 400px;
+      margin: 0 auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <label for="boroughSelect">Select Borough:</label>
+    <select id="boroughSelect"></select>
+  </div>
+  <div id="main"></div>
+
+  <script>
+    let chartDom = document.getElementById('main');
+    let myChart = echarts.init(chartDom);
+    let boroughSelect = document.getElementById('boroughSelect');
+    let geoData = null;
+
+    // 读取 GeoJSON 数据
+    fetch('./data/housing/boroughs_rent.geojson')
+      .then(response => response.json())
+      .then(data => {
+        geoData = data;
+
+        // 获取所有 Borough 的唯一名称
+        let boroughs = [...new Set(data.features.map(f => f.properties.NAME))];
+
+        // 填充下拉框
+        boroughs.forEach(borough => {
+          let option = document.createElement('option');
+          option.value = borough;
+          option.textContent = borough;
+          boroughSelect.appendChild(option);
+        });
+
+        // 默认选择第一个 Borough
+        updateChart(boroughs[0]);
+
+        // 监听选择变化，更新图表
+        boroughSelect.addEventListener('change', function () {
+          updateChart(this.value);
+        });
+      })
+      .catch(error => console.error('Error loading GeoJSON:', error));
+
+    function updateChart(boroughName) {
+      if (!geoData) return;
+
+      let filteredData = geoData.features.filter(f => f.properties.NAME === boroughName);
+
+      // 按年份排序
+      filteredData.sort((a, b) => a.properties.Year - b.properties.Year);
+
+      // 生成 ECharts 需要的数据格式
+      let years = filteredData.map(f => f.properties.Year);
+      let rentalPrice = filteredData.map(f => f.properties["Rental price"]);
+      let rentalOneBed = filteredData.map(f => f.properties["Rental price one bed"]);
+      let rentalTwoBed = filteredData.map(f => f.properties["Rental price two bed"]);
+      let rentalThreeBed = filteredData.map(f => f.properties["Rental price three bed"]);
+      let rentalFourBed = filteredData.map(f => f.properties["Rental price four or more bed"]);
+
+      let option = {
+        title: {
+          text: `Monthly Rental Prices in ${boroughName} (2015-2025)`,
+          left: 'center'
+        },
+        tooltip: { trigger: 'axis' },
+        legend: { bottom: 0, data: ['Overall', 'One Bed', 'Two Bed', 'Three Bed', 'Four or More Bed'] },
+        xAxis: { type: 'category', data: years },
+        yAxis: { type: 'value', name: 'Price (£)' },
+        series: [
+          { name: 'Overall', type: 'line', data: rentalPrice, smooth: true },
+          { name: 'One Bed', type: 'line', data: rentalOneBed, smooth: true },
+          { name: 'Two Bed', type: 'line', data: rentalTwoBed, smooth: true },
+          { name: 'Three Bed', type: 'line', data: rentalThreeBed, smooth: true },
+          { name: 'Four or More Bed', type: 'line', data: rentalFourBed, smooth: true }
+        ]
+      };
+      myChart.setOption(option);
+    }
+
+    window.addEventListener('resize', function () {
+      myChart.resize();
+    });
+  </script>
+</body>
+</html>
