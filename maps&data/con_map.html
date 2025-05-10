@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ConvenienceMap</title>
+
+  <!-- Mapbox GL 样式与脚本 -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.js"></script>
+
+  <!-- Geocoder 插件 -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.min.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.css" rel="stylesheet">
+
+  <!-- Turf.js 用于空间计算 -->
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+
+  <!-- 全局样式文件 -->
+  <link rel="stylesheet" href="../css/styles.css" />
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+
+  <!-- 地图核心逻辑 -->
+  <script src="../js/con_map.js"></script>
+</body>
+</html>
