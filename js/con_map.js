@@ -29,10 +29,10 @@ loadLondonBoundary();
 
 // 3. 定义 POI 类型映射与颜色
 const categoryColors = {
-  shop: '#44a5f0',
-  food: '#f4a582'  ,
-  health: '#b2182b'  ,
-  leisure:'#d1e5f0'
+  shop: 'rgba(21, 101, 192, 0.8)',
+  food: 'rgba(247, 152, 114, 0.8)'  ,
+  health: 'rgba(217, 75, 58, 0.8)'  ,
+  leisure:'rgba(147, 185, 217, 0.8)'
 };
 
 const poiTypes = {
