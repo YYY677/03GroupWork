@@ -1,4 +1,4 @@
-// Mapbox 初始化
+// 1. Mapbox 初始化
 mapboxgl.accessToken = 'pk.eyJ1IjoiY2h0MTk5OCIsImEiOiJjbTZzMHR3a2UwMmU4Mmpxdm9vbm8zdDBsIn0.sS9cb0C04bji7VbyKL6Bzw';
 
 const map = new mapboxgl.Map({
@@ -13,6 +13,7 @@ map.addControl(new mapboxgl.NavigationControl());
 
 let londonBoundary = null;
 
+// 2. 加载伦敦 LSOA 边界
 function loadLondonBoundary() {
   fetch('./data/LSOA_21.geojson')
     .then(res => res.json())
@@ -26,12 +27,12 @@ loadLondonBoundary();
 
 // Removed the TimeSelectControl class and its addition to map controls
 
-// POI 分类颜色与映射
+// 3. 定义 POI 类型映射与颜色
 const categoryColors = {
-  shop: '#2166AC',
-  food: '#f4a582',
-  health: '#b2182b',
-  leisure: '#d1e5f0'
+  shop: '#44a5f0',
+  food: '#f4a582'  ,
+  health: '#b2182b'  ,
+  leisure:'#d1e5f0'
 };
 
 const poiTypes = {
@@ -55,12 +56,12 @@ let poiData = null;
 let postcodeMarker = null;
 let searchMarker = null;
 
-// 加载 POI
+// 4. 加载 POI 并聚合显示
 function loadPOIData() {
   fetch('./data/poi_london.geojson')
     .then(res => res.json())
     .then(data => {
-      console.log("Original POI count:", data.features.length);
+      // 过滤和整理 POI 数据
       data.features = data.features.filter(f => {
         const tags = f.properties || {};
         const type = tags.shop || tags.amenity || tags.leisure;
@@ -73,11 +74,10 @@ function loadPOIData() {
         return true;
       });
 
-      // 过滤：仅保留在 londonBoundary 内部的 POI
+      // 仅保留在伦敦边界内的 POI
       if (londonBoundary) {
         data.features = data.features.filter(f => turf.booleanPointInPolygon(f, londonBoundary));
       }
-      console.log("Filtered POI count:", data.features.length);
 
       poiData = data;
 
@@ -120,35 +120,27 @@ function loadPOIData() {
         });
       });
 
-      // 添加 cluster-count layer for all clusters combined
-      map.addLayer({
-        id: 'cluster-count',
-        type: 'symbol',
-        source: 'pois-shop', // Use one source for cluster counts display
-        filter: ['has', 'point_count'],
-        layout: {
-          'text-field': '{point_count_abbreviated}',
-          'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-          'text-size': 12
-        },
-        paint: {
-          'text-color': '#fff'
-        }
-      });
-
-      // 缩放切换聚合/单点
-      map.on('zoom', () => {
-        const z = map.getZoom();
-        const vis = z >= 13 ? 'none' : 'visible';
-        categories.forEach(cat => {
-          map.setLayoutProperty(`clusters-${cat}`, 'visibility', vis);
-        });
-        map.setLayoutProperty('cluster-count', 'visibility', vis);
-        categories.forEach(cat => {
-          map.setLayoutProperty(`unclustered-${cat}`, 'visibility', z >= 13 ? 'visible' : 'none');
+      // 添加聚合数字图层（每个类别）
+      categories.forEach(cat => {
+        map.addLayer({
+          id: `cluster-count-${cat}`,
+          type: 'symbol',
+          source: `pois-${cat}`,
+          filter: ['has', 'point_count'],
+          layout: {
+            'text-field': '{point_count_abbreviated}',
+            'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+            'text-size': 12
+          },
+          paint: {
+            'text-color': '#fff'
+          }
         });
       });
 
+      // 缩放切换聚合/单点（已由下方统一处理，这里移除）
+
+      // POI 单点点击弹窗
       map.on('click', 'unclustered-shop', e => {
         const f = e.features[0];
         const html = `<b>${f.properties.name}</b><br>Type: ${f.properties.type}`;
@@ -170,7 +162,7 @@ function loadPOIData() {
         new mapboxgl.Popup().setLngLat(f.geometry.coordinates).setHTML(html).addTo(map);
       });
 
-      // Cluster click for each category
+      // 聚合点击放大
       categories.forEach(cat => {
         map.on('click', `clusters-${cat}`, e => {
           const clusterId = e.features[0].properties.cluster_id;
@@ -184,15 +176,15 @@ function loadPOIData() {
 }
 
 // 步行等时圈 + 统计
+// 5. 搜索邮编并绘制等时圈
 async function searchByPostcode(postcode, duration = 600) {
   try {
     const res = await fetch(`https://api.postcodes.io/postcodes/${postcode}`);
     const resJson = await res.json();
     if (!resJson.result) {
-      alert('❌ Postcode not found. Please input a valid UK postcode.');
+      alert('Postcode not found. Please input a valid UK postcode.');
       return;
     }
-    console.log("Postcode lookup result:", resJson);
     const { latitude, longitude } = resJson.result;
 
     const isoRes = await fetch(`https://api.openrouteservice.org/v2/isochrones/foot-walking?api_key=5b3ce3597851110001cf62483837ef5a171e432fa95123a6dc1bf175`, {
@@ -201,7 +193,6 @@ async function searchByPostcode(postcode, duration = 600) {
       body: JSON.stringify({ locations: [[longitude, latitude]], range: [duration] })
     });
     const isoJson = await isoRes.json();
-    console.log("Isochrone result:", isoJson);
     const area = isoJson.features[0];
     const counts = { shop: 0, food: 0, health: 0, leisure: 0 };
 
@@ -232,7 +223,7 @@ async function searchByPostcode(postcode, duration = 600) {
     const popupContent = `
       <b>Postcode: ${postcode}</b><br>
       🛍️ Shops: ${counts.shop}<br>
-      🍔 Food: ${counts.food}<br>
+      🍔 Food and Drink: ${counts.food}<br>
       🏥 Health: ${counts.health}<br>
       🌿 Leisure: ${counts.leisure}
     `;
@@ -241,11 +232,18 @@ async function searchByPostcode(postcode, duration = 600) {
 
   } catch (e) {
     alert('Postcode not found or ORS error.');
-    console.error(e);
   }
 }
 
+// 6. LSOA 图层加载与点击高亮统计
 map.on('load', () => {
+  // 静态 DOM 获取
+  const infoPanel = document.getElementById('info-panel');
+  const checkPanel = document.getElementById('check-panel');
+  const legendPanel = document.getElementById('legend-panel');
+  const searchPanel = document.getElementById('custom-search-panel');
+
+  // 加载 LSOA 边界及高亮图层
   map.addSource('lsoa', {
     type: 'geojson',
     data: './data/LSOA_21.geojson'
@@ -292,17 +290,37 @@ map.on('load', () => {
     map.getCanvas().style.cursor = '';
   });
 
-  // 新的点击监听逻辑：点击地图任意处，检测是否在LSOA区域内
+  // 点击地图任意处，检测是否在LSOA区域内，高亮并统计POI
   map.on('click', (e) => {
     const features = map.queryRenderedFeatures(e.point, {
       layers: ['lsoa-fill']
     });
     if (!features.length) {
+      // 新增：如果点击在等时圈层上，不清除等时圈
+      const featuresAtIso = map.queryRenderedFeatures(e.point, { layers: ['isochrone-layer'] });
+      if (featuresAtIso.length) return;
       // 点击空白处清除高亮和 popup
-      map.getSource('highlighted-lsoa').setData({
-        type: 'FeatureCollection',
-        features: []
-      });
+      if (map.getSource('highlighted-lsoa')) {
+        map.getSource('highlighted-lsoa').setData({
+          type: 'FeatureCollection',
+          features: []
+        });
+      }
+      if (map.getSource('isochrone')) {
+        map.getSource('isochrone').setData({
+          type: 'FeatureCollection',
+          features: []
+        });
+      }
+      if (searchMarker) {
+        searchMarker.remove();
+        searchMarker = null;
+      }
+      // 清除所有 mapboxgl.Popup 实例
+      const popups = document.getElementsByClassName('mapboxgl-popup');
+      while (popups[0]) {
+        popups[0].remove();
+      }
       return;
     }
 
@@ -333,7 +351,7 @@ map.on('load', () => {
     const html = `
       <b>${feature.properties.LSOA21NM}</b><br>
       🛍️ Shops: ${counts.shop}<br>
-      🍔 Food: ${counts.food}<br>
+      🍔 Food and Drink: ${counts.food}<br>
       🏥 Health: ${counts.health}<br>
       🌿 Leisure: ${counts.leisure}
     `;
@@ -344,6 +362,7 @@ map.on('load', () => {
       .addTo(map);
   });
 
+  // 7. 图标加载完成后触发 POI 加载
   const iconList = [
     'supermarket', 'convenience', 'mall', 'marketplace',
     'fast_food', 'cafe', 'bar',
@@ -354,86 +373,22 @@ map.on('load', () => {
 
   iconList.forEach(name => {
     map.loadImage(`./icon/${name}.png`, (error, image) => {
-      if (error) {
-        console.warn(`Icon ${name}.png not loaded`);
-        iconsLoaded++;
-        if (iconsLoaded === iconList.length) {
-          loadPOIData();
-        }
-        return;
-      }
-      if (!map.hasImage(name)) {
+      iconsLoaded++;
+      if (!error && !map.hasImage(name)) {
         map.addImage(name, image);
       }
-      iconsLoaded++;
       if (iconsLoaded === iconList.length) {
         loadPOIData();
       }
     });
   });
 
-  // loadPOIData();  // 注释掉此行，避免图标未加载就添加图层
-
+  // 3秒超时后强制加载POI（容错）
   setTimeout(() => {
     if (!poiData) {
-      console.warn("Forcing POI load due to timeout fallback");
       loadPOIData();
     }
   }, 3000);
-
-  // 添加自定义图层控制UI
-  const infoPanel = document.createElement('div');
-  infoPanel.className = 'info';
-  infoPanel.innerHTML = `
-    <details open>
-      <summary><b>What POIs to show?</b></summary>
-      <label><input type="checkbox" checked data-layer="clusters-shop"> 🛍️ Shop</label><br>
-      <label><input type="checkbox" checked data-layer="clusters-food"> 🍔 Food</label><br>
-      <label><input type="checkbox" checked data-layer="clusters-health"> 🏥 Health</label><br>
-      <label><input type="checkbox" checked data-layer="clusters-leisure"> 🌿 Leisure</label><br>
-    </details>
-    <button id="checkSourceBtn">Check Source</button>
-    <div id="sourceInfo" style="display:none; margin-top:5px;">
-      <small>
-        <a href="https://api.openrouteservice.org/" target="_blank">OpenRouteService</a><br>
-        <a href="https://postcodes.io/" target="_blank">UK Postcodes API</a>
-      </small>
-    </div>
-  `;
-  infoPanel.style.position = 'absolute';
-  infoPanel.style.top = '10px';
-  infoPanel.style.left = '10px';
-  infoPanel.style.padding = '10px';
-  infoPanel.style.background = '#fff';
-  infoPanel.style.borderRadius = '6px';
-  infoPanel.style.boxShadow = '0 0 6px rgba(0,0,0,0.2)';
-  infoPanel.style.fontSize = '14px';
-  document.body.appendChild(infoPanel);
-
-  // 创建组合搜索栏（含 geocoder + duration + apply）
-  const searchPanel = document.createElement('div');
-  searchPanel.id = 'custom-search-panel';
-  searchPanel.style.position = 'absolute';
-  searchPanel.style.top = '20px';
-  searchPanel.style.right = '20px';
-  searchPanel.style.zIndex = '999';
-  searchPanel.style.backgroundColor = '#fff';
-  searchPanel.style.padding = '12px';
-  searchPanel.style.borderRadius = '8px';
-  searchPanel.style.boxShadow = '0 0 6px rgba(0,0,0,0.15)';
-  searchPanel.innerHTML = `
-    <div id="geocoder-container" style="margin-bottom: 10px;"></div>
-    <select id="durationSelect" style="width: 100%; padding: 6px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ccc;">
-      <option value="300">5 minutes</option>
-      <option value="600" selected>10 minutes</option>
-      <option value="900">15 minutes</option>
-      <option value="1200">20 minutes</option>
-    </select>
-    <button id="applyIsoBtn" style="width: 100%; padding: 8px; background-color: #f4623a; color: #fff; border: none; border-radius: 6px; font-weight: bold;">
-      Apply
-    </button>
-  `;
-  document.body.appendChild(searchPanel);
 
   // 挂载 geocoder 控件到容器
   const geocoder = new MapboxGeocoder({
@@ -497,7 +452,7 @@ map.on('load', () => {
     const popupContent = `
       <b>Within ${duration / 60} minutes walk</b><br>
       🛍️ Shops: ${counts.shop}<br>
-      🍔 Food: ${counts.food}<br>
+      🍔 Food and Drink: ${counts.food}<br>
       🏥 Health: ${counts.health}<br>
       🌿 Leisure: ${counts.leisure}
     `;
@@ -507,40 +462,55 @@ map.on('load', () => {
   infoPanel.querySelectorAll('input[type="checkbox"]').forEach(cb => {
     cb.addEventListener('change', e => {
       const layerId = e.target.getAttribute('data-layer');
+      const cat = layerId.split('-')[1]; // shop/food/health/leisure
+      const clusterLayer = `clusters-${cat}`;
+      const countLayer = `cluster-count-${cat}`;
+      const unclusteredLayer = `unclustered-${cat}`;
       const vis = e.target.checked ? 'visible' : 'none';
-      if (map.getLayer(layerId)) {
-        map.setLayoutProperty(layerId, 'visibility', vis);
+      if (map.getLayer(clusterLayer)) {
+        map.setLayoutProperty(clusterLayer, 'visibility', vis);
+      }
+      if (map.getLayer(countLayer)) {
+        map.setLayoutProperty(countLayer, 'visibility', vis);
+      }
+      if (map.getLayer(unclusteredLayer)) {
+        map.setLayoutProperty(unclusteredLayer, 'visibility', vis === 'visible' && map.getZoom() >= 13 ? 'visible' : 'none');
       }
     });
   });
 
-  // Add toggle event for Check Source button
-  infoPanel.querySelector('#checkSourceBtn')?.addEventListener('click', () => {
-    const info = infoPanel.querySelector('#sourceInfo');
-    info.style.display = info.style.display === 'none' ? 'block' : 'none';
+
+  // 监听缩放，按复选框状态控制图层显示（修复：不覆盖用户操作）
+  map.on('zoom', () => {
+    const z = map.getZoom();
+    const categories = ['shop', 'food', 'health', 'leisure'];
+    categories.forEach(cat => {
+      const checkbox = document.getElementById(`chk-${cat}`);
+      if (!checkbox) return;
+      const isChecked = checkbox.checked;
+
+      if (!isChecked) {
+        ['clusters', 'cluster-count', 'unclustered'].forEach(prefix => {
+          const layerId = `${prefix}-${cat}`;
+          if (map.getLayer(layerId)) {
+            map.setLayoutProperty(layerId, 'visibility', 'none');
+          }
+        });
+        return;
+      }
+
+      const clusterVis = z < 13 ? 'visible' : 'none';
+      const countVis = z < 13 ? 'visible' : 'none';
+      const unclusteredVis = z >= 13 ? 'visible' : 'none';
+
+      if (map.getLayer(`clusters-${cat}`)) map.setLayoutProperty(`clusters-${cat}`, 'visibility', clusterVis);
+      if (map.getLayer(`cluster-count-${cat}`)) map.setLayoutProperty(`cluster-count-${cat}`, 'visibility', countVis);
+      if (map.getLayer(`unclustered-${cat}`)) map.setLayoutProperty(`unclustered-${cat}`, 'visibility', unclusteredVis);
+    });
   });
 
-  // Style the check source button
-  const btnStyle = document.createElement('style');
-  btnStyle.textContent = `
-    .info button {
-      background-color: #f4623a;
-      color: #fff;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 6px;
-      margin-top: 8px;
-      font-weight: 500;
-      cursor: pointer;
-    }
-    .info button:hover {
-      background-color: #e6552f;
-    }
-  `;
-  document.head.appendChild(btnStyle);
-
 });
-// 自定义 Geocoder 搜索框样式，使其外观与 HousingPrice.html 一致，包括高亮颜色、放大镜图标、边框样式
+// 10. 自定义搜索框样式
 const style = document.createElement('style');
 style.textContent = `
   .mapboxgl-ctrl-geocoder {
@@ -575,4 +545,3 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
-// 邮编搜索功能已由 MapboxGeocoder 控件替代
