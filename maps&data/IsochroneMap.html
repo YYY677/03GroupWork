@@ -127,6 +127,41 @@
       border: 2px solid #f4623a !important;
       box-shadow: 0 0 14px rgba(244, 98, 58, 0.75) !important;
     }
+
+    /* 添加信息展示样式 */
+    .info-panel {
+      position: fixed;
+      top: 80px;
+      right: 40px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 99;
+      width: 220px;
+      transition: all 0.3s ease;
+      border-left: 4px solid #f4623a;
+      display: none;
+    }
+
+    .info-panel:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .info-item {
+      margin: 4px 0;
+      line-height: 1.5;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .info-value {
+      color: #0056b3;
+    }
   </style>
 </head>
 
@@ -145,6 +180,11 @@
           <button id="Isoch_click" class="btn btn-primary btn-sm mt-2">Click to display Isochrone Map</button> <br><br>
           <button id="Isoch_remove" class="btn btn-danger btn-sm">Remove current Isochrone Map</button> <br><br>
         </div>
+        <input type="checkbox" id="toggle-Boroughs">
+        <b><label for="toggle-Boroughs">Boroughs</label></b>
+        &nbsp;
+        <input type="checkbox" id="toggle-LSOAs">
+        <b><label for="toggle-LSOAs">LSOAs</label></b>
       </div>
 
       <p style="margin-left: 10px;">
@@ -158,7 +198,8 @@
           <div class="card card-body" style="width: 250px; font-size: 16px; line-height: 1.6;">
             <div>
               <strong>UK Travel Area Isochrones: </strong>
-              <a href="https://geoportal.statistics.gov.uk/search?collection=Dataset&q=UK%20Travel%20Area%20Isochrones" target="_blank">
+              <a href="https://geoportal.statistics.gov.uk/search?collection=Dataset&q=UK%20Travel%20Area%20Isochrones"
+                target="_blank">
                 ONS
               </a>
             </div>
@@ -187,6 +228,30 @@
       </div>
     </div>
 
+    <!-- 添加信息面板 -->
+    <div id="borough-info" class="info-panel">
+      <b class="text-primary"><i class="bi bi-building"></i> Borough information</b>
+      <div class="info-item">
+        <span class="info-label">Name:</span>
+        <span id="borough-name" class="info-value">Click a borough</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Code:</span>
+        <span id="borough-code" class="info-value">Click a borough</span>
+      </div>
+    </div>
+
+    <div id="lsoa-info" class="info-panel">
+      <b class="text-primary"><i class="bi bi-geo-alt"></i> LSOA information</b>
+      <div class="info-item">
+        <span class="info-label">Name:</span>
+        <span id="lsoa-name" class="info-value">Click a LSOA</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Code:</span>
+        <span id="lsoa-code" class="info-value">Click a LSOA</span>
+      </div>
+    </div>
 
     <div class="legend" id="legend">
       <h4>Area accessible in:</h4>
@@ -221,6 +286,144 @@
     });
 
     map.on('load', () => {
+      //#region 
+      map.addSource('LondonBoroughs', {
+        type: 'geojson',
+        data: './data/London_Boroughs.geojson'
+      });
+
+      // 添加 borough 面图层
+      map.addLayer({
+        id: 'LocalAuthorities',
+        type: 'fill',
+        source: 'LondonBoroughs',
+        layout: {
+          visibility: 'none'
+        },
+        paint: {
+          'fill-color': '#000',
+          'fill-opacity': 0.1
+        }
+      });
+
+      // 添加高亮边界图层（初始隐藏）
+      map.addLayer({
+        id: 'highlight',
+        type: 'line',
+        source: 'LondonBoroughs',
+        layout: {
+          visibility: 'none'
+        },
+        paint: {
+          'line-color': 'rgba(0, 0, 0, 0.5)',
+          'line-width': 3
+        },
+        filter: ['==', 'name', ''] // 初始无匹配
+      });
+
+      // hover 高亮逻辑
+      map.on('mousemove', (e) => {
+        const features = map.queryRenderedFeatures(e.point, {
+          layers: ['LocalAuthorities']
+        });
+
+        if (features.length === 1) {
+          const name = features[0].properties.name;
+          const boroughCode = features[0].properties.gss_code;
+          map.setFilter('highlight', ['==', 'name', name]);
+        } else {
+          map.setFilter('highlight', ['==', 'name', '']);
+        }
+      });
+
+      // click 显示信息
+      map.on('click', 'LocalAuthorities', (e) => {
+        const name = e.features[0].properties.name;
+        const boroughCode = e.features[0].properties.gss_code;
+
+        document.getElementById('borough-name').textContent = name || '未知';
+        document.getElementById('borough-code').textContent = boroughCode || '未知';
+      });
+
+
+      map.addSource('lsoas', {
+        type: 'geojson',
+        data: './data/LSOA_21.geojson'
+      })
+      map.addLayer({
+        id: 'LSOAs',
+        type: 'fill',
+        source: 'lsoas',
+        layout: {
+          visibility: 'none'
+        },
+        paint: {
+          'fill-color': '#000',
+          'fill-opacity': 0.1
+        }
+      });
+      map.addLayer({
+        id: 'highlight-lsoa',
+        type: 'line',
+        source: 'lsoas',
+        layout: {
+          visibility: 'none'
+        },
+        paint: {
+          'line-color': 'rgba(0, 0, 0, 0.5)',
+          'line-width': 3
+        },
+        filter: ['==', ['get', 'lsoa21nm'], ''] // 初始无匹配
+      });
+
+      // hover 高亮逻辑
+      // map.on('mousemove', (e) => {
+      //   const features = map.queryRenderedFeatures(e.point, {
+      //     layers: ['LSOAs']
+      //   });
+
+      //   if (features.length === 1) {
+      //     const name = features[0].properties.lsoa21nm;
+      //     const lsoaCode = features[0].properties.lsoa21cd;
+      //     map.setFilter('highlight-lsoa', ['==', ['get', 'lsoa21nm'], name]);
+      //   } else {
+      //     map.setFilter('highlight-lsoa', ['==', ['get', 'lsoa21nm'], '']);
+      //   }
+      // });
+
+      function debounce(func, delay) {
+        let timeout;
+        return function (...args) {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+      }
+
+      // 原始高亮逻辑
+      const handleMouseMove = (e) => {
+        const features = map.queryRenderedFeatures(e.point, {
+          layers: ['LSOAs']
+        });
+
+        if (features.length === 1) {
+          const name = features[0].properties.lsoa21nm;
+          map.setFilter('highlight-lsoa', ['==', ['get', 'lsoa21nm'], name]);
+        } else {
+          map.setFilter('highlight-lsoa', ['==', ['get', 'lsoa21nm'], '']);
+        }
+      };
+
+      // 用防抖包装并注册
+      map.on('mousemove', debounce(handleMouseMove, 10)); // 50ms 可根据需要调节
+
+      // click 显示信息
+      map.on('click', 'LSOAs', (e) => {
+        const name = e.features[0].properties.lsoa21nm;
+        const lsoaCode = e.features[0].properties.lsoa21cd;
+
+        document.getElementById('lsoa-name').textContent = name || '未知';
+        document.getElementById('lsoa-code').textContent = lsoaCode || '未知';
+      });
 
     })
 
@@ -344,9 +547,6 @@
       )
     }
 
-
-
-
     // 处理搜索结果
     function handleSearchResult(lon, lat, placeName) {
       if (isNaN(lon) || isNaN(lat)) {
@@ -390,7 +590,7 @@
         searchMarker.remove();
       }
 
-      searchMarker = new mapboxgl.Marker({ color: '#f4623a' }) 
+      searchMarker = new mapboxgl.Marker({ color: '#f4623a' })
         .setLngLat([lon, lat])
         .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(placeName))
         .addTo(map);
@@ -442,6 +642,17 @@
       });
       toast.show(); // 页面加载时自动显示
     });
+
+    document.getElementById('toggle-Boroughs').addEventListener('change', (e) => {
+      map.setLayoutProperty('LocalAuthorities', 'visibility', e.target.checked ? 'visible' : 'none')
+      map.setLayoutProperty('highlight', 'visibility', e.target.checked ? 'visible' : 'none')
+      document.getElementById('borough-info').style.display = e.target.checked ? 'block' : 'none'
+    })
+    document.getElementById('toggle-LSOAs').addEventListener('change', (e) => {
+      map.setLayoutProperty('LSOAs', 'visibility', e.target.checked ? 'visible' : 'none')
+      map.setLayoutProperty('highlight-lsoa', 'visibility', e.target.checked ? 'visible' : 'none')
+      document.getElementById('lsoa-info').style.display = e.target.checked ? 'block' : 'none'
+    })
 
   </script>
 

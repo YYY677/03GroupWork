@@ -190,6 +190,41 @@
       border: 2px solid #f4623a !important;
       box-shadow: 0 0 14px rgba(244, 98, 58, 0.75) !important;
     }
+
+    /* 添加信息展示样式 */
+    .info-panel {
+      position: fixed;
+      top: 80px;
+      right: 40px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 99;
+      width: 220px;
+      transition: all 0.3s ease;
+      border-left: 4px solid #f4623a;
+      display: none;
+    }
+
+    .info-panel:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .info-item {
+      margin: 4px 0;
+      line-height: 1.5;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .info-value {
+      color: #0056b3;
+    }
   </style>
 </head>
 
@@ -198,22 +233,21 @@
     <div id="map"></div>
     <div class="map-overlay top">
       <div class="map-overlay-inner">
-        <fieldset class="select-fieldset">
+        <!-- <fieldset class="select-fieldset">
           <label>Select light preset</label>
           <select id="lightPreset" name="lightPreset">
-            <!-- Each value matches a light preset -->
             <option value="dawn">Dawn</option>
             <option value="day" selected>Day</option>
             <option value="dusk">Dusk</option>
             <option value="night">Night</option>
           </select>
-        </fieldset>
+        </fieldset> -->
         <table>
           <tr>
             <td>
               <input type="checkbox" id="toggle-underground" checked>
               <label for="toggle-underground">Trains</label>
-              <div class="spinner-grow spinner-grow-sm" role="status">
+              <div class="spinner-grow spinner-grow-sm bg-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
             </td>
@@ -222,7 +256,7 @@
             <td>
               <input type="checkbox" id="toggle-bus">
               <label for="toggle-bus">Bus</label>
-              <div class="spinner-grow spinner-grow-sm" role="status">
+              <div class="spinner-grow spinner-grow-sm bg-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
             </td>
@@ -231,9 +265,47 @@
             <td>
               <input type="checkbox" id="toggle-cycle">
               <label for="toggle-cycle">Cycle</label>
-              <div class="spinner-grow spinner-grow-sm" role="status">
+              <div class="spinner-grow spinner-grow-sm bg-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="toggle-Boroughs">
+              <label for="toggle-Boroughs">Boroughs</label>
+              <div class="spinner-grow spinner-grow-sm bg-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="toggle-LSOAs">
+              <label for="toggle-LSOAs">LSOAs</label>
+              <div class="spinner-grow spinner-grow-sm bg-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="toggle-zones" checked>
+              <label for="toggle-zones">Zones</label>
+              <div class="spinner-grow spinner-grow-sm bg-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span tabindex="0" class="text-primary" style="cursor: pointer; font-weight: bold; font-size: 14px;"
+                data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="top" data-bs-html="true"
+                data-bs-title="<strong>London Transport Zones: </strong>"
+                data-bs-content="
+                London is divided into fare zones, from Zone 1 (central London) to Zone 6 (outer areas). Zones affect ticket prices for the Tube, Overground, and more.">
+                What's Zones?
+              </span>
             </td>
           </tr>
         </table>
@@ -276,6 +348,31 @@
       </div>
     </div>
 
+    <!-- 添加信息面板 -->
+    <div id="borough-info" class="info-panel">
+      <b class="text-primary"><i class="bi bi-building"></i> Borough information</b>
+      <div class="info-item">
+        <span class="info-label">Name:</span>
+        <span id="borough-name" class="info-value">Click a borough</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Code:</span>
+        <span id="borough-code" class="info-value">Click a borough</span>
+      </div>
+    </div>
+
+    <div id="lsoa-info" class="info-panel">
+      <b class="text-primary"><i class="bi bi-geo-alt"></i> LSOA information</b>
+      <div class="info-item">
+        <span class="info-label">Name:</span>
+        <span id="lsoa-name" class="info-value">Click a LSOA</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Code:</span>
+        <span id="lsoa-code" class="info-value">Click a LSOA</span>
+      </div>
+    </div>
+
     <div id="legend">
       <div class="legend-header">
         <button id="select-all" class="select-all-btn">Deselect All</button>
@@ -302,7 +399,7 @@
     const map = new mapboxgl.Map({
       container: 'map',
       center: [-0.134039, 51.524514],
-      zoom: 10,
+      zoom: 9.5,
       // bearing: 53, //设置地图的旋转角度
       style: 'mapbox://styles/yuuy/cm683gzb700ab01s229c20ar5',
       minZoom: 9,
@@ -340,20 +437,175 @@
     //#endregion
 
     //#region 选择不同的主题
-    document
-      .getElementById('lightPreset')
-      .addEventListener('change', function () {
-        map.setConfigProperty('basemap', 'lightPreset', this.value);
-      });
+    // document
+    //   .getElementById('lightPreset')
+    //   .addEventListener('change', function () {
+    //     map.setConfigProperty('basemap', 'lightPreset', this.value);
+    //   });
     //#endregion
 
 
     map.on('load', () => {
+
+      //#region boroughs lsoas zones
+      map.addSource('LondonBoroughs', {
+        type: 'geojson',
+        data: './data/London_Boroughs.geojson'
+      });
+
+      // 添加 borough 面图层
+      map.addLayer({
+        id: 'LocalAuthorities',
+        type: 'fill',
+        source: 'LondonBoroughs',
+        layout: {
+          visibility: 'none'
+        },
+        paint: {
+          'fill-color': '#000',
+          'fill-opacity': 0.1
+        }
+      });
+
+      // 添加高亮边界图层（初始隐藏）
+      map.addLayer({
+        id: 'highlight',
+        type: 'line',
+        source: 'LondonBoroughs',
+        layout: {
+          visibility: 'none'
+        },
+        paint: {
+          'line-color': 'rgba(0, 0, 0, 0.5)',
+          'line-width': 3
+        },
+        filter: ['==', 'name', ''] // 初始无匹配
+      });
+
+      // hover 高亮逻辑
+      map.on('mousemove', (e) => {
+        const features = map.queryRenderedFeatures(e.point, {
+          layers: ['LocalAuthorities']
+        });
+
+        if (features.length === 1) {
+          const name = features[0].properties.name;
+          const boroughCode = features[0].properties.gss_code;
+          map.setFilter('highlight', ['==', 'name', name]);
+        } else {
+          map.setFilter('highlight', ['==', 'name', '']);
+        }
+      });
+
+      // click 显示信息
+      map.on('click', 'LocalAuthorities', (e) => {
+        const name = e.features[0].properties.name;
+        const boroughCode = e.features[0].properties.gss_code;
+
+        document.getElementById('borough-name').textContent = name || '未知';
+        document.getElementById('borough-code').textContent = boroughCode || '未知';
+      });
+
+
+      map.addSource('lsoas', {
+        type: 'geojson',
+        data: './data/LSOA_21.geojson'
+      })
+      map.addLayer({
+        id: 'LSOAs',
+        type: 'fill',
+        source: 'lsoas',
+        layout: {
+          visibility: 'none'
+        },
+        paint: {
+          'fill-color': '#000',
+          'fill-opacity': 0.1
+        }
+      });
+      map.addLayer({
+        id: 'highlight-lsoa',
+        type: 'line',
+        source: 'lsoas',
+        layout: {
+          visibility: 'none'
+        },
+        paint: {
+          'line-color': 'rgba(0, 0, 0, 0.5)',
+          'line-width': 3
+        },
+        filter: ['==', ['get', 'lsoa21nm'], ''] // 初始无匹配
+      });
+
+      function debounce(func, delay) {
+        let timeout;
+        return function (...args) {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+      }
+
+      // 原始高亮逻辑
+      const handleMouseMove = (e) => {
+        const features = map.queryRenderedFeatures(e.point, {
+          layers: ['LSOAs']
+        });
+
+        if (features.length === 1) {
+          const name = features[0].properties.lsoa21nm;
+          map.setFilter('highlight-lsoa', ['==', ['get', 'lsoa21nm'], name]);
+        } else {
+          map.setFilter('highlight-lsoa', ['==', ['get', 'lsoa21nm'], '']);
+        }
+      };
+
+      // 用防抖包装并注册
+      map.on('mousemove', debounce(handleMouseMove, 10)); // 50ms 可根据需要调节
+
+      // click 显示信息
+      map.on('click', 'LSOAs', (e) => {
+        const name = e.features[0].properties.lsoa21nm;
+        const lsoaCode = e.features[0].properties.lsoa21cd;
+
+        document.getElementById('lsoa-name').textContent = name || '未知';
+        document.getElementById('lsoa-code').textContent = lsoaCode || '未知';
+      });
+
+      const firstLayerId = map.getStyle().layers[0].id;
+      map.addSource('zones', {
+        type: 'geojson',
+        data: './data/zones1to6.json'
+      });
+      map.addLayer({
+        id: 'zones',
+        type: 'fill',
+        source: 'zones',
+        layout: {
+          visibility: 'visible'
+        },
+        paint: {
+          'fill-color': [
+            'match',
+            ['get', 'name'],
+            'Zone 1', '#b92b27',
+            'Zone 2', '#d94b3a',
+            'Zone 3', '#f06e4e',
+            'Zone 4', '#f79872',
+            'Zone 5', '#93b9d9',
+            'Zone 6', '#1565C0',
+            '#ccc' // fallback color
+          ],
+          'fill-opacity': 0.4,
+          'fill-outline-color': 'black'
+        }
+      }, firstLayerId);
+      //#endregion
+
       //#region 地铁及其站点
       // 地铁样式和数据来自mapbox studio云仓库
       // 监听地铁线路的 hover 交互
       lineIDs.forEach(line => {
-        
+
         map.setLayoutProperty(line, 'visibility', 'visible');
 
         const layerID = line; // 每条线路的图层 ID
@@ -722,11 +974,29 @@
       map.setLayoutProperty('cycle', 'visibility', e.target.checked ? 'visible' : 'none')
       document.querySelectorAll('.cycle_notif').forEach(notif => notif.style.display = e.target.checked ? 'block' : 'none')
     })
+    document.getElementById('toggle-Boroughs').addEventListener('change', (e) => {
+      map.setLayoutProperty('LocalAuthorities', 'visibility', e.target.checked ? 'visible' : 'none')
+      map.setLayoutProperty('highlight', 'visibility', e.target.checked ? 'visible' : 'none')
+      document.getElementById('borough-info').style.display = e.target.checked ? 'block' : 'none'
+    })
+    document.getElementById('toggle-LSOAs').addEventListener('change', (e) => {
+      map.setLayoutProperty('LSOAs', 'visibility', e.target.checked ? 'visible' : 'none')
+      map.setLayoutProperty('highlight-lsoa', 'visibility', e.target.checked ? 'visible' : 'none')
+      document.getElementById('lsoa-info').style.display = e.target.checked ? 'block' : 'none'
+    })
+    document.getElementById('toggle-zones').addEventListener('change', (e) => {
+      map.setLayoutProperty('zones', 'visibility', e.target.checked ? 'visible' : 'none')
+    })
+
     //#endregion
 
   </script>
   <!-- Bootstrap core JS-->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+    const popoverList = [...popoverTriggerList].map(triggerEl => new bootstrap.Popover(triggerEl))
+  </script>
 </body>
 
 </html>

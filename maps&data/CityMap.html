@@ -46,7 +46,7 @@
       gap: 10px;
     }
 
-    .location-selector{
+    .location-selector {
       position: fixed;
       top: 10px;
       left: 45%;
@@ -235,11 +235,71 @@
       background-color: rgba(200, 200, 200, 0.8);
       border-radius: 5px;
     }
+
+    /* 添加信息展示样式 */
+    .info-panel {
+      position: fixed;
+      top: 80px;
+      right: 40px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 99;
+      width: 220px;
+      transition: all 0.3s ease;
+      border-left: 4px solid #f4623a;
+      display: none;
+    }
+
+    .info-panel:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .info-item {
+      margin: 4px 0;
+      line-height: 1.5;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .info-value {
+      color: #0056b3;
+    }
   </style>
 </head>
 
 <body>
   <div id="map"></div>
+
+  <!-- 添加信息面板 -->
+  <div id="borough-info" class="info-panel">
+    <b class="text-primary"><i class="bi bi-building"></i> Borough information</b>
+    <div class="info-item">
+      <span class="info-label">Name:</span>
+      <span id="borough-name" class="info-value">Click a borough</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">Code:</span>
+      <span id="borough-code" class="info-value">Click a borough</span>
+    </div>
+  </div>
+
+  <div id="lsoa-info" class="info-panel">
+    <b class="text-primary"><i class="bi bi-geo-alt"></i> LSOA information</b>
+    <div class="info-item">
+      <span class="info-label">Name:</span>
+      <span id="lsoa-name" class="info-value">Click a LSOA</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">Code:</span>
+      <span id="lsoa-code" class="info-value">Click a LSOA</span>
+    </div>
+  </div>
 
   <div class="top-controls-container">
     <div class="map-style-container">
@@ -254,11 +314,11 @@
           Landmarks!
         </button>
         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+          <li><a class="dropdown-item" href="#britishmuseum">British Museum</a></li>
           <li><a class="dropdown-item" href="#bigben">Big Ben & Houses of Parliament</a></li>
           <li><a class="dropdown-item" href="#towerbridge">Tower Bridge</a></li>
           <li><a class="dropdown-item" href="#londoneye">London Eye</a></li>
           <li><a class="dropdown-item" href="#buckingham">Buckingham Palace</a></li>
-          <li><a class="dropdown-item" href="#britishmuseum">British Museum</a></li>
           <li><a class="dropdown-item" href="#stpaul">St Paul's Cathedral</a></li>
           <li><a class="dropdown-item" href="#towerof">Tower of London</a></li>
           <li><a class="dropdown-item" href="#trafalgar">Trafalgar Square</a></li>
@@ -287,10 +347,24 @@
         </div>
       </div>
 
-      <button id="resetView" class="reset-btn">Reset View</button>
+      <button id="resetView" class="reset-btn" style="margin-bottom: 10px;">Reset View</button>
+
+      <input type="checkbox" id="toggle-Boroughs" checked>
+      <label for="toggle-Boroughs">Boroughs</label>
+      &nbsp;
+      <input type="checkbox" id="toggle-LSOAs">
+      <label for="toggle-LSOAs">LSOAs</label>
+      <span tabindex="0" class="text-primary small" style="cursor: pointer; font-weight: bold;" data-bs-toggle="popover"
+        data-bs-trigger="focus" data-bs-placement="top" data-bs-html="true"
+        data-bs-title="<strong>Boroughs and LSOAs Explained:</strong>"
+        data-bs-content="
+    In London, a borough is a large administrative area, totally 32 boroughs in London.<br><br>
+    While an LSOA (Lower Layer Super Output Area) is a smaller geographic unit used for statistical analysis, totally around 5000 LSOAs in London.">
+        What're Boroughs & LSOAs?
+      </span>
     </div>
 
-    <div class="card border-dark mb-3" style="max-width: 18rem;">
+    <div class="card border-dark" style="max-width: 18rem;">
       <div class="card-header fs-6">Hints <i class="bi bi-emoji-sunglasses"></i></div>
       <div class="card-body px-2">
         <p class="card-text fw-bold tube_notif">Zoom in or use landmark guide to see detailed 3D builidings.</p>
@@ -298,9 +372,27 @@
         <p class="card-text fw-bold tube_notif">Satellite shows real image.</p>
       </div>
     </div>
+
+    <p style="margin-left: 10px; margin-bottom: 0;">
+      <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample"
+        aria-expanded="false" aria-controls="collapseWidthExample">
+        Check Source
+      </button>
+    </p>
+    <div style="min-height: 120px; margin-left: 10px;">
+      <div class="collapse collapse-horizontal" id="collapseWidthExample">
+        <div class="card card-body" style="width: 250px; font-size: 16px; line-height: 1.6;">
+          <div>
+            <strong>Boroughs & LSOAs data: </strong>
+            <a href="https://data.london.gov.uk/"
+              target="_blank">
+              London Data Store
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-
-
 
   <div class="legend">
     <h6>Building Types</h6>
@@ -378,7 +470,7 @@
       container: "map",
       style: "mapbox://styles/mapbox/streets-v12",
       center: [-0.13320, 51.52432],
-      zoom: 11,
+      zoom: 9.5,
       pitch: 0,
       bearing: 0,
     });
@@ -403,14 +495,14 @@
         .setLngLat([lon, lat])
         .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(placeName))
         .addTo(map);
-      
-        map.flyTo({
-          center: [lon, lat],
-          zoom: 15.5,          
-          pitch: 45,         
-          bearing: 0,       
-          duration: 1500    
-        });
+
+      map.flyTo({
+        center: [lon, lat],
+        zoom: 15.5,
+        pitch: 45,
+        bearing: 0,
+        duration: 1500
+      });
     });
     map.addControl(geocoder, 'top-right');
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
@@ -421,7 +513,66 @@
     window.onload = function () {
       updateLegendVisibility();
       updateControlsVisibility();
+
+      // 初始化图层显示状态
+      document.getElementById('toggle-Boroughs').checked = true;
+      document.getElementById('toggle-LSOAs').checked = false;
+
+      // 延迟执行信息面板更新，确保地图加载完成
+      setTimeout(() => {
+        updateInfoPanelsVisibility();
+      }, 1000);
     };
+
+    // 防抖函数
+    function debounce(func, delay) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    // 添加对图层切换的事件监听
+    document.getElementById('toggle-Boroughs').addEventListener('change', function () {
+      if (this.checked) {
+        map.setLayoutProperty('LocalAuthorities', 'visibility', 'visible');
+        map.setLayoutProperty('highlight', 'visibility', 'visible');
+        document.getElementById('borough-info').style.display = map.getLayoutProperty('LocalAuthorities', 'visibility') === 'visible' ? 'block' : 'none';
+      } else {
+        map.setLayoutProperty('LocalAuthorities', 'visibility', 'none');
+        map.setLayoutProperty('highlight', 'visibility', 'none');
+        document.getElementById('borough-info').style.display = 'none';
+      }
+    });
+
+    document.getElementById('toggle-LSOAs').addEventListener('change', function () {
+      if (this.checked) {
+        map.setLayoutProperty('LSOAs', 'visibility', 'visible');
+        map.setLayoutProperty('highlight-lsoa', 'visibility', 'visible');
+        document.getElementById('lsoa-info').style.display = map.getLayoutProperty('LSOAs', 'visibility') === 'visible' ? 'block' : 'none';
+      } else {
+        map.setLayoutProperty('LSOAs', 'visibility', 'none');
+        map.setLayoutProperty('highlight-lsoa', 'visibility', 'none');
+        document.getElementById('lsoa-info').style.display = 'none';
+      }
+    });
+
+    // 更新信息面板显示状态
+    function updateInfoPanelsVisibility() {
+      try {
+        // 检查图层是否存在，避免报错
+        const boroughVisible = map.getLayer('LocalAuthorities') ?
+          map.getLayoutProperty('LocalAuthorities', 'visibility') === 'visible' : false;
+        const lsoaVisible = map.getLayer('LSOAs') ?
+          map.getLayoutProperty('LSOAs', 'visibility') === 'visible' : false;
+
+        document.getElementById('borough-info').style.display = boroughVisible ? 'block' : 'none';
+        document.getElementById('lsoa-info').style.display = lsoaVisible ? 'block' : 'none';
+      } catch (e) {
+        console.log('图层尚未加载完成，稍后将更新信息面板');
+      }
+    }
 
     // 确保地图首次加载完成后添加数据层
     map.on('load', function () {
@@ -435,6 +586,125 @@
           }
         }, 500); // 添加小延迟确保地图样式完全加载
       }
+
+      map.addSource('LondonBoroughs', {
+        type: 'geojson',
+        data: './data/London_Boroughs.geojson' // ← 确保路径正确
+      });
+
+      // 添加 borough 面图层
+      map.addLayer({
+        id: 'LocalAuthorities',
+        type: 'fill',
+        source: 'LondonBoroughs',
+        layout: {
+          visibility: 'visible'
+        },
+        paint: {
+          'fill-color': '#000',
+          'fill-opacity': 0.1
+        }
+      });
+
+      // 添加高亮边界图层（初始隐藏）
+      map.addLayer({
+        id: 'highlight',
+        type: 'line',
+        source: 'LondonBoroughs',
+        layout: {
+          visibility: 'visible'
+        },
+        paint: {
+          'line-color': 'rgba(0, 0, 0, 0.5)',
+          'line-width': 3
+        },
+        filter: ['==', 'name', ''] // 初始无匹配
+      });
+
+      // hover 高亮逻辑
+      map.on('mousemove', debounce((e) => {
+        const features = map.queryRenderedFeatures(e.point, {
+          layers: ['LocalAuthorities']
+        });
+
+        if (features.length === 1) {
+          const name = features[0].properties.name;
+          const boroughCode = features[0].properties.gss_code;
+          map.setFilter('highlight', ['==', 'name', name]);
+        } else {
+          map.setFilter('highlight', ['==', 'name', '']);
+        }
+      }, 0));
+
+      // click 显示信息
+      map.on('click', 'LocalAuthorities', (e) => {
+        const name = e.features[0].properties.name;
+        const boroughCode = e.features[0].properties.gss_code;
+
+        document.getElementById('borough-name').textContent = name || '未知';
+        document.getElementById('borough-code').textContent = boroughCode || '未知';
+      });
+
+
+      map.addSource('lsoas', {
+        type: 'geojson',
+        data: './data/LSOA_21.geojson'
+      })
+      map.addLayer({
+        id: 'LSOAs',
+        type: 'fill',
+        source: 'lsoas',
+        layout: {
+          visibility: 'none'
+        },
+        paint: {
+          'fill-color': '#000',
+          'fill-opacity': 0.1
+        }
+      });
+      map.addLayer({
+        id: 'highlight-lsoa',
+        type: 'line',
+        source: 'lsoas',
+        layout: {
+          visibility: 'none'
+        },
+        paint: {
+          'line-color': 'rgba(0, 0, 0, 0.5)',
+          'line-width': 3
+        },
+        filter: ['==', ['get', 'lsoa21nm'], ''] // 初始无匹配
+      });
+
+      // hover 高亮逻辑 - 使用防抖
+      const handleLsoaMouseMove = (e) => {
+        const features = map.queryRenderedFeatures(e.point, {
+          layers: ['LSOAs']
+        });
+
+        if (features.length === 1) {
+          const name = features[0].properties.lsoa21nm;
+          const lsoaCode = features[0].properties.lsoa21cd;
+          map.setFilter('highlight-lsoa', ['==', ['get', 'lsoa21nm'], name]);
+        } else {
+          map.setFilter('highlight-lsoa', ['==', ['get', 'lsoa21nm'], '']);
+        }
+      };
+
+      // 用防抖包装并注册
+      map.on('mousemove', debounce(handleLsoaMouseMove, 10));
+
+      // click 显示信息
+      map.on('click', 'LSOAs', (e) => {
+        const name = e.features[0].properties.lsoa21nm;
+        const lsoaCode = e.features[0].properties.lsoa21cd;
+
+        document.getElementById('lsoa-name').textContent = name || '未知';
+        document.getElementById('lsoa-code').textContent = lsoaCode || '未知';
+      });
+
+      // 初始化状态
+      updateInfoPanelsVisibility();
     });
 
     // 监听styleImageMissing事件提供缺失的图标
@@ -472,6 +742,10 @@
     // Map style switcher
     document.getElementById('streets-v12').addEventListener('click', () => {
       setActiveStyleButton('streets-v12');
+      // 在切换样式前保存图层状态
+      const boroughVisible = map.getLayoutProperty('LocalAuthorities', 'visibility');
+      const lsoaVisible = map.getLayoutProperty('LSOAs', 'visibility');
+
       // 在切换样式前移除数据层
       removeDataLayers();
       map.setStyle('mapbox://styles/mapbox/streets-v12');
@@ -479,10 +753,19 @@
       isStandardMode = false;
       updateControlsVisibility();
       updateLegendVisibility();
+
+      // 在样式加载完成后恢复图层
+      map.once('style.load', function () {
+        restoreLayers(boroughVisible, lsoaVisible);
+      });
     });
 
     document.getElementById('light-v11').addEventListener('click', () => {
       setActiveStyleButton('light-v11');
+      // 在切换样式前保存图层状态
+      const boroughVisible = map.getLayoutProperty('LocalAuthorities', 'visibility');
+      const lsoaVisible = map.getLayoutProperty('LSOAs', 'visibility');
+
       // 在切换样式前移除数据层
       removeDataLayers();
       map.setStyle('mapbox://styles/mapbox/light-v11');
@@ -490,10 +773,19 @@
       isStandardMode = false;
       updateControlsVisibility();
       updateLegendVisibility();
+
+      // 在样式加载完成后恢复图层
+      map.once('style.load', function () {
+        restoreLayers(boroughVisible, lsoaVisible);
+      });
     });
 
     document.getElementById('standard-v12').addEventListener('click', () => {
       setActiveStyleButton('standard-v12');
+      // 在切换样式前保存图层状态
+      const boroughVisible = map.getLayoutProperty('LocalAuthorities', 'visibility');
+      const lsoaVisible = map.getLayoutProperty('LSOAs', 'visibility');
+
       // 在切换样式前移除数据层
       removeDataLayers();
       map.setStyle('mapbox://styles/mapbox/standard');
@@ -501,6 +793,11 @@
       isStandardMode = true;
       updateControlsVisibility();
       updateLegendVisibility();
+
+      // 在样式加载完成后恢复图层
+      map.once('style.load', function () {
+        restoreLayers(boroughVisible, lsoaVisible);
+      });
     });
 
     document.getElementById('satellite-streets-v12').addEventListener('click', () => {
@@ -515,6 +812,10 @@
         });
       }
 
+      // 在切换样式前保存图层状态
+      const boroughVisible = map.getLayoutProperty('LocalAuthorities', 'visibility');
+      const lsoaVisible = map.getLayoutProperty('LSOAs', 'visibility');
+
       setActiveStyleButton('satellite-streets-v12');
       // 在切换样式前移除数据层
       removeDataLayers();
@@ -523,7 +824,157 @@
       isStandardMode = false;
       updateControlsVisibility();
       updateLegendVisibility();
+
+      // 在样式加载完成后恢复图层
+      map.once('style.load', function () {
+        restoreLayers(boroughVisible, lsoaVisible);
+      });
     });
+
+    // 恢复图层的函数
+    function restoreLayers(boroughVisible, lsoaVisible) {
+      // 重新添加数据源和图层
+      if (!map.getSource('LondonBoroughs')) {
+        map.addSource('LondonBoroughs', {
+          type: 'geojson',
+          data: './data/London_Boroughs.geojson'
+        });
+      }
+
+      if (!map.getSource('lsoas')) {
+        map.addSource('lsoas', {
+          type: 'geojson',
+          data: './data/LSOA_21.geojson'
+        });
+      }
+
+      // 添加区域图层
+      if (!map.getLayer('LocalAuthorities')) {
+        map.addLayer({
+          id: 'LocalAuthorities',
+          type: 'fill',
+          source: 'LondonBoroughs',
+          layout: {
+            visibility: boroughVisible
+          },
+          paint: {
+            'fill-color': '#000',
+            'fill-opacity': 0.1
+          }
+        });
+      }
+
+      if (!map.getLayer('highlight')) {
+        map.addLayer({
+          id: 'highlight',
+          type: 'line',
+          source: 'LondonBoroughs',
+          layout: {
+            visibility: boroughVisible
+          },
+          paint: {
+            'line-color': 'rgba(0, 0, 0, 0.5)',
+            'line-width': 3
+          },
+          filter: ['==', 'name', '']
+        });
+      }
+
+      // 添加LSOA图层
+      if (!map.getLayer('LSOAs')) {
+        map.addLayer({
+          id: 'LSOAs',
+          type: 'fill',
+          source: 'lsoas',
+          layout: {
+            visibility: lsoaVisible
+          },
+          paint: {
+            'fill-color': '#000',
+            'fill-opacity': 0.1
+          }
+        });
+      }
+
+      if (!map.getLayer('highlight-lsoa')) {
+        map.addLayer({
+          id: 'highlight-lsoa',
+          type: 'line',
+          source: 'lsoas',
+          layout: {
+            visibility: lsoaVisible
+          },
+          paint: {
+            'line-color': 'rgba(0, 0, 0, 0.5)',
+            'line-width': 3
+          },
+          filter: ['==', ['get', 'lsoa21nm'], '']
+        });
+      }
+
+      // 重新绑定事件
+      bindMapEvents();
+
+      // 更新复选框状态
+      document.getElementById('toggle-Boroughs').checked = boroughVisible === 'visible';
+      document.getElementById('toggle-LSOAs').checked = lsoaVisible === 'visible';
+
+      // 更新信息面板显示状态
+      updateInfoPanelsVisibility();
+    }
+
+    // 绑定地图事件
+    function bindMapEvents() {
+      // 区域hover事件 - 使用防抖
+      const handleBoroughMouseMove = (e) => {
+        const features = map.queryRenderedFeatures(e.point, {
+          layers: ['LocalAuthorities']
+        });
+
+        if (features.length === 1) {
+          const name = features[0].properties.name;
+          map.setFilter('highlight', ['==', 'name', name]);
+        } else {
+          map.setFilter('highlight', ['==', 'name', '']);
+        }
+      };
+
+      map.on('mousemove', debounce(handleBoroughMouseMove, 0));
+
+      // 区域点击事件
+      map.on('click', 'LocalAuthorities', (e) => {
+        const name = e.features[0].properties.name;
+        const boroughCode = e.features[0].properties.gss_code;
+
+        document.getElementById('borough-name').textContent = name || '未知';
+        document.getElementById('borough-code').textContent = boroughCode || '未知';
+      });
+
+      // LSOA hover事件 - 使用防抖
+      const handleLsoaMouseMove = (e) => {
+        const features = map.queryRenderedFeatures(e.point, {
+          layers: ['LSOAs']
+        });
+
+        if (features.length === 1) {
+          const name = features[0].properties.lsoa21nm;
+          map.setFilter('highlight-lsoa', ['==', ['get', 'lsoa21nm'], name]);
+        } else {
+          map.setFilter('highlight-lsoa', ['==', ['get', 'lsoa21nm'], '']);
+        }
+      };
+
+      map.on('mousemove', debounce(handleLsoaMouseMove, 10));
+
+      // LSOA点击事件
+      map.on('click', 'LSOAs', (e) => {
+        const name = e.features[0].properties.lsoa21nm;
+        const lsoaCode = e.features[0].properties.lsoa21cd;
+
+        document.getElementById('lsoa-name').textContent = name || '未知';
+        document.getElementById('lsoa-code').textContent = lsoaCode || '未知';
+      });
+    }
 
     function setActiveStyleButton(id) {
       // Remove active class from all buttons
@@ -937,7 +1388,7 @@
       towerbridge: { center: [-0.0753, 51.5055], zoom: 16.5, pitch: 60, bearing: -30 },
       londoneye: { center: [-0.1195, 51.5033], zoom: 17, pitch: 58, bearing: 97 },
       buckingham: { center: [-0.1419, 51.5014], zoom: 17, pitch: 50, bearing: -30 },
-      britishmuseum: { center: [-0.1269, 51.5194], zoom: 17, pitch: 70, bearing: -33 },
+      britishmuseum: { center: [-0.1269, 51.5194], zoom: 17, pitch: 45, bearing: -33 },
       stpaul: { center: [-0.0983, 51.5138], zoom: 17, pitch: 50, bearing: 82 },
       towerof: { center: [-0.0756, 51.5081], zoom: 17, pitch: 55, bearing: 25 },
       trafalgar: { center: [-0.1281, 51.5080], zoom: 17, pitch: 55, bearing: -12 },
@@ -1002,9 +1453,15 @@
         }
       });
     });
+
   </script>
   <!-- Bootstrap core JS-->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+    const popoverList = [...popoverTriggerList].map(triggerEl => new bootstrap.Popover(triggerEl))
+  </script>
+
 </body>
 
 </html>
