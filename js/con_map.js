@@ -5,7 +5,7 @@ const map = new mapboxgl.Map({
   container: 'map',
   style: 'mapbox://styles/mapbox/light-v9',
   center: [-0.1278, 51.5074],
-  zoom: 10
+  zoom: 9.5
 });
 
 map.addControl(new mapboxgl.NavigationControl());
@@ -89,7 +89,7 @@ function loadPOIData() {
           type: 'geojson',
           data: { type: 'FeatureCollection', features: filteredPOI },
           cluster: true,
-          clusterRadius: 50
+          clusterRadius: 70
         });
         
         map.addLayer({
@@ -243,6 +243,30 @@ map.on('load', () => {
   const legendPanel = document.getElementById('legend-panel');
   const searchPanel = document.getElementById('custom-search-panel');
 
+  // 加载 Borough 图层
+  map.addSource('borough', {
+    type: 'geojson',
+    data: './data/London_Boroughs.geojson'
+  });
+  map.addLayer({
+    id: 'borough-boundary',
+    type: 'line',
+    source: 'borough',
+    layout: {
+      'visibility': 'visible'
+    },
+    paint: {
+      'line-width': 1.2,
+      'line-color': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        9, '#cccccc',
+        12, '#cccccc'
+      ]
+    }
+  });
+
   // 加载 LSOA 边界及高亮图层
   map.addSource('lsoa', {
     type: 'geojson',
@@ -252,8 +276,17 @@ map.on('load', () => {
     id: 'lsoa-boundary',
     type: 'line',
     source: 'lsoa',
+    layout: {
+      'visibility': 'none'
+    },
     paint: {
-      'line-color': '#444',
+      'line-color': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        12, '#555555',
+        14, '#555555'
+      ],
       'line-width': 1.5,
       'line-opacity': 0.5
     }
@@ -417,8 +450,9 @@ map.on('load', () => {
   // 监听 Apply 按钮
   document.getElementById('applyIsoBtn').addEventListener('click', async () => {
     const duration = parseInt(document.getElementById('durationSelect').value);
-    if (!latestCoords) {
-      alert('Please enter a postcode first.');
+    const inputValue = document.querySelector('.mapboxgl-ctrl-geocoder input').value.trim();
+    if (!latestCoords || inputValue === '') {
+      alert('You have to input a postcode');
       return;
     }
     const [lon, lat] = latestCoords;
@@ -480,9 +514,14 @@ map.on('load', () => {
   });
 
 
-  // 监听缩放，按复选框状态控制图层显示（修复：不覆盖用户操作）
+  // 监听缩放，按复选框状态控制图层显示（修复：不覆盖用户操作），并控制 borough/lsoa 边界显示
   map.on('zoom', () => {
-    const z = map.getZoom();
+    const zoom = map.getZoom();
+    // 控制 borough/lsoa 边界显示
+    map.setLayoutProperty('borough-boundary', 'visibility', zoom < 12 ? 'visible' : 'none');
+    map.setLayoutProperty('lsoa-boundary', 'visibility', zoom >= 12 ? 'visible' : 'none');
+
+    // 控制 POI 聚合/单点显示
     const categories = ['shop', 'food', 'health', 'leisure'];
     categories.forEach(cat => {
       const checkbox = document.getElementById(`chk-${cat}`);
@@ -499,9 +538,9 @@ map.on('load', () => {
         return;
       }
 
-      const clusterVis = z < 13 ? 'visible' : 'none';
-      const countVis = z < 13 ? 'visible' : 'none';
-      const unclusteredVis = z >= 13 ? 'visible' : 'none';
+      const clusterVis = zoom < 13 ? 'visible' : 'none';
+      const countVis = zoom < 13 ? 'visible' : 'none';
+      const unclusteredVis = zoom >= 13 ? 'visible' : 'none';
 
       if (map.getLayer(`clusters-${cat}`)) map.setLayoutProperty(`clusters-${cat}`, 'visibility', clusterVis);
       if (map.getLayer(`cluster-count-${cat}`)) map.setLayoutProperty(`cluster-count-${cat}`, 'visibility', countVis);
@@ -545,3 +584,20 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
+  // 监听 geocoder 输入框变化，清除等时圈和 marker
+  const inputField = document.querySelector('.mapboxgl-ctrl-geocoder input');
+  if (inputField) {
+    inputField.addEventListener('input', () => {
+      if (inputField.value.trim() === '' && map.getSource('isochrone')) {
+        map.getSource('isochrone').setData({
+          type: 'FeatureCollection',
+          features: []
+        });
+        if (postcodeMarker) {
+          postcodeMarker.remove();
+          postcodeMarker = null;
+        }
+      }
+    });
+  }
