@@ -218,7 +218,17 @@ async function searchByPostcode(postcode, duration = 600) {
     }
 
     if (postcodeMarker) postcodeMarker.remove();
-    postcodeMarker = new mapboxgl.Marker().setLngLat([longitude, latitude]).addTo(map);
+    postcodeMarker = new mapboxgl.Marker({ color: '#f4623a' })
+      .setLngLat([longitude, latitude])
+      .addTo(map);
+
+    map.flyTo({
+      center: [longitude, latitude],
+      zoom: 13,
+      speed: 0.8,
+      curve: 1.5,
+      essential: true
+    });
 
     const popupContent = `
       <b>Postcode: ${postcode}</b><br>
@@ -228,7 +238,6 @@ async function searchByPostcode(postcode, duration = 600) {
       🌿 Leisure: ${counts.leisure}
     `;
     new mapboxgl.Popup().setLngLat([longitude, latitude]).setHTML(popupContent).addTo(map);
-    map.easeTo({ center: [longitude, latitude], zoom: 13 });
 
   } catch (e) {
     alert('Postcode not found or ORS error.');
@@ -444,7 +453,13 @@ map.on('load', () => {
       .setLngLat([lon, lat])
       .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(e.result.place_name))
       .addTo(map);
-    map.easeTo({ center: [lon, lat], zoom: 13 });
+    map.flyTo({
+      center: [lon, lat],
+      zoom: 13,
+      speed: 0.8,
+      curve: 1.5,
+      essential: true
+    });
   });
 
   // 监听 Apply 按钮
