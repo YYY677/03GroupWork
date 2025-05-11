@@ -770,50 +770,151 @@
   <script src="js/scripts.js"></script>
   <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
 
-  <!-- Custom Scripts -->
   <script>
-    // 初始化 AOS
     document.addEventListener('DOMContentLoaded', function () {
-      AOS.init({
-        duration: 800,
-        easing: 'ease-in-out',
-        once: true
+    // Budget slider display 预算滑杆
+    const budgetRange = document.getElementById('budgetRange');
+    const budgetValue = document.getElementById('budgetValue');
+  
+    if (budgetRange && budgetValue) {
+      budgetRange.addEventListener('input', function () {
+        budgetValue.textContent = '£' + this.value;
+      });
+    }
+    // 安全性吸附
+    const slider = document.getElementById('safetyPercentile');
+    const safetyDisplay = document.getElementById('safetyValue');
+    const safetyValues = [14, 29, 43, 57, 71, 86, 100];
+  
+    slider.addEventListener('input', () => {
+      const index = Math.max(0, Math.min(6, parseInt(slider.value)));
+      const value = safetyValues[index];
+      safetyDisplay.textContent = `Top ${value}%`;
+    });
+  
+    // button highlight
+    const commuteButtons = document.querySelectorAll("#commuteButtons button");
+  
+    commuteButtons.forEach((btn) => {
+      btn.addEventListener("click", function () {
+        commuteButtons.forEach((b) => b.classList.remove("active"));
+        this.classList.add("active");
+        const selectedValue = this.getAttribute("data-value");
+        console.log("Selected commute time:", selectedValue);
       });
     });
-
-    // Display slider values
-    document.addEventListener('DOMContentLoaded', function () {
-      const budgetRange = document.getElementById('budgetRange');
-      const budgetValue = document.getElementById('budgetValue');
-
-      if (budgetRange && budgetValue) {
-        budgetRange.addEventListener('input', function () {
-          budgetValue.textContent = '£' + this.value;
-        });
-      }
-
-      const commuteRange = document.getElementById('commuteRange');
-      const commuteValue = document.getElementById('commuteValue');
-
-      if (commuteRange && commuteValue) {
-        commuteRange.addEventListener('input', function () {
-          commuteValue.textContent = this.value + ' minutes';
-        });
-      }
-    });
-
-    // Area selector functionality
-    document.addEventListener('DOMContentLoaded', function () {
-      const findAreasBtn = document.getElementById('findAreasBtn');
-
-      if (findAreasBtn) {
-        findAreasBtn.addEventListener('click', function () {
-          // Can add real query logic here in the future
-          alert('Area filtering feature is currently in development. Please check back soon!');
-        });
+  
+    // 默认权重
+    const defaultWeights = {
+      student:      { shop: 2, health: 1, food: 4, leisure: 3 },
+      professional: { shop: 3, health: 2, food: 3, leisure: 2 },
+      family:       { shop: 3, health: 4, food: 2, leisure: 1 },
+      retiree:      { shop: 2, health: 5, food: 1, leisure: 2 }
+    };
+  
+    let currentWeight = {}; // 当前便利性权重
+  
+    // 自定义按钮逻辑
+    const toggleBtn = document.getElementById("toggleCustomBtn");
+    const panel = document.getElementById("customWeightsPanel");
+  
+    toggleBtn.addEventListener("click", function () {
+      const isVisible = panel.style.display === "block";
+      panel.style.display = isVisible ? "none" : "block";
+      if (!isVisible) {
+        updateCustomWeightsUI();
       }
     });
+  
+    // 更新权重输入框内容
+    function updateCustomWeightsUI() {
+      document.getElementById("weightShop").value = currentWeight.shop ?? '';
+      document.getElementById("weightHealth").value = currentWeight.health ?? '';
+      document.getElementById("weightFood").value = currentWeight.food ?? '';
+      document.getElementById("weightLeisure").value = currentWeight.leisure ?? '';
+    }
+  
+    // 验证权重总和为 10
+    const inputs = [
+      document.getElementById("weightShop"),
+      document.getElementById("weightHealth"),
+      document.getElementById("weightFood"),
+      document.getElementById("weightLeisure"),
+    ];
+  
+    const submitBtn = document.getElementById("findAreasBtn");
+    const warningDiv = document.createElement("div");
+    warningDiv.className = "text-danger mt-2 small";
+    warningDiv.innerText = "Total weight must equal 10.";
+    warningDiv.style.display = "none";
+    document.getElementById("customWeightsPanel").appendChild(warningDiv);
+  
+    inputs.forEach((input) => {
+      input.addEventListener("input", validateWeights);
+    });
+  
+    function validateWeights() {
+      const total = inputs.reduce((sum, input) => {
+        const val = parseInt(input.value, 10);
+        return sum + (isNaN(val) ? 0 : val);
+      }, 0);
+  
+      if (total !== 10) {
+        warningDiv.style.display = "block";
+        submitBtn.disabled = true;
+      } else {
+        warningDiv.style.display = "none";
+        submitBtn.disabled = false;
+      }
+    }
+    // 获取iframe对象
+    const mapFrame = document.getElementById('mapFrame');
+  
+    submitBtn.addEventListener('click', () => {
+      // 获取用户输入的数据
+      const budget = parseInt(document.getElementById("budgetRange").value, 10);
+      const safetyIdx = parseInt(document.getElementById("safetyPercentile").value, 10);
+      const safetyPercentiles = [14, 29, 43, 57, 71, 86, 100];
+      const safety = safetyPercentiles[safetyIdx];
+      const commutePostcode = document.getElementById("commutePostcode").value.trim();
+      const commuteTimeBtn = document.querySelector("#commuteButtons .active");
+      const commuteTime = commuteTimeBtn ? parseInt(commuteTimeBtn.dataset.value, 10) : 30;
+  
+      let weight = {};
+  
+      if (panel.style.display === "block") {
+        weight.shop = parseInt(document.getElementById("weightShop").value, 10) || 0;
+        weight.health = parseInt(document.getElementById("weightHealth").value, 10) || 0;
+        weight.food = parseInt(document.getElementById("weightFood").value, 10) || 0;
+        weight.leisure = parseInt(document.getElementById("weightLeisure").value, 10) || 0;
+      } else {
+        weight = currentWeight; // 使用默认
+      }
+  
+      // 构造消息对象
+      const preferences = {
+        budget,
+        safety,
+        commutePostcode,
+        commuteTime,
+        weight
+      };
+  
+      // 发送到 iframe
+      mapFrame.contentWindow.postMessage(preferences, "*");
+    });
+  
+    const identityButtons = document.querySelectorAll("#identityButtons button");
+    identityButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        identityButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const identity = btn.dataset.value;
+        currentWeight = { ...defaultWeights[identity] };
+      });
+    });
+  
+  });
   </script>
-</body>
-
-</html>
+  </body>
+  </html>
