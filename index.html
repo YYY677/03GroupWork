@@ -37,7 +37,7 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ms-auto my-2 my-lg-0">
-          <li class="nav-item"><a class="nav-link" href="#about">Overview</a></li>
+          <!-- <li class="nav-item"><a class="nav-link" href="#about">Overview</a></li> -->
           <li class="nav-item"><a class="nav-link" href="#intro">City Map</a></li>
           <li class="nav-item"><a class="nav-link" href="#transport">Transport</a></li>
           <li class="nav-item"><a class="nav-link" href="#isochrone">Isochrone</a></li>
@@ -45,7 +45,6 @@
           <li class="nav-item"><a class="nav-link" href="#safety">Safety</a></li>
           <li class="nav-item"><a class="nav-link" href="#convenience">Amenities</a></li>
           <li class="nav-item"><a class="nav-link" href="#selector">Selector</a></li>
-          <li class="nav-item"><a class="nav-link" href="#source">Sources</a></li>
         </ul>
       </div>
     </div>
@@ -58,7 +57,7 @@
           <h2 class="text-white font-weight-bold">Liveable London</h2>
           <hr class="divider" />
         </div>
-        <div class="col-lg-8 align-self-baseline">
+        <div class="col-lg-8 align-self-baseline" id="masthead-content">
           <p class="text-white-75 mb-5">
             Find your ideal London neighborhood by balancing commute time, affordability, safety, and so forth.
           </p>
@@ -72,38 +71,51 @@
             <span class="visually-hidden">Loading...</span>
           </div>
           <br>
-          <a class="btn btn-primary btn-xl" href="#about">Start Exploring!</a>
+          <a class="btn btn-primary btn-xl" href="#intro">Start Exploring!</a>
         </div>
       </div>
     </div>
   </header>
 
   <!-- About-->
-  <section class="page-section bg-primary" id="about"
-    style="background: linear-gradient(135deg, #f4623a 50%, #ffffff 100%);">
-    <div class="container px-4 px-lg-5">
-      <div class="row gx-4 gx-lg-5 justify-content-center">
-        <div class="col-lg-8 text-center" data-aos="fade-up">
-          <h2 class="text-white mt-0">Your Comprehensive London Living Guide</h2>
-          <hr class="divider divider-light" />
-          <p class="text-white-75 mb-2">
+  <section class="bg-primary" id="about" style="height: auto; padding: 3vh 0;">
+    <div class="container px-3">
+      <div class="row justify-content-center">
+        <div class="col-lg-11 py-2 text-center">
+          <h3 class="text-white">Your Comprehensive London Living Guide</h3>
+          <hr class="divider" style="background-color: #fff;" />
+          <p class="text-white mb-4">
             Our platform provides comprehensive data analysis of London. Whether you're looking for affordability,
             convenient transport options, or vibrant communities, we offer detailed insights on rental trends, commuting
             options,
             safety indices, and amenities to help you find your perfect place to live.
           </p>
-          <a class="btn btn-light btn-xl" href="#intro">Learn More</a>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Introduction for London Map -->
-  <section id="intro" class="page-section" style="background: linear-gradient(225deg, #ffffff 0%, #abbaab 100%);">
+  <section id="intro" class="page-section" style="background-color: #ededed;">
+    <div style="position: absolute; top: 4vh; right: 5vw; width: 20vw; z-index: 1000;">
+      <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#content01">
+        <i class="bi bi-info-circle me-2"></i>Map Usage Guide:
+      </button>
+      <div class="collapse mt-2" id="content01">
+        <div class="card card-body"
+          style="background-color: rgba(255, 255, 255, 0.95); box-shadow: 0 0 10px rgba(0,0,0,0.3); z-index: 1000;">
+          <small>
+            - Control map content using sidebar sliders or button selections.<br>
+            - Click on 3D buildings for detailed information.<br>
+            - Use the mouse wheel to zoom and left-click drag to pan.<br>
+            - Right-click and drag to rotate your view and experience London from all angles.<br>
+          </small>
+        </div>
+      </div>
+    </div>
     <div class="container-fluid px-1 px-lg-2">
       <h2 class="text-primary text-center mb-2" data-aos="fade-up">London City Map Explorer</h2>
-
-      <div class="row justify-content-center mb-4">
+      <div class="row justify-content-center">
         <div class="col-lg-10" data-aos="fade-down" data-aos-delay="100">
           <div>
             <p>
@@ -111,15 +123,6 @@
               allows you to explore London's urban structure, building layout, and geographical features, helping you
               better understand the city's spatial distribution and unique character of each area.
             </p>
-            <div class="mt-4">
-              <h5><i class="bi bi-info-circle me-2"></i>Map Usage Guide:</h5>
-              <ul class="median">
-                <li>Control map content using sidebar sliders or button selections</li>
-                <li>Click on 3D buildings for detailed information</li>
-                <li>Use the mouse wheel to zoom and left-click drag to pan</li>
-                <li>Right-click and drag to rotate your view and experience London from all angles</li>
-              </ul>
-            </div>
           </div>
         </div>
       </div>
@@ -135,11 +138,27 @@
 
 
   <!-- Transport Section -->
-  <section id="transport" class="page-section" style="background: linear-gradient(135deg, #abbaab 0%, #ffffff 100%);">
+  <section id="transport" class="page-section" style="background-color: #ededed;">
+    <div style="position: absolute; top: 4vh; right: 5vw; width: 20vw; z-index: 1000;">
+      <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#content01">
+        <i class="bi bi-info-circle me-2"></i>Transport Tips:
+      </button>
+      <div class="collapse mt-2" id="content01">
+        <div class="card card-body"
+          style="background-color: rgba(255, 255, 255, 0.95); box-shadow: 0 0 10px rgba(0,0,0,0.3); z-index: 1000;">
+          <small>
+            - Use an Oyster card or contactless payment to save on fares.<br>
+            - Peak hours (07:30–09:30, 16:00–19:00) have higher fares.<br>
+            - Plan journeys with Citymapper or TfL Go apps.<br>
+            - Consider Santander Cycles for short trips.<br>
+            - Zones 1–3 cover most popular areas.<br>
+          </small>
+        </div>
+      </div>
+    </div>
     <div class="container-fluid px-1 px-lg-2">
       <h2 class="text-primary text-center mb-2" data-aos="fade-up">London Transport Network</h2>
-
-      <div class="row justify-content-center mb-4">
+      <div class="row justify-content-center">
         <div class="col-lg-10" data-aos="fade-down" data-aos-delay="100">
           <div>
             <p class="median">
@@ -147,24 +166,6 @@
               an extensive public transport system including the iconic red double-decker buses, the Underground,
               Docklands Light Railway (DLR), and trains, offering diverse travel options throughout the city.
             </p>
-
-            <div class="card border-0 bg-white shadow-sm mt-4 mb-4">
-              <div class="card-body">
-                <h5 class="card-title text-primary"><i class="bi bi-star me-2"></i>Transport Tips</h5>
-                <ul class="list-group list-group-flush small">
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-credit-card me-2 text-primary"></i>Use an
-                    Oyster card or contactless payment to save on fares</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-clock me-2 text-primary"></i>Peak hours
-                    (07:30–09:30, 16:00–19:00) have higher fares</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-phone me-2 text-primary"></i>Plan journeys
-                    with Citymapper or TfL Go apps</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-bicycle me-2 text-primary"></i>Consider
-                    Santander Cycles for short trips</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-info-circle me-2 text-primary"></i>Zones 1–3
-                    cover most popular areas</li>
-                </ul>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -180,12 +181,12 @@
 
 
   <!-- Isochrone Section -->
-  <section id="isochrone" class="page-section" style="background: linear-gradient(225deg, #ffffff 0%, #abbaab 100%);">
+  <section id="isochrone" class="page-section" style="background-color: #ededed;">
     <div class="container-fluid px-1 px-lg-2">
       <h2 class="text-primary text-center mb-2" data-aos="fade-up">Travel Time & Accessibility</h2>
 
       <!-- 上方：说明文字和交互按钮 -->
-      <div class="row justify-content-center mb-4">
+      <div class="row justify-content-center">
         <div class="col-lg-10" data-aos="fade-down" data-aos-delay="100">
           <div>
             <p>
@@ -213,7 +214,7 @@
 
 
   <!-- Housing Section -->
-  <section id="housing" class="page-section" style="background: linear-gradient(135deg, #abbaab 0%, #ffffff 100%);">
+  <section id="housing" class="page-section" style="background-color: #ededed;">
     <div class="container-fluid px-1 px-lg-2">
       <h2 class="text-primary text-center mb-2" data-aos="fade-up">London Housing Market Analysis</h2>
 
@@ -230,8 +231,6 @@
         </div>
       </div>
 
-
-
       <div class="row justify-content-center">
         <div class="col-11" data-aos="fade-up" data-aos-delay="200">
           <iframe src="./maps&data/HousingPrice.html" frameborder="0"
@@ -242,7 +241,7 @@
       <!-- 图表区域 -->
       <div class="row mt-4 justify-content-center">
         <!-- 租金趋势分析图表 -->
-        <div class="col-md-5 mb-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="col-md-5 mb-4 px-3 offset-md-1" data-aos="fade-up" data-aos-delay="300">
           <div class="bg-white p-3 rounded shadow-sm h-100">
             <h5 class="text-primary">Rental Trends Analysis</h5>
             <p class="small text-muted mb-2">The chart shows average rent levels and historical changes across London
@@ -259,7 +258,7 @@
         </div>
 
         <!-- 价格比较 & 预测图表 -->
-        <div class="col-md-7 mb-4" data-aos="fade-up" data-aos-delay="400">
+        <div class="col-md-5 mb-4 px-3" data-aos="fade-up" data-aos-delay="400">
           <div class="bg-white p-3 rounded shadow-sm h-100">
             <h5 class="text-primary">Price Trends Comparison</h5>
             <p class="small text-muted mb-2">Compare housing prices across different areas and their changing trends to
@@ -315,7 +314,7 @@
 
 
   <!-- Safety Section -->
-  <section id="safety" class="page-section" style="background: linear-gradient(135deg, #adb5bd 0%, #9aaab4 100%);">
+  <section id="safety" class="page-section" style="background-color: #ededed;">
     <div class="container-fluid px-4 px-lg-5">
       <h2 class="text-primary text-center mb-4" data-aos="fade-up">London Safety Index</h2>
       <div class="row">
@@ -433,7 +432,7 @@
   </section>
 
   <!-- Convenience Section -->
-  <section id="convenience" class="page-section" style="background: linear-gradient(135deg, #9aaab4 0%, #86a0b3 100%);">
+  <section id="convenience" class="page-section" style="background-color: #ededed;">
     <div class="container-fluid px-4 px-lg-5">
       <h2 class="text-primary text-center mb-4" data-aos="fade-up">Amenities & Convenience Analysis</h2>
       <div class="row">
@@ -632,7 +631,7 @@
   </section>
 
   <!-- Area Selector Section -->
-  <section id="selector" class="page-section" style="background: linear-gradient(135deg, #86a0b3 0%, #7395b3 100%);">
+  <section id="selector" class="page-section" style="background-color: #ededed;">
     <div class="container-fluid px-4 px-lg-5">
       <h2 class="text-primary text-center mb-4" data-aos="fade-up">London Area Selector</h2>
       <div class="row">
@@ -822,110 +821,20 @@
     </div>
   </section>
 
-  <!-- Source Data -->
-  <section id="source" class="page-section bg-primary text-white">
-    <div class="container px-4 px-lg-5">
-      <h2 class="text-center mb-4" data-aos="fade-up">Data and Sources</h2>
-      <hr class="divider divider-light" />
-      <div class="row">
-        <!-- 数据来源 -->
-        <div class="col-md-5 text-white-100 mb-4 justify-content-center" data-aos="fade-right" data-aos-delay="100">
-          <h3 class="text-center mb-3">Data Sources</h3>
-          <ul class="list-group">
-            <li class="list-group-item bg-transparent text-white border-light">
-              <i class="bi bi-train-front-fill me-2"></i>
-              <a href="https://gis-tfl.opendata.arcgis.com" target="_blank" class="text-white">London Transport Data
-                (TfL)</a>
-            </li>
-            <li class="list-group-item bg-transparent text-white border-light">
-              <i class="bi bi-clock-fill me-2"></i>
-              <a href="https://github.com/pbarber/uk-isochrones-map" target="_blank" class="text-white">Isochrone Map
-                Reference Project</a>
-            </li>
-            <li class="list-group-item bg-transparent text-white border-light">
-              <i class="bi bi-house-fill me-2"></i>
-              <a href="https://data.london.gov.uk/dataset/uk-house-price-index" target="_blank"
-                class="text-white">London Borough House Price Data (GLA)</a>
-            </li>
-            <li class="list-group-item bg-transparent text-white border-light">
-              <i class="bi bi-cash-coin me-2"></i>
-              <a href="https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics"
-                target="_blank" class="text-white">Private Rental Market Statistics (ONS)</a>
-            </li>
-            <li class="list-group-item bg-transparent text-white border-light">
-              <i class="bi bi-map-fill me-2"></i>
-              <a href="https://www.ons.gov.uk/peoplepopulationandcommunity/housing/datasets/medianpricepaidbylowerlayersuperoutputareahpssadataset46"
-                target="_blank" class="text-white">LSOA House Price Data (ONS)</a>
-            </li>
-            <li class="list-group-item bg-transparent text-white border-light">
-              <i class="bi bi-shield-fill me-2"></i>
-              <a href="https://data.police.uk/data/" target="_blank" class="text-white">UK Police Crime Data</a>
-            </li>
-          </ul>
-        </div>
-        <!-- 材料与工具 -->
-        <div class="col-md-7 text-white-100 mb-4 justify-content-center" data-aos="fade-left" data-aos-delay="200">
-          <h3 class="text-center mb-3">Technologies and Tools</h3>
-          <div class="row">
-            <div class="col-md-6">
-              <ul class="list-group">
-                <li class="list-group-item bg-transparent text-white border-light">
-                  <i class="bi bi-code-slash me-2"></i><strong>HTML5 & CSS3:</strong> Web structure & styling
-                </li>
-                <li class="list-group-item bg-transparent text-white border-light">
-                  <i class="bi bi-filetype-js me-2"></i><strong>JavaScript:</strong> Interactivity & data handling
-                </li>
-                <li class="list-group-item bg-transparent text-white border-light">
-                  <i class="bi bi-map me-2"></i><strong>Mapbox:</strong> Interactive map library
-                </li>
-              </ul>
-            </div>
-            <div class="col-md-6">
-              <ul class="list-group">
-                <li class="list-group-item bg-transparent text-white border-light">
-                  <i class="bi bi-bar-chart-fill me-2"></i><strong>ECharts:</strong> Data visualization library
-                </li>
-                <li class="list-group-item bg-transparent text-white border-light">
-                  <i class="bi bi-bootstrap me-2"></i><strong>Bootstrap:</strong> Responsive frontend framework
-                </li>
-                <li class="list-group-item bg-transparent text-white border-light">
-                  <i class="bi bi-geo-alt-fill me-2"></i><strong>Turf.js:</strong> Geospatial analysis library
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div class="mt-4 text-center">
-            <h5 class="mb-3">Project Team</h5>
-            <p>This project was collaboratively developed by a group of students from the CASA Master's program, aiming
-              to provide a comprehensive living guide for London residents and potential newcomers.</p>
-            <button class="btn btn-outline-light mt-2">
-              <i class="bi bi-people-fill me-2"></i>Meet Our Team
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- Footer-->
-  <footer class="bg-dark text-white py-5">
+  <footer class="bg-primary text-white py-5">
     <div class="container px-4 px-lg-5">
       <div class="row">
-        <div class="col-md-4 mb-3">
-          <h5>Liveable London</h5>
-          <p class="small">A comprehensive guide to help you find the ideal place to live in London, integrating data on
-            rent, transport, safety, and convenience.</p>
-        </div>
-        <div class="col-md-4 mb-3">
-          <h5>Quick Links</h5>
+        <div class="col-md-6 mb-3">
+          <h5>Team Members</h5>
           <ul class="list-unstyled">
-            <li><a href="#about" class="text-white-50">Project Overview</a></li>
-            <li><a href="#intro" class="text-white-50">City Map</a></li>
-            <li><a href="#housing" class="text-white-50">Housing Analysis</a></li>
-            <li><a href="#selector" class="text-white-50">Area Selector</a></li>
+            <li><i class="bi bi-person-circle me-2"></i>Team Member 1 - Data Analysis</li>
+            <li><i class="bi bi-person-circle me-2"></i>Team Member 2 - Frontend Development</li>
+            <li><i class="bi bi-person-circle me-2"></i>Team Member 3 - GIS Specialist</li>
+            <li><i class="bi bi-person-circle me-2"></i>Team Member 4 - UI/UX Design</li>
           </ul>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-md-6 mb-3">
           <h5>Contact Us</h5>
           <ul class="list-unstyled">
             <li><i class="bi bi-envelope me-2"></i>info@londonliving.example.com</li>
@@ -956,7 +865,14 @@
 
   <!-- Custom Scripts -->
   <script>
-
+    // 初始化 AOS
+    document.addEventListener('DOMContentLoaded', function () {
+      AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true
+      });
+    });
 
     // Display slider values
     document.addEventListener('DOMContentLoaded', function () {
