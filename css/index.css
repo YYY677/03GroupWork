@@ -34,6 +34,15 @@ body {
   height: 3px;
   background: linear-gradient(to right, transparent, white, transparent);
 }
+#about::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 4px;
+  background: linear-gradient(to right, transparent, white, transparent);
+}
 
 
 /* Buttons */
