@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>London Crime Map with Quantile Legend & Local Geocoder</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+
+  <!-- Mapbox GL JS -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js"></script>
+
+  <!-- Mapbox Geocoder -->
+  <link
+    href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css"
+    rel="stylesheet"
+  />
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+
+  <!-- ECharts -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+  <!-- Turf.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+
+  <style>
+    html, body { margin:0; padding:0; height:100%; width:100%; font-family:Arial,sans-serif; }
+    #map { position:absolute; top:0; left:0; right:0; bottom:0; }
+
+    /* 左侧控制面板 */
+    .map-overlay {
+      position:absolute; left:10px; top:10px;
+      background: rgba(255,255,255,0.9);
+      padding:12px; border-radius:10px;
+      max-width:260px; z-index:100;
+      box-shadow:0 4px 20px rgba(0,0,0,0.15);
+      font-size:14px; color:#333;
+    }
+    .map-overlay label { font-size:16px; font-weight:600; color:#4a4a4a; display:block; margin-top:10px; }
+    .map-overlay input#year-slider {
+      width:180px; margin-top:4px; accent-color:#f4623a; background-color:#fff;
+    }
+    /* 自定义轨道 & 拇指 */
+    input#year-slider::-webkit-slider-runnable-track {
+      height:6px; background:#e0dddd; border:none; border-radius:3px;
+    }
+    input#year-slider::-moz-range-track {
+      height:6px; background:#e0dddd; border:none; border-radius:3px;
+    }
+    input#year-slider::-ms-track {
+      height:6px; background:#e0dddd; border-color:transparent; color:transparent;
+    }
+    input#year-slider::-webkit-slider-thumb {
+      -webkit-appearance:none; width:14px; height:14px; border-radius:50%;
+      background:#f4623a; margin-top:-4px;
+    }
+    input#year-slider::-moz-range-thumb {
+      width:14px; height:14px; border:none; border-radius:50%; background:#f4623a;
+    }
+
+    .map-overlay select#crime-type {
+      width:100%; font-size:15px; padding:6px 8px; margin-top:6px;
+      border:2px solid #fcd5b4; border-radius:6px; background:#fff;
+      appearance:none; transition:border-color .2s,box-shadow .2s;
+    }
+    .map-overlay select#crime-type:focus {
+      outline:none; border-color:#f4623a; box-shadow:0 0 6px rgba(244,98,58,0.4);
+    }
+    /* 复选框切换显示模式 */
+    #display-options { margin-top:12px; }
+    #display-options label {
+      display:flex; align-items:center; font-size:14px; margin-bottom:6px;
+    }
+    #display-options input {
+      margin-right:6px; width:16px; height:16px; cursor:pointer;
+    }
+
+    /* Check Source 容器 */
+    #check-source-container {
+      position:absolute; left:10px; z-index:100;
+      /* top 会由脚本设置 */
+    }
+    #checkSourceBtn {
+      background:#f4623a; border:none; padding:6px 12px;
+      color:#fff; border-radius:4px; cursor:pointer; font-size:14px;
+      display:block;
+    }
+    #sourceContent {
+      display:none; margin-top:6px;
+      background:rgba(255,255,255,0.9);
+      padding:8px; border-radius:6px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.15);
+      font-size:14px; line-height:1.5;
+    }
+    #sourceContent ul { padding-left:16px; margin:0; }
+    #sourceContent li { margin-bottom:4px; }
+
+    /* 右上角搜索框 */
+    #geocoder-container {
+      position:absolute; top:10px; right:10px; z-index:200; width:260px;
+    }
+    .mapboxgl-ctrl-geocoder {
+      width:100% !important; border:2px solid #fcd5b4 !important;
+      box-shadow:0 0 6px rgba(244,98,58,0.3) !important;
+      border-radius:6px !important; transition:border-color .2s,box-shadow .2s;
+    }
+    .mapboxgl-ctrl-geocoder:hover,
+    .mapboxgl-ctrl-geocoder input:focus {
+      border-color:#f4623a !important;
+      box-shadow:0 0 12px rgba(244,98,58,0.5) !important;
+    }
+    .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--icon { left:12px !important; }
+    .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--input {
+      font-size:16px !important; padding-left:40px !important;
+    }
+
+    /* 分位图例 */
+    #legend {
+      position:absolute; bottom:10px; left:10px;
+      background:rgba(255,255,255,0.9); padding:5px;
+      border-radius:5px; z-index:100; max-width:200px;
+    }
+    .legend-item { display:flex; align-items:center; margin-bottom:2px; }
+    .legend-key { width:15px; height:15px; margin-right:5px; border-radius:3px; }
+
+    /* 底部图表 */
+    #chart-container {
+      display:none; position:absolute; bottom:20px; right:10px;
+      width:450px; background:rgba(255,255,255,0.9);
+      border-radius:5px; padding:12px;
+      box-shadow:0 4px 20px rgba(0,0,0,0.15); z-index:300;
+    }
+    #chart-close-btn {
+      position:absolute; top:8px; right:8px;
+      background:none; border:none; font-size:18px; cursor:pointer;
+    }
+    #lsoa-name {
+      text-align:center; margin:0 0 8px;
+      font-size:18px; font-weight:bold;
+    }
+    #chart-mode-toggle { text-align:center; margin-bottom:8px; }
+    #chart-mode-toggle button {
+      border:2px solid #fcd5b4; background:#fff;
+      margin:0 8px; padding:6px 12px; cursor:pointer; font-size:14px;
+    }
+    #chart { width:100%; height:400px; }
+  </style>
+</head>
+<body>
+
+  <div id="map"></div>
+
+  <!-- 左侧控制面板 -->
+  <div class="map-overlay">
+    <label>Year: <span id="year-label">2011</span></label>
+    <input id="year-slider" type="range" min="2011" max="2024" step="1" value="2011">
+
+    <label for="crime-type">Crime Type:</label>
+    <select id="crime-type">
+      <option value="BURGLARY">Burglary</option>
+      <option value="ROBBERY">Robbery</option>
+      <option value="THEFT">Theft</option>
+      <option value="VIOLENCE_AGAINST_THE_PERSON">Violence</option>
+    </select>
+
+    <div id="display-options">
+      <label><input type="checkbox" id="display-count" checked> Total crime</label>
+      <label><input type="checkbox" id="display-density"> Crime density</label>
+    </div>
+  </div>
+
+  <!-- Check Source 放在面板外 -->
+  <div id="check-source-container">
+    <button id="checkSourceBtn">Check Source</button>
+    <div id="sourceContent">
+      <ul>
+        <li><a href="https://data.london.gov.uk/dataset/recorded_crime_summary" target="_blank">Crime data</a></li>
+        <li><a href="https://www.ons.gov.uk/peoplepopulationandcommunity/housing/datasets/medianpricepaidbylowerlayersuperoutputareahpssadataset46" target="_blank">Boundary data</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 右上角搜索框 -->
+  <div id="geocoder-container"></div>
+
+  <!-- 分位图例 -->
+  <div id="legend"></div>
+
+  <!-- 底部图表 -->
+  <div id="chart-container">
+    <button id="chart-close-btn">✖</button>
+    <h4 id="lsoa-name"></h4>
+    <div id="chart-mode-toggle">
+      <button data-mode="count" class="active">Total Count</button>
+      <button data-mode="density">Crime Density</button>
+    </div>
+    <div id="chart"></div>
+  </div>
+
+  <script>
+    // 动态定位 Check Source 按钮
+    window.addEventListener('load', () => {
+      const overlay = document.querySelector('.map-overlay');
+      const box = document.getElementById('check-source-container');
+      const rect = overlay.getBoundingClientRect();
+      box.style.top = rect.bottom + 10 + 'px';
+    });
+    // 折叠 Check Source
+    document.getElementById('checkSourceBtn').addEventListener('click', () => {
+      const src = document.getElementById('sourceContent');
+      src.style.display = src.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Mapbox & state setup
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY2FzYTAwMDMtaGFvZGEiLCJhIjoiY203dXBnem5xMDMwdjJscXUzcTF0dzI5OCJ9.AYcGJ2cpn5afQoEHnby4TQ';
+    let searchMarker = null;
+
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [-0.05, 51.5],
+      zoom: 10.5
+    });
+
+    let allFeatures = [], selectedProps = null, chartMode = 'count';
+    const years = Array.from({length:2024-2011+1},(_,i)=>2011+i);
+    const colors = ['#2166AC','#92c5de','#d1e5f0','#fddbc7','#f4a582','#d6604d','#b2182b'];
+    const displayLabels = {
+      BURGLARY:"Burglary", ROBBERY:"Robbery",
+      THEFT:"Theft", VIOLENCE_AGAINST_THE_PERSON:"Violence"
+    };
+    const chart = echarts.init(document.getElementById('chart'));
+    window.addEventListener('resize',()=>chart.resize());
+
+    // Utility functions
+    function calculateQuantiles(arr,num){
+      const d=arr.filter(v=>!isNaN(v)).sort((a,b)=>a-b);
+      if(!d.length) return [];
+      let qs=[]; for(let i=1;i<num;i++) qs.push(d[Math.floor(i*d.length/num)]);
+      return [...new Set(qs)];
+    }
+    function getQuantileColor(prop){
+      const vals=allFeatures.map(f=>+f.properties[prop]);
+      const qs=calculateQuantiles(vals,7);
+      let expr=['step',['get',prop],colors[0]];
+      qs.forEach((q,i)=>expr.push(q,colors[i+1]));
+      return expr;
+    }
+    function getQuantileDensityColor(prop){
+      const vals=allFeatures.map(f=>{
+        const c=+f.properties[prop],a=+f.properties['Area_km2'];
+        return a>0?c/a:0;
+      });
+      const qs=calculateQuantiles(vals,7);
+      let expr=['step',['coalesce',['/',['get',prop],['get','Area_km2']],0],colors[0]];
+      qs.forEach((q,i)=>expr.push(q,colors[i+1]));
+      return expr;
+    }
+    function updateLegend(type,mode,prop){
+      const lg=document.getElementById('legend'); lg.innerHTML='';
+      const t=document.createElement('div');
+      t.style.fontWeight='bold'; t.style.marginBottom='5px';
+      t.textContent=`${displayLabels[type]} (${mode==='density'?'Density':'Total'})`;
+      lg.appendChild(t);
+      let vals=allFeatures.map(f=>+f.properties[prop]);
+      if(mode==='density') vals=allFeatures.map(f=>{
+        const c=+f.properties[prop],a=+f.properties['Area_km2'];
+        return a>0?c/a:0;
+      });
+      vals=vals.filter(v=>!isNaN(v)).sort((a,b)=>a-b);
+      if(!vals.length) return;
+      const qs=calculateQuantiles(vals,7);
+      const breaks=[vals[0],...qs,vals[vals.length-1]];
+      for(let i=0;i<breaks.length-1;i++){
+        const item=document.createElement('div'); item.className='legend-item';
+        const key=document.createElement('span'); key.className='legend-key';
+        key.style.backgroundColor=colors[i];
+        const lbl=i===breaks.length-2
+          ?`${breaks[i].toFixed(2)}+`
+          :`${breaks[i].toFixed(2)} - ${breaks[i+1].toFixed(2)}`;
+        item.appendChild(key);
+        item.appendChild(document.createTextNode(lbl));
+        lg.appendChild(item);
+      }
+    }
+    function updateLayer(){
+      const y=document.getElementById('year-slider').value;
+      const ct=document.getElementById('crime-type').value;
+      const prop=`${y}_${ct}`;
+      const expr=chartMode==='density'
+        ? getQuantileDensityColor(prop)
+        : getQuantileColor(prop);
+      map.setPaintProperty('LSOAs-fill','fill-color',expr);
+      updateLegend(ct,chartMode,prop);
+    }
+    function updateCharts(){
+      if(!selectedProps) return;
+      const y=+document.getElementById('year-slider').value;
+      const area=+selectedProps['Area_km2']||1;
+      const pieData=Object.keys(displayLabels).map(type=>{
+        const v=+selectedProps[`${y}_${type}`]||0;
+        return {name:displayLabels[type],value:chartMode==='count'?v:+(v/area).toFixed(2)};
+      });
+      const lineSeries=Object.keys(displayLabels).map(type=>({
+        name:displayLabels[type],type:'line',smooth:true,
+        data:years.map(yy=>{
+          const v=+selectedProps[`${yy}_${type}`]||0;
+          return chartMode==='count'?v:+(v/area).toFixed(2);
+        })
+      }));
+      const opt={
+        tooltip:{trigger:'item'},
+        legend:{bottom:0,left:'center',textStyle:{fontSize:12}},
+        grid:{top:'50%',left:'8%',right:'8%',bottom:'10%'},
+        xAxis:{type:'category',data:years,boundaryGap:false,axisLabel:{fontSize:11}},
+        yAxis:{type:'value',name:chartMode==='count'?'Count':'Density',axisLabel:{fontSize:11}},
+        series:[
+          {name:'Proportion',type:'pie',radius:'30%',center:['50%','25%'],
+            label:{formatter:'{b}: {c} ({d}%)',fontSize:12},data:pieData},
+          ...lineSeries
+        ]
+      };
+      chart.setOption(opt,{notMerge:true});
+      chart.resize();
+    }
+
+    map.on('load',()=>{
+      // 加载本地 LSOA GeoJSON
+      fetch('data/Crime_data_2011_2024_merged2.geojson')
+        .then(r=>r.json())
+        .then(data=>{
+          allFeatures = data.features;
+          map.addSource('LSOAs',{type:'geojson',data});
+          map.addLayer({
+            id:'LSOAs-fill',type:'fill',source:'LSOAs',
+            paint:{'fill-color':getQuantileColor('2011_BURGLARY'),'fill-opacity':0.7}
+          });
+          updateLegend('BURGLARY','count','2011_BURGLARY');
+          map.addLayer({
+            id:'LSOA-highlight',type:'line',source:'LSOAs',
+            paint:{'line-color':'#333','line-width':2},
+            filter:['==',['get','LSOA Code'],'']
+          });
+
+          // 本地 geocoder
+          function forwardGeocoder(query){
+            const q=query.toLowerCase(), matches=[];
+            for(const f of allFeatures){
+              const name=(f.properties['LSOA Name']||'').toLowerCase();
+              const code=(f.properties['LSOA Code']||'').toLowerCase();
+              if(name.includes(q)||code.includes(q)){
+                const center=turf.centroid(f.geometry).geometry.coordinates;
+                matches.push({
+                  type:'Feature',
+                  geometry:{type:'Point',coordinates:center},
+                  text:f.properties['LSOA Name'],
+                  place_name:f.properties['LSOA Name'],
+                  properties:f.properties
+                });
+              }
+            }
+            return matches;
+          }
+
+          // 初始化 Geocoder
+          const geocoder = new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            placeholder:'Search postcode, lsoa or address...',
+            mapboxgl: mapboxgl,
+            marker: false,
+            bbox: [-9.0,49.75,2.01,61.01],
+            countries: 'gb',
+            localGeocoder: forwardGeocoder
+          });
+          map.addControl(geocoder,'top-right');
+          map.addControl(new mapboxgl.NavigationControl(),'top-right');
+          map.addControl(new mapboxgl.ScaleControl(),'bottom-left');
+
+          geocoder.on('result', e => {
+            const props    = e.result.properties;
+            const name     = props['LSOA Name']   || e.result.place_name;
+            const code     = props['LSOA Code']   || '';
+            const [lon,lat] = e.result.geometry.coordinates;
+
+            map.flyTo({ center:[lon,lat], zoom:13 });
+            
+            
+            if (searchMarker) {
+                searchMarker.remove();
+                searchMarker = null;
+            }
+            
+            if (code) {
+                // —— 本地 LSOA 结果 —— 直接按 code 高亮
+                map.setFilter('LSOA-highlight',
+                ['==',['get','LSOA Code'], code]
+                );
+                selectedProps = props;
+                /* ...更新图表... */
+            } else {
+                // —— 官方 Postcode/地址 结果 —— 除了打一个 Marker，我们再找它在哪个 LSOA 里
+                searchMarker= new mapboxgl.Marker({ color:'#f4623a' })
+                .setLngLat([lon,lat])
+                .setPopup(new mapboxgl.Popup().setText(name))
+                .addTo(map);
+
+                // 1) 用 Turf 判断落在哪个多边形
+                const pt = turf.point([lon,lat]);
+                let containingCode = null;
+                for (const f of allFeatures) {
+                if (turf.booleanPointInPolygon(pt, f.geometry)) {
+                    containingCode = f.properties['LSOA Code'];
+                    break;
+                }
+                }
+                // 2) 如果找到了，就高亮
+                if (containingCode) {
+                map.setFilter('LSOA-highlight',
+                    ['==',['get','LSOA Code'], containingCode]
+                );
+                // 可选：把弹出的 Popup 标题换成 LSOA 名称
+                const containingName = allFeatures.find(f=>f.properties['LSOA Code']===containingCode)
+                                                    .properties['LSOA Name'];
+                // 更新 Marker 的 popup
+                new mapboxgl.Popup()
+                    .setLngLat([lon,lat])
+                    .setHTML(`<strong>${name}</strong><br/>In LSOA: ${containingName}`)
+                    .addTo(map);
+                }
+            }
+            });
+
+            // 当用户手动把输入框清空时
+            geocoder.on('clear', () => {
+            // 除去 marker
+            if (searchMarker) {
+                searchMarker.remove();
+                searchMarker = null;
+            }
+            // 也清除 LSOA 高亮
+            map.setFilter('LSOA-highlight',['==',['get','LSOA Code'], '']);
+            // 隐藏底部图表（可选）
+            document.getElementById('chart-container').style.display = 'none';
+            selectedProps = null;
+            });
+        })
+        .catch(console.error);
+    });
+
+    // UI 绑定
+    document.getElementById('year-slider').addEventListener('input',e=>{
+      document.getElementById('year-label').textContent=e.target.value;
+      updateLayer(); if(selectedProps) updateCharts();
+    });
+    document.getElementById('crime-type').addEventListener('change',()=>{
+      updateLayer(); if(selectedProps) updateCharts();
+    });
+    const cbCount=document.getElementById('display-count'),
+          cbDensity=document.getElementById('display-density');
+    cbCount.addEventListener('change',()=>{
+      if(cbCount.checked){ cbDensity.checked=false; chartMode='count'; updateLayer(); if(selectedProps) updateCharts(); }
+      else cbCount.checked=true;
+    });
+    cbDensity.addEventListener('change',()=>{
+      if(cbDensity.checked){ cbCount.checked=false; chartMode='density'; updateLayer(); if(selectedProps) updateCharts(); }
+      else cbDensity.checked=true;
+    });
+
+    // hover popup
+    const hoverPopup = new mapboxgl.Popup({closeButton:false,closeOnClick:false});
+    map.on('mouseenter','LSOAs-fill',()=>map.getCanvas().style.cursor='pointer');
+    map.on('mousemove','LSOAs-fill',e=>{
+      const p=e.features[0].properties;
+      const y=document.getElementById('year-slider').value;
+      const ct=document.getElementById('crime-type').value;
+      const area=+p['Area_km2']||0;
+      const cnt=+p[`${y}_${ct}`]||0;
+      const dens=area>0?(cnt/area).toFixed(2):'N/A';
+      hoverPopup.setLngLat(e.lngLat)
+        .setHTML(`<strong>${p['LSOA Name']}</strong><br>`+
+                 `Area: ${area.toFixed(3)} km²<br>`+
+                 `Count: ${cnt}<br>`+
+                 `Density: ${dens}`)
+        .addTo(map);
+    });
+    map.on('mouseleave','LSOAs-fill',()=>{
+      map.getCanvas().style.cursor=''; hoverPopup.remove();
+    });
+
+    // click → highlight & chart
+    map.on('click','LSOAs-fill',e=>{
+      const props=e.features[0].properties;
+      const name=props['LSOA Name'], code=props['LSOA Code'];
+      map.setFilter('LSOA-highlight',['==',['get','LSOA Code'],code]);
+      selectedProps=props;
+      document.getElementById('lsoa-name').textContent=`LSOA: ${name} (${code})`;
+      document.getElementById('chart-container').style.display='block';
+      updateCharts();
+    });
+    document.getElementById('chart-close-btn').addEventListener('click',()=>{
+      document.getElementById('chart-container').style.display='none';
+      selectedProps=null;
+      map.setFilter('LSOA-highlight',['==',['get','LSOA Code'],'']);
+    });
+  </script>
+
+</body>
+</html>
