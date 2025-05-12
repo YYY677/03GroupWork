@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rental Recommendation Map</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+  <script src="https://unpkg.com/kd-tree-javascript@1.0.3/kdTree-min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; }
+    #map { height: 100vh; width: 100%; }
+
+    #recommendationCard {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
+      width: 340px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background-color: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 0 10px rgba(244, 98, 58, 0.4);
+      border: 2px solid #f4623a;
+      border-radius: 10px;
+      transition: box-shadow 0.2s, border 0.2s;
+    }
+
+    #recommendationCard:hover {
+      box-shadow: 0 0 14px rgba(244, 98, 58, 0.75);
+    }
+
+    #infoCard {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      z-index: 10;
+      width: 300px;
+      background-color: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 0 8px rgba(244, 98, 58, 0.4);
+      border: 1px solid #fbbca2;
+      border-radius: 10px;
+      padding: 0;
+      display: none;
+      transition: box-shadow 0.2s, border 0.2s;
+    }
+
+    #infoCard:hover {
+      box-shadow: 0 0 14px rgba(244, 98, 58, 0.75);
+    }
+
+    .info-header {
+      background-color: #f4623a;
+      color: white;
+      border-radius: 10px 10px 0 0;
+      padding: 8px 12px;
+    }
+
+    .info-body {
+      padding: 10px;
+    }
+
+    .card-header.bg-primary {
+      background-color: #f4623a !important;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .recommend-card {
+      font-size: 0.85em;
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .recommend-card:hover {
+      background: #fef8f4;
+      border-color: #f4623a;
+    }
+
+    .recommend-title {
+      font-weight: 600;
+      color: #f4623a;
+      margin-bottom: 4px;
+    }
+
+    .recommend-section {
+      margin-bottom: 2px;
+    }
+
+    .recommend-gap {
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="recommendationCard" class="card d-none">
+    <div class="card-header bg-primary text-white">
+      <h6 class="mb-0">Top 4 Recommended Areas</h6>
+    </div>
+    <div class="card-body card-grid" id="recommendationList"></div>
+  </div>
+  <div id="infoCard"></div>
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiNDk4Mjg5MjQxIiwiYSI6ImNtNjgwZWt5eTA5c2Qya3M4OW4yM3JvZzcifQ.NpJX3xw-xfripS6msKI8_A';
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/light-v11',
+      center: [-0.12, 51.5],
+      zoom: 10
+    });
+
+    function loadJson(url, callback) {
+      return fetch(url)
+        .then(response => response.json())
+        .then(data => callback(data))
+        .catch(error => console.error('Error loading JSON:', error));
+    }
+
+    function distance(a, b) {
+      return turf.distance(turf.point([a.lng, a.lat]), turf.point([b.lng, b.lat]));
+    }
+
+    function scoreFeature(props, weights) {
+      return (
+        (props.shop ?? 0) * weights.shop +
+        (props.food ?? 0) * weights.food +
+        (props.health ?? 0) * weights.health +
+        (props.leisure ?? 0) * weights.leisure
+      );
+    }
+
+    async function renderRecommendations(prefs) {
+      if (!prefs.budget || !prefs.commuteTime || !prefs.commutePostcode || !prefs.safety || !prefs.weight) {
+        alert("Please complete all preference inputs before generating recommendations.");
+        return;
+      }
+
+      const lsoaData = await fetch('data/merged_data.geojson').then(res => res.json());
+      const features = lsoaData.features;
+      const safetyThreshold = prefs.safety;
+
+      const geoRes = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${prefs.commutePostcode}.json?access_token=${mapboxgl.accessToken}`);
+      const geoData = await geoRes.json();
+      const [lng, lat] = geoData.features[0].center;
+
+      const sa = await new Promise((resolve) => {
+        loadJson('https://ni-travel-isochrones.s3.eu-west-2.amazonaws.com/all-area-centres.geojson', function (data) {
+          const searchTree = new kdTree(data.features.map(feature => ({
+            lat: feature.geometry.coordinates[1],
+            lng: feature.geometry.coordinates[0],
+            areaname: feature.properties.areaname
+          })), distance, ["lat", "lng"]);
+          const nearest = searchTree.nearest({ lat, lng }, 1);
+          resolve(nearest[0][0].areaname);
+        });
+      });
+
+      const isochroneRes = await fetch(`https://ni-travel-isochrones.s3.eu-west-2.amazonaws.com/${sa}.geojson`);
+      const isochrones = await isochroneRes.json();
+      const zones = isochrones.features;
+
+      const baseScores = features.map(f => scoreFeature(f.properties, prefs.weight));
+      const minBase = Math.min(...baseScores);
+      const maxBase = Math.max(...baseScores);
+
+      const allValid = features.map((f, idx) => {
+        const props = f.properties;
+        const baseScore = baseScores[idx];
+        const normalizedBase = (baseScore - minBase) / (maxBase - minBase);
+        const center = turf.center(f);
+        let commuteMinutes = null;
+        for (let zone of zones) {
+          if (turf.booleanPointInPolygon(center, zone)) {
+            commuteMinutes = zone.properties['Travel Minutes'];
+            break;
+          }
+        }
+        const commuteScore = (commuteMinutes !== null && commuteMinutes <= prefs.commuteTime)
+          ? 1 - commuteMinutes / prefs.commuteTime : -1;
+        const totalScore = (commuteScore >= 0)
+          ? 0.5 * normalizedBase + 0.5 * commuteScore : -1;
+        return {
+          feature: f,
+          commuteMinutes,
+          totalScore
+        };
+      }).filter(r => {
+        const p = r.feature.properties;
+        return (
+          r.totalScore >= 0 &&
+          p.monthly_rental_yield <= prefs.budget &&
+          p.Crime_Level <= safetyThreshold
+        );
+      });
+
+      if (allValid.length === 0) {
+        alert("No areas match your current preferences. Please try adjusting your inputs.");
+        return;
+      }
+
+      const candidates = [...allValid].sort((a, b) => b.totalScore - a.totalScore).slice(0, 4);
+
+      if (map.getSource('top5')) map.removeSource('top5');
+      ['top5-fill', 'top5-outline'].forEach(id => map.getLayer(id) && map.removeLayer(id));
+      if (map.getSource('validAreas')) map.removeSource('validAreas');
+      ['valid-fill', 'valid-outline'].forEach(id => map.getLayer(id) && map.removeLayer(id));
+
+      const validFeatures = allValid.map(v => {
+        v.feature.properties.commuteMinutes = v.commuteMinutes;
+        v.feature.properties.totalScore = v.totalScore;
+        return v.feature;
+      });
+
+      map.addSource('validAreas', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: validFeatures }
+      });
+      map.addLayer({
+        id: 'valid-fill',
+        type: 'fill',
+        source: 'validAreas',
+        paint: { 'fill-color': '#fff3e6', 'fill-opacity': 0.4 }
+      });
+      map.addLayer({
+        id: 'valid-outline',
+        type: 'line',
+        source: 'validAreas',
+        paint: { 'line-color': '#fbbca2', 'line-width': 1 }
+      });
+
+      map.addSource('top5', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: candidates.map(item => item.feature)
+        }
+      });
+      map.addLayer({
+        id: 'top5-fill',
+        type: 'fill',
+        source: 'top5',
+        paint: { 'fill-color': '#FFA500', 'fill-opacity': 0.4 }
+      });
+      map.addLayer({
+        id: 'top5-outline',
+        type: 'line',
+        source: 'top5',
+        paint: { 'line-color': '#FF4500', 'line-width': 2 }
+      });
+
+      const recommendationList = document.getElementById('recommendationList');
+      recommendationList.innerHTML = '';
+      candidates.forEach((item) => {
+        const p = item.feature.properties;
+        const card = document.createElement('div');
+        card.className = 'recommend-card';
+        card.innerHTML = `
+          <div class="recommend-title">${p.lsoa21nm}</div>
+          <div class="recommend-section"><strong>Rent:</strong> £${p.monthly_rental_yield}</div>
+          <div class="recommend-section"><strong>Safety:</strong> Top ${prefs.safety}%</div>
+          <div class="recommend-section recommend-gap"><strong>Commute:</strong> ${p.commuteMinutes ?? 'N/A'} min</div>
+          <div class="recommend-section"><strong>Shopping:</strong> ${p.shop ?? 0}</div>
+          <div class="recommend-section"><strong>Dining:</strong> ${p.food ?? 0}</div>
+          <div class="recommend-section"><strong>Healthcare:</strong> ${p.health ?? 0}</div>
+          <div class="recommend-section"><strong>Leisure:</strong> ${p.leisure ?? 0}</div>
+        `;
+        card.addEventListener('click', () => {
+          const center = turf.center(item.feature).geometry.coordinates;
+          map.flyTo({ center: center, zoom: 13, speed: 0.8 });
+        });
+        recommendationList.appendChild(card);
+      });
+      document.getElementById('recommendationCard').classList.remove('d-none');
+
+      map.on('click', 'valid-fill', (e) => {
+        const f = e.features[0];
+        const p = f.properties;
+        const center = turf.center(f).geometry.coordinates;
+        const infoCard = document.getElementById('infoCard');
+        infoCard.innerHTML = `
+          <div class="info-header"><strong>${p.lsoa21nm}</strong></div>
+          <div class="info-body">
+            <div class="recommend-section"><strong>Rent:</strong> £${p.monthly_rental_yield}</div>
+            <div class="recommend-section"><strong>Safety:</strong> Top ${prefs.safety}%</div>
+            <div class="recommend-section recommend-gap"><strong>Commute:</strong> ${p.commuteMinutes ?? 'N/A'} min</div>
+            <div class="recommend-section"><strong>Shopping:</strong> ${p.shop ?? 0}</div>
+            <div class="recommend-section"><strong>Dining:</strong> ${p.food ?? 0}</div>
+            <div class="recommend-section"><strong>Healthcare:</strong> ${p.health ?? 0}</div>
+            <div class="recommend-section"><strong>Leisure:</strong> ${p.leisure ?? 0}</div>
+          </div>
+        `;
+        infoCard.style.display = 'block';
+        map.flyTo({ center: center, zoom: 13, speed: 0.8 });
+      });
+    }
+
+    window.addEventListener('message', (event) => {
+      const prefs = event.data;
+      renderRecommendations(prefs);
+    });
+  </script>
+</body>
+</html>
