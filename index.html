@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="Liveable London - Your Guide to Finding the Perfect Place to Live" />
   <meta name="author" content="CASA Group" />
-  <title>Liveable London - Guidebook for choosing a rental area</title>
+  <title>Liveable London - Housing, Transport & Living</title>
   <!-- Favicon-->
   <link rel="icon" type="image/x-icon" href="assets/OIP.jpg" />
   <!-- Bootstrap Icons-->
@@ -37,14 +37,15 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ms-auto my-2 my-lg-0">
-          <!-- <li class="nav-item"><a class="nav-link" href="#about">Overview</a></li> -->
+          <li class="nav-item"><a class="nav-link" href="#about">Overview</a></li>
           <li class="nav-item"><a class="nav-link" href="#intro">City Map</a></li>
-          <li class="nav-item"><a class="nav-link" href="#housing">Price</a></li>
           <li class="nav-item"><a class="nav-link" href="#transport">Transport</a></li>
-          <li class="nav-item"><a class="nav-link" href="#isochrone">Commute</a></li> 
+          <li class="nav-item"><a class="nav-link" href="#isochrone">Isochrone</a></li>
+          <li class="nav-item"><a class="nav-link" href="#housing">Housing</a></li>
           <li class="nav-item"><a class="nav-link" href="#safety">Safety</a></li>
-          <li class="nav-item"><a class="nav-link" href="#convenience">Convenience</a></li>
-          <li class="nav-item"><a class="nav-link" href="#selector">Recommender</a></li>
+          <li class="nav-item"><a class="nav-link" href="#convenience">Amenities</a></li>
+          <li class="nav-item"><a class="nav-link" href="#selector">Selector</a></li>
+          <li class="nav-item"><a class="nav-link" href="#source">Sources</a></li>
         </ul>
       </div>
     </div>
@@ -57,9 +58,9 @@
           <h2 class="text-white font-weight-bold">Liveable London</h2>
           <hr class="divider" />
         </div>
-        <div class="col-lg-8 align-self-baseline" id="masthead-content">
+        <div class="col-lg-8 align-self-baseline">
           <p class="text-white-75 mb-5">
-            Find your ideal London neighborhood by balancing affordability, commute time, safety, convenience and so forth.
+            Find your ideal London neighborhood by balancing rent, commute time, and so forth.
           </p>
           <div class="spinner-grow text-danger" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -71,50 +72,38 @@
             <span class="visually-hidden">Loading...</span>
           </div>
           <br>
-          <a class="btn btn-primary btn-xl" href="#intro">Start Exploring!</a>
+          <a class="btn btn-primary btn-xl" href="#about">Start Exploring!</a>
         </div>
       </div>
     </div>
   </header>
 
   <!-- About-->
-  <section class="bg-primary" id="about" style="height: auto; padding: 3vh 0;">
-    <div class="container px-3">
-      <div class="row justify-content-center">
-        <div class="col-lg-11 py-2 text-center">
-          <h3 class="text-white">Your Comprehensive London Living Guide</h3>
-          <hr class="divider" style="background-color: #fff;" />
-          <p class="text-white mb-4">
-            This platform provides comprehensive data analysis of London. Whether you're looking for affordability,
+  <section class="page-section bg-primary" id="about"
+  style="background: linear-gradient(135deg, #f4623a 50%, #ffffff 100%);">
+    <div class="container px-4 px-lg-5">
+      <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="col-lg-8 text-center" data-aos="fade-up">
+          <h2 class="text-white mt-0">Your Comprehensive London Living Guide</h2>
+          <hr class="divider divider-light" />
+          <p class="text-white-75 mb-2">
+            Our platform provides comprehensive data analysis of London. Whether you're looking for affordability,
             convenient transport options, or vibrant communities, we offer detailed insights on rental trends, commuting
-            options, safety indices, and amenities to help you find your perfect place to live.
+            options,
+            safety indices, and amenities to help you find your perfect place to live.
           </p>
+          <a class="btn btn-light btn-xl" href="#intro">Learn More</a>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Introduction for London Map -->
-  <section id="intro" class="page-section" style="background-color: #ededed;">
-    <div style="position: absolute; top: 4vh; right: 5vw; width: 20vw; z-index: 1000;">
-      <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#content01">
-        <i class="bi bi-info-circle me-2"></i>Map Usage Guide
-      </button>
-      <div class="collapse mt-2" id="content01">
-        <div class="card card-body"
-          style="background-color: rgba(255, 255, 255, 0.95); box-shadow: 0 0 10px rgba(0,0,0,0.3); z-index: 1000;">
-          <small>
-            - Control map content using sidebar sliders or button selections.<br>
-            - Click on 3D buildings for detailed information.<br>
-            - Use the mouse wheel to zoom and left-click drag to pan.<br>
-            - Right-click and drag to rotate your view and experience London from all angles.<br>
-          </small>
-        </div>
-      </div>
-    </div>
+  <section id="intro" class="page-section" style="background: linear-gradient(225deg, #ffffff 0%, #abbaab 100%);">
     <div class="container-fluid px-1 px-lg-2">
       <h2 class="text-primary text-center mb-2" data-aos="fade-up">London City Map Explorer</h2>
-      <div class="row justify-content-center">
+
+      <div class="row justify-content-center mb-4">
         <div class="col-lg-10" data-aos="fade-down" data-aos-delay="100">
           <div>
             <p>
@@ -122,6 +111,15 @@
               allows you to explore London's urban structure, building layout, and geographical features, helping you
               better understand the city's spatial distribution and unique character of each area.
             </p>
+            <div class="mt-4">
+              <h5><i class="bi bi-info-circle me-2"></i>Map Usage Guide:</h5>
+              <ul class="median">
+                <li>Control map content using sidebar sliders or button selections</li>
+                <li>Click on 3D buildings for detailed information</li>
+                <li>Use the mouse wheel to zoom and left-click drag to pan</li>
+                <li>Right-click and drag to rotate your view and experience London from all angles</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -135,10 +133,90 @@
     </div>
   </section>
 
-  <!-- Housing Section -->
-  <section id="housing" class="page-section" style="background-color: #ededed;">
+
+  <!-- Transport Section -->
+  <section id="transport" class="page-section" style="background: linear-gradient(135deg, #abbaab 0%, #ffffff 100%);">
     <div class="container-fluid px-1 px-lg-2">
-      <h2 class="text-primary text-center mb-2" data-aos="fade-up">Price & Rent Analysis</h2>
+      <h2 class="text-primary text-center mb-2" data-aos="fade-up">London Transport Network</h2>
+
+      <div class="row justify-content-center mb-4">
+        <div class="col-lg-10" data-aos="fade-down" data-aos-delay="100">
+          <div>
+            <p class="median">
+              Understanding London's transport network is crucial when choosing your ideal place to live. London boasts
+              an extensive public transport system including the iconic red double-decker buses, the Underground,
+              Docklands Light Railway (DLR), and trains, offering diverse travel options throughout the city.
+            </p>
+
+            <div class="card border-0 bg-white shadow-sm mt-4 mb-4">
+              <div class="card-body">
+                <h5 class="card-title text-primary"><i class="bi bi-star me-2"></i>Transport Tips</h5>
+                <ul class="list-group list-group-flush small">
+                  <li class="list-group-item border-0 ps-0"><i class="bi bi-credit-card me-2 text-primary"></i>Use an
+                    Oyster card or contactless payment to save on fares</li>
+                  <li class="list-group-item border-0 ps-0"><i class="bi bi-clock me-2 text-primary"></i>Peak hours
+                    (07:30–09:30, 16:00–19:00) have higher fares</li>
+                  <li class="list-group-item border-0 ps-0"><i class="bi bi-phone me-2 text-primary"></i>Plan journeys
+                    with Citymapper or TfL Go apps</li>
+                  <li class="list-group-item border-0 ps-0"><i class="bi bi-bicycle me-2 text-primary"></i>Consider
+                    Santander Cycles for short trips</li>
+                  <li class="list-group-item border-0 ps-0"><i class="bi bi-info-circle me-2 text-primary"></i>Zones 1–3
+                    cover most popular areas</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+
+      <div class="row justify-content-center">
+        <div class="col-11" data-aos="fade-up" data-aos-delay="200">
+          <iframe src="./maps&data/Transport.html" frameborder="0"
+            style="width: 100%; height: 80vh; border-radius: 10px;" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Isochrone Section -->
+  <section id="isochrone" class="page-section" style="background: linear-gradient(225deg, #ffffff 0%, #abbaab 100%);">
+    <div class="container-fluid px-1 px-lg-2">
+      <h2 class="text-primary text-center mb-2" data-aos="fade-up">Travel Time & Accessibility</h2>
+
+      <!-- 上方：说明文字和交互按钮 -->
+      <div class="row justify-content-center mb-4">
+        <div class="col-lg-10" data-aos="fade-down" data-aos-delay="100">
+          <div>
+            <p>
+              Commute time is often a decisive factor when choosing where to live in London. Isochrone maps show you
+              areas that can be reached within specific time frames from different starting points, helping you evaluate
+              commute times and convenience.
+            </p>
+            <p class="median text-primary fst-italic">
+              <i class="bi bi-lightbulb me-2"></i>Pro tip: Areas within a 30-minute commute of your workplace often
+              provide the best balance between affordability and convenience.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下方：地图部分 -->
+      <div class="row justify-content-center">
+        <div class="col-11" data-aos="fade-up" data-aos-delay="200">
+          <iframe src="./maps&data/IsochroneMap.html" frameborder="0"
+            style="width: 100%; height: 80vh; border-radius: 10px;" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Housing Section -->
+  <section id="housing" class="page-section" style="background: linear-gradient(135deg, #abbaab 0%, #ffffff 100%);">
+    <div class="container-fluid px-1 px-lg-2">
+      <h2 class="text-primary text-center mb-2" data-aos="fade-up">London Housing Market Analysis</h2>
 
       <div class="row justify-content-center mb-2">
         <div class="col-lg-10" data-aos="fade-down" data-aos-delay="100">
@@ -152,6 +230,8 @@
           </div>
         </div>
       </div>
+      
+
 
       <div class="row justify-content-center">
         <div class="col-11" data-aos="fade-up" data-aos-delay="200">
@@ -163,7 +243,7 @@
       <!-- 图表区域 -->
       <div class="row mt-4 justify-content-center">
         <!-- 租金趋势分析图表 -->
-        <div class="col-md-5 mb-4 px-3" data-aos="fade-up" data-aos-delay="300">
+        <div class="col-md-5 mb-4" data-aos="fade-up" data-aos-delay="300">
           <div class="bg-white p-3 rounded shadow-sm h-100">
             <h5 class="text-primary">Rental Trends Analysis</h5>
             <p class="small text-muted mb-2">The chart shows average rent levels and historical changes across London
@@ -180,9 +260,9 @@
         </div>
 
         <!-- 价格比较 & 预测图表 -->
-        <div class="col-md-5 mb-4 px-3" data-aos="fade-up" data-aos-delay="400">
+        <div class="col-md-7 mb-4" data-aos="fade-up" data-aos-delay="400">
           <div class="bg-white p-3 rounded shadow-sm h-100">
-            <h5 class="text-primary">Price Trends Comparison</h5>
+            <h5 class="text-primary">Price Comparison & Forecast</h5>
             <p class="small text-muted mb-2">Compare housing prices across different areas and their changing trends to
               help you assess investment potential and long-term housing costs.</p>
 
@@ -216,209 +296,213 @@
 
       <!-- 价格比较 & 预测弹窗 -->
       <div class="modal fade" id="priceModal" tabindex="-1" aria-labelledby="priceModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" style="max-width: 80%; max-height: 80%;">
+        <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="priceModalLabel">Price Trends Comparison</h5>
+              <h5 class="modal-title" id="priceModalLabel">Price Comparison & Forecast</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" style="overflow-y: auto; height: 85vh;">
+            <div class="modal-body">
               <!-- 更大图表 -->
               <iframe src="./maps&data/Borough_Propertyprice.html" frameborder="0"
-                style="width: 100%; height: 100%; border-radius: 8px;" loading="lazy"></iframe>
+                style="width: 100%; height: 750px; border-radius: 8px;" loading="lazy"></iframe>
             </div>
           </div>
         </div>
       </div>
-
-    </div>
-  </section>
-
-  
-  <!-- Transport Section -->
-  <section id="transport" class="page-section" style="background-color: #ededed;">
-    <div style="position: absolute; top: 4vh; right: 5vw; width: 20vw; z-index: 1000;">
-      <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#content01">
-        <i class="bi bi-info-circle me-2"></i>Transport Tips
-      </button>
-      <div class="collapse mt-2" id="content01">
-        <div class="card card-body"
-          style="background-color: rgba(255, 255, 255, 0.95); box-shadow: 0 0 10px rgba(0,0,0,0.3); z-index: 1000;">
-          <small>
-            - Use an Oyster card or contactless payment to save on fares.<br>
-            - Peak hours (07:30–09:30, 16:00–19:00) have higher fares.<br>
-            - Plan journeys with Citymapper or TfL Go apps.<br>
-            - Consider Santander Cycles for short trips.<br>
-            - Zones 1–3 cover most popular areas.<br>
-          </small>
-        </div>
-      </div>
-    </div>
-    <div class="container-fluid px-1 px-lg-2">
-      <h2 class="text-primary text-center mb-2" data-aos="fade-up">London Transport Network</h2>
-      <div class="row justify-content-center">
-        <div class="col-lg-10" data-aos="fade-down" data-aos-delay="100">
-          <div>
-            <p class="median">
-              Understanding London's transport network is crucial when choosing your ideal place to live. London boasts
-              an extensive public transport system including the iconic red double-decker buses, the Underground,
-              Docklands Light Railway (DLR), and trains, offering diverse travel options throughout the city.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="row justify-content-center">
-        <div class="col-11" data-aos="fade-up" data-aos-delay="200">
-          <iframe src="./maps&data/Transport.html" frameborder="0"
-            style="width: 100%; height: 80vh; border-radius: 10px;" loading="lazy"></iframe>
-        </div>
-      </div>
     </div>
   </section>
 
 
-  <!-- Isochrone Section -->
-  <section id="isochrone" class="page-section" style="background-color: #ededed;">
-    <div class="container-fluid px-1 px-lg-2">
-      <h2 class="text-primary text-center mb-2" data-aos="fade-up">Travel Time & Accessibility</h2>
-
-      <!-- 上方：说明文字和交互按钮 -->
-      <div class="row justify-content-center">
-        <div class="col-lg-10" data-aos="fade-down" data-aos-delay="100">
-          <div>
-            <p>
-              Commute time is often a decisive factor when choosing where to live in London. Isochrone maps show you
-              areas that can be reached within specific time frames from different starting points, helping you evaluate
-              commute times and convenience.
-            </p>
-            <p class="median text-primary fst-italic">
-              <i class="bi bi-lightbulb me-2"></i>Pro tip: Areas within a 30-minute commute of your workplace often
-              provide the best balance between affordability and convenience.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- 下方：地图部分 -->
-      <div class="row justify-content-center">
-        <div class="col-11" data-aos="fade-up" data-aos-delay="200">
-          <iframe src="./maps&data/IsochroneMap.html" frameborder="0"
-            style="width: 100%; height: 80vh; border-radius: 10px;" loading="lazy"></iframe>
-        </div>
+ <!-- Safety Section -->
+<section id="safety" class="page-section" style="background: linear-gradient(135deg, #adb5bd 0%, #9aaab4 100%);">
+  <div class="container-fluid px-1 px-lg-2">
+    <!-- Section title -->
+    <h2 class="text-primary text-center mb-2" data-aos="fade-up">London Safety Index</h2>
+    <!-- Intro paragraph -->
+    <div class="row justify-content-center mb-2">
+      <div class="col-lg-10" data-aos="fade-down" data-aos-delay="100">
+        <p>
+          Safety is a crucial consideration when choosing where to live. Understanding crime rates and safety
+          conditions across London boroughs helps you make more informed decisions about your potential home.
+        </p>
       </div>
     </div>
-  </section>
+    <!-- Crime map embed, styled like the housing iframe -->
+    <div class="row justify-content-center">
+      <div class="col-11" data-aos="fade-up" data-aos-delay="200">
+        <iframe
+          src="./maps&data/Crime.html"
+          frameborder="0"
+          style="width: 100%; height: 80vh; border-radius: 10px;"
+          loading="lazy">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
 
-
-  <!-- Safety Section -->
-  <section id="safety" class="page-section" style="background-color: #ededed;">
+  <!-- Convenience Section -->
+  <section id="convenience" class="page-section" style="background: linear-gradient(135deg, #9aaab4 0%, #86a0b3 100%);">
     <div class="container-fluid px-4 px-lg-5">
-      <h2 class="text-primary text-center mb-4" data-aos="fade-up">Safety Analysis</h2>
+      <h2 class="text-primary text-center mb-4" data-aos="fade-up">Amenities & Convenience Analysis</h2>
       <div class="row">
         <div class="col-lg-3" data-aos="fade-right" data-aos-delay="100">
           <div class="pe-lg-4">
             <p>
-              Safety is a crucial consideration when choosing where to live. Understanding crime rates and safety
-              conditions across London boroughs helps you make more informed decisions about your potential home.
+              The convenience of daily life is an important indicator when evaluating the quality of living areas.
+              London's boroughs have varying densities of amenities, including supermarkets, healthcare facilities,
+              parks, and entertainment venues. Understanding the distribution of these facilities helps you choose an
+              area that best suits your lifestyle needs.
             </p>
-            <div class="card border-0 bg-white shadow-sm mt-4 mb-4">
-              <div class="card-header bg-danger text-white">
-                <h5 class="my-0">Safest Boroughs</h5>
+            <div class="card border-0 bg-white shadow-sm mt-4">
+              <div class="card-header bg-success text-white">
+                <h5 class="my-0">Amenity Types</h5>
               </div>
-              <div class="card-body">
-                <ol class="list-group list-group-numbered">
-                  <li class="list-group-item d-flex justify-content-between align-items-start">
-                    <div class="ms-2 me-auto">
-                      <div class="fw-bold">Richmond</div>
-                      Low crime rate, livable community
+              <div class="card-body p-0">
+                <div class="accordion" id="convenienceAccordion">
+                  <div class="accordion-item border-0">
+                    <h2 class="accordion-header" id="headingOne">
+                      <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        <i class="bi bi-cart3 me-2"></i>Shopping & Daily Needs
+                      </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                      data-bs-parent="#convenienceAccordion">
+                      <div class="accordion-body">
+                        <ul class="list-group list-group-flush small">
+                          <li class="list-group-item border-0 ps-0">Large Supermarkets (Tesco, Sainsbury's)</li>
+                          <li class="list-group-item border-0 ps-0">Convenience Stores (Tesco Express, Co-op)</li>
+                          <li class="list-group-item border-0 ps-0">Shopping Centers (Westfield, The O2)</li>
+                          <li class="list-group-item border-0 ps-0">Markets (Borough Market, Camden)</li>
+                        </ul>
+                      </div>
                     </div>
-                    <span class="badge bg-success rounded-pill">Safety 9.2</span>
-                  </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-start">
-                    <div class="ms-2 me-auto">
-                      <div class="fw-bold">Harrow</div>
-                      Family-friendly, high safety rating
+                  </div>
+                  <div class="accordion-item border-0">
+                    <h2 class="accordion-header" id="headingTwo">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        <i class="bi bi-heart-pulse me-2"></i>Healthcare & Wellbeing
+                      </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                      data-bs-parent="#convenienceAccordion">
+                      <div class="accordion-body">
+                        <ul class="list-group list-group-flush small">
+                          <li class="list-group-item border-0 ps-0">Hospitals (NHS and private)</li>
+                          <li class="list-group-item border-0 ps-0">GP Clinics</li>
+                          <li class="list-group-item border-0 ps-0">Pharmacies (Boots, Superdrug)</li>
+                          <li class="list-group-item border-0 ps-0">Dental Practices</li>
+                          <li class="list-group-item border-0 ps-0">Gyms (PureGym, Fitness First)</li>
+                        </ul>
+                      </div>
                     </div>
-                    <span class="badge bg-success rounded-pill">Safety 8.9</span>
-                  </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-start">
-                    <div class="ms-2 me-auto">
-                      <div class="fw-bold">Kingston</div>
-                      Low violent crime, good community
-                    </div>
-                    <span class="badge bg-success rounded-pill">Safety 8.7</span>
-                  </li>
-                </ol>
-              </div>
-            </div>
-            <div class="card border-0 bg-white shadow-sm">
-              <div class="card-header bg-info text-white">
-                <h5 class="my-0">Safety Recommendations</h5>
-              </div>
-              <div class="card-body">
-                <ul class="list-group list-group-flush small">
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-shield me-2 text-primary"></i>Choose areas
-                    with good safety records, especially for night safety</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-lightbulb me-2 text-primary"></i>Check
-                    street lighting and walking route safety</li>
-                  <li class="list-group-item border-0 ps-0"><i class="bi bi-house-door me-2 text-primary"></i>Consider
-                    building security features like access systems and monitoring</li>
-                </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <div class="col-lg-9" data-aos="fade-left" data-aos-delay="200">
           <div class="bg-white p-3 rounded shadow-sm mb-4">
-            <h5 class="text-primary mb-3">London Crime Density Map</h5>
-            <!-- Placeholder for crime density map -->
+            <h5 class="text-primary mb-3">London Amenities Distribution Map</h5>
+            <!-- Placeholder for amenities map -->
             <iframe src="./maps&data/CityMap.html" frameborder="0"
               style="width: 100%; height: 60vh; border-radius: 10px;" loading="lazy"></iframe>
-            <div class="small text-muted mt-2">
-              <i class="bi bi-info-circle me-2"></i>Data source: Metropolitan Police open data, last updated: 2024
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <small class="text-muted">Data sources: OpenStreetMap, Google Places API</small>
+              <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-success">Supermarkets</button>
+                <button type="button" class="btn btn-sm btn-outline-primary">Healthcare</button>
+                <button type="button" class="btn btn-sm btn-outline-info">Leisure</button>
+                <button type="button" class="btn btn-sm btn-outline-warning">Dining</button>
+              </div>
             </div>
           </div>
 
-          <div class="card border-0 shadow-sm">
-            <div class="card-header bg-secondary text-white">
-              <h5 class="my-0">Crime Type Distribution</h5>
-            </div>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-6">
-                  <h6 class="text-center mb-3">Common Crime Types in London</h6>
-                  <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      Theft and Robbery
-                      <span class="badge bg-primary rounded-pill">32%</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      Anti-social Behavior
-                      <span class="badge bg-primary rounded-pill">24%</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      Violent Crime
-                      <span class="badge bg-primary rounded-pill">18%</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      Vehicle-related Crime
-                      <span class="badge bg-primary rounded-pill">15%</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      Other Types
-                      <span class="badge bg-primary rounded-pill">11%</span>
-                    </li>
-                  </ul>
+          <div class="row">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-info text-white">
+                  <h5 class="my-0">Top Areas for Convenience</h5>
                 </div>
-                <div class="col-md-6">
-                  <h6 class="text-center mb-3">Crime Trend Analysis</h6>
-                  <p class="small">London's overall crime rate has shown a decreasing trend over the past five years,
-                    particularly in central areas. However, property crime has increased in some outer areas. When
-                    choosing where to live, consider crime data from the last two years for the most current trends.</p>
-                  <div class="alert alert-info small">
-                    <i class="bi bi-info-circle-fill me-2"></i>Safety data should be considered alongside personal needs
-                    and lifestyle; different people may have varying safety needs and perceptions.
+                <div class="card-body">
+                  <ol class="list-group list-group-numbered">
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                      <div class="ms-2 me-auto">
+                        <div class="fw-bold">Islington</div>
+                        Rich in amenities, good transport
+                      </div>
+                      <span class="badge bg-success rounded-pill">9.4/10</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                      <div class="ms-2 me-auto">
+                        <div class="fw-bold">Kensington & Chelsea</div>
+                        High-end facilities, beautiful environment
+                      </div>
+                      <span class="badge bg-success rounded-pill">9.2/10</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                      <div class="ms-2 me-auto">
+                        <div class="fw-bold">Camden</div>
+                        Culturally diverse, rich entertainment
+                      </div>
+                      <span class="badge bg-success rounded-pill">9.0/10</span>
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-8" data-aos="fade-up" data-aos-delay="400">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-secondary text-white">
+                  <h5 class="my-0">Area Convenience Comparison</h5>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>Area Type</th>
+                          <th>Supermarket Density</th>
+                          <th>Healthcare Facilities</th>
+                          <th>Dining Venues</th>
+                          <th>Park Space</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Central Areas</td>
+                          <td><span class="text-success">★★★★★</span></td>
+                          <td><span class="text-success">★★★★☆</span></td>
+                          <td><span class="text-success">★★★★★</span></td>
+                          <td><span class="text-warning">★★☆☆☆</span></td>
+                        </tr>
+                        <tr>
+                          <td>Inner Boroughs</td>
+                          <td><span class="text-success">★★★★☆</span></td>
+                          <td><span class="text-success">★★★★☆</span></td>
+                          <td><span class="text-success">★★★★☆</span></td>
+                          <td><span class="text-warning">★★★☆☆</span></td>
+                        </tr>
+                        <tr>
+                          <td>Outer Boroughs</td>
+                          <td><span class="text-warning">★★★☆☆</span></td>
+                          <td><span class="text-warning">★★★☆☆</span></td>
+                          <td><span class="text-warning">★★☆☆☆</span></td>
+                          <td><span class="text-success">★★★★☆</span></td>
+                        </tr>
+                        <tr>
+                          <td>Suburbs</td>
+                          <td><span class="text-danger">★★☆☆☆</span></td>
+                          <td><span class="text-danger">★★☆☆☆</span></td>
+                          <td><span class="text-danger">★☆☆☆☆</span></td>
+                          <td><span class="text-success">★★★★★</span></td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -428,323 +512,302 @@
       </div>
     </div>
   </section>
-
-  <!-- Convenience Section -->
-  <section id="transport" class="page-section" style="background-color: #ededed;">
-    <div style="position: absolute; top: 4vh; right: 5vw; width: 20vw; z-index: 1000;">
-      <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#content01">
-        <i class="bi bi-info-circle me-2"></i>Amenity Types
-      </button>
-      <div class="collapse mt-2" id="content01">
-        <div class="card card-body"
-          style="background-color: rgba(255, 255, 255, 0.95); box-shadow: 0 0 10px rgba(0,0,0,0.3); z-index: 1000;">
-          <div class="card-body p-0">
-            <div class="accordion" id="convenienceAccordion">
-              <div class="accordion-item border-0">
-                <h2 class="accordion-header" id="headingOne">
-                  <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    Shopping & Daily Needs
-                  </button>
-                </h2>
-                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
-                  data-bs-parent="#convenienceAccordion">
-                  <div class="accordion-body">
-                    <ul class="list-group list-group-flush small">
-                      <li class="list-group-item border-0 ps-0">Supermarkets (e.g. M&S, Waitrose)</li>
-                      <li class="list-group-item border-0 ps-0">Convenience Stores (e.g. Tesco Express, Co-op)</li>
-                      <li class="list-group-item border-0 ps-0">Shopping Mall (e.g. Westfield, The O2)</li>
-                      <li class="list-group-item border-0 ps-0">Markets (e.g. Borough Market, Camden)</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div class="accordion-item border-0">
-                <h2 class="accordion-header" id="headingTwo">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    Dining Rooms
-                  </button>
-                </h2>
-                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
-                  data-bs-parent="#convenienceAccordion">
-                  <div class="accordion-body">
-                    <ul class="list-group list-group-flush small">
-                      <li class="list-group-item border-0 ps-0">Fast Food (e.g. KFC, McDonald's)</li>
-                      <li class="list-group-item border-0 ps-0">Cafe (e.g. Nero, Costa)</li>
-                      <li class="list-group-item border-0 ps-0">Bars (e.g. Connaught)</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div class="accordion-item border-0">
-                <h2 class="accordion-header" id="headingThree">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                    Healthcare
-                  </button>
-                </h2>
-                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
-                  data-bs-parent="#convenienceAccordion">
-                  <div class="accordion-body">
-                    <ul class="list-group list-group-flush small">
-                      <li class="list-group-item border-0 ps-0">Hospitals (NHS and private)</li>
-                      <li class="list-group-item border-0 ps-0">GP Clinics</li>
-                      <li class="list-group-item border-0 ps-0">Pharmacies (Boots, Superdrug)</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div class="accordion-item border-0">
-                <h2 class="accordion-header" id="headingFour">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                    Leisure & Wellbeing
-                  </button>
-                </h2>
-                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
-                  data-bs-parent="#convenienceAccordion">
-                  <div class="accordion-body">
-                    <ul class="list-group list-group-flush small">
-                      <li class="list-group-item border-0 ps-0">Green Parks (e.g. Hyde Park, St James's Park)</li>
-                      <li class="list-group-item border-0 ps-0">Sports Centres</li>
-                      <li class="list-group-item border-0 ps-0">Fitness Centres</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="container-fluid px-1 px-lg-2">
-      <h2 class="text-primary text-center mb-2" data-aos="fade-up">Amenities & Convenience Analysis</h2>
-      <div class="row justify-content-center">
-        <div class="col-lg-10" data-aos="fade-down" data-aos-delay="100">
-          <div>
-            <p class="median">
-              This map shows the location of shops related to amenities such as supermarkets,
-              shopping malls, food and drink outlets, hospitals, pharmacies, parks and sports centres contained in various lsoa areas of London.
-              You can get statistics on all the shops within walking distance by entering your postcode
-              and selecting the walking time according to the target area you are interested in.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="row justify-content-center">
-        <div class="col-11" data-aos="fade-up" data-aos-delay="200">
-          <iframe src="./maps&data/con_map.html" frameborder="0"
-            style="width: 100%; height: 80vh; border-radius: 10px;" loading="lazy"></iframe>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  
 
   <!-- Area Selector Section -->
-  <section id="selector" class="page-section" style="background-color: #ededed;">
+  <section id="selector" class="page-section" style="background: linear-gradient(135deg, #86a0b3 0%, #7395b3 100%);">
     <div class="container-fluid px-4 px-lg-5">
-      <!-- 1. 页面标题 -->
-      <h2 class="text-primary text-center mb-4" data-aos="fade-up">London Live Area Recommender</h2>
-  
-      <!-- 2. 新增：标题下横向的 Preferences 卡片 -->
-      <div class="row mb-4" data-aos="fade-up" data-aos-delay="100">
-        <div class="col-12">
-          <div class="card border-0 bg-white shadow-sm">
-            <div class="card-header bg-primary text-white">
-              <div class="d-flex justify-content-between align-items-center">
+      <h2 class="text-primary text-center mb-4" data-aos="fade-up">London Area Selector</h2>
+      <div class="row">
+        <div class="col-lg-3" data-aos="fade-right" data-aos-delay="100">
+          <div class="pe-lg-4">
+            <p>
+              Based on your personal needs and preferences, our area selector helps you find the most suitable London
+              neighborhoods. By adjusting the parameters below, the system will recommend areas based on rent, commute
+              time, safety index, and convenience.
+            </p>
+            <div class="card border-0 bg-white shadow-sm mt-4">
+              <div class="card-header bg-primary text-white">
                 <h5 class="my-0">Set Your Preferences</h5>
-                <button type="button" class="btn btn-sm custom-info-btn ms-2" data-bs-toggle="modal" data-bs-target="#logicModal" title="See how we calculate recommendations">
-                  <i class="bi bi-info-circle fs-4"></i>
-                </button>
               </div>
-            </div>
-            <div class="card-body">
-              <form>
-                <div class="row">
-                  <!-- Budget + Safety：合并为一列（上下显示） -->
-                  <div class="col-md-4 mb-3">
-                    <!-- Budget -->
-                    <div class="mb-3">
-                      <label for="budgetRange" class="form-label d-flex justify-content-between">
-                        <span><i class="bi bi-cash-coin me-2"></i>Monthly Budget</span>
-                        <span class="text-primary" id="budgetValue">£1500</span>
-                      </label>
-                      <input type="range" class="form-range" min="1000" max="6000" step="50" value="1500" id="budgetRange">
-                      <div class="d-flex justify-content-between small">
-                        <span>£1000</span>
-                        <span>£6000+</span>
-                      </div>
-                    </div>
-                    <!-- Security -->
-                    <div class="mb-3">
-                      <label for="safetyPercentile" class="form-label d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-shield-check me-2"></i>Top Safety Percentile</span>
-                        <span class="text-primary" id="safetyValue">Top 14%</span>
-                      </label>
-                    
-                      <input type="range" class="form-range" id="safetyPercentile" min="0" max="6" step="1" value="0" list="safetyTicks">
-                    
-                      <datalist id="safetyTicks">
-                        <option value="0" label="14%"></option>
-                        <option value="1" label="29%"></option>
-                        <option value="2" label="43%"></option>
-                        <option value="3" label="57%"></option>
-                        <option value="4" label="71%"></option>
-                        <option value="5" label="86%"></option>
-                        <option value="6" label="100%"></option>
-                      </datalist>
-                    
-                      <div class="d-flex justify-content-between small">
-                        <span>Top 14%</span>
-                        <span>Top 100%</span>
-                      </div>
-                    </div>
-                                       
-                  </div>
-              
-                  <!-- 2. Commute (time + postcode) -->
-                  <div class="col-md-4 mb-3">
-                    <label for="commutePostcode" class="form-label">
-                      <i class="bi bi-geo-alt me-2"></i>Commute Destination
+              <div class="card-body">
+                <form>
+                  <!-- Budget Range -->
+                  <div class="mb-3">
+                    <label for="budgetRange" class="form-label d-flex justify-content-between">
+                      <span><i class="bi bi-cash-coin me-2"></i>Monthly Budget</span>
+                      <span class="text-primary" id="budgetValue">£1500</span>
                     </label>
-                    <input type="text" class="form-control mb-2" id="commutePostcode" placeholder="e.g. EC1A 1BB or W1D 3QH">
-                    <label class="form-label mt-2">
-                      <i class="bi bi-clock-history me-2"></i>Max Commute Time
-                    </label>
-                    <div class="btn-group w-100 small-text-btn" role="group" id="commuteButtons">
-                      <button type="button" class="btn btn-outline-primary" data-value="15">15<br><small>min</small></button>
-                      <button type="button" class="btn btn-outline-primary active" data-value="30">30<br><small>min</small></button>
-                      <button type="button" class="btn btn-outline-primary" data-value="45">45<br><small>min</small></button>
-                      <button type="button" class="btn btn-outline-primary" data-value="60">60<br><small>min</small></button>
-                    </div>
-                  </div>
-            
-                  <!-- 4. Convenience（身份+权重）-->
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label d-flex align-items-center">
-                      <i class="bi bi-puzzle me-2"></i>Convenience
-                      <button type="button" class="btn btn-sm btn-link text-info ms-2 p-0" data-bs-toggle="tooltip"
-                        title="Choose your identity to auto-set convenience preferences, or customise them manually.">
-                        <i class="bi bi-question-circle"></i>
-                      </button>
-                    </label>
-                    <div class="fw-semibold mb-1 text-muted" style="font-size: 0.85rem;">
-                      Your Identity
-                    </div>
-                    <div class="btn-group w-100 mb-2" role="group" id="identityButtons">
-                      <button type="button" class="btn btn-sm btn-outline-primary" data-value="student">Student</button>
-                      <button type="button" class="btn btn-sm btn-outline-primary" data-value="professional">Professional</button>
-                      <button type="button" class="btn btn-sm btn-outline-primary" data-value="family">Family</button>
-                      <button type="button" class="btn btn-sm btn-outline-primary" data-value="retiree">Retiree</button>
-                    </div>                   
-                    <button type="button" class="btn btn-outline-dark w-100 mb-2" id="toggleCustomBtn">
-                      Set Custom Preferences
-                    </button>
-                    <div id="customWeightsPanel" class="border rounded p-3" style="display: none; background: #f9f9f9;">
-                      <div class="row g-2">
-                        <!-- Shop -->
-                        <div class="col-3">
-                          <label class="form-label text-center w-100">Shop</label>
-                          <input type="number" class="form-control text-center" id="weightShop" min="0" max="5">
-                        </div>
-                    
-                        <!-- Health -->
-                        <div class="col-3">
-                          <label class="form-label text-center w-100">Health</label>
-                          <input type="number" class="form-control text-center" id="weightHealth" min="0" max="5">
-                        </div>
-                    
-                        <!-- Food -->
-                        <div class="col-3">
-                          <label class="form-label text-center w-100">Food</label>
-                          <input type="number" class="form-control text-center" id="weightFood" min="0" max="5">
-                        </div>
-                    
-                        <!-- Leisure -->
-                        <div class="col-3">
-                          <label class="form-label text-center w-100">Leisure</label>
-                          <input type="number" class="form-control text-center" id="weightLeisure" min="0" max="5">
-                        </div>
-                      </div>
+                    <input type="range" class="form-range" min="600" max="3000" step="50" value="1500" id="budgetRange">
+                    <div class="d-flex justify-content-between small">
+                      <span>£600</span>
+                      <span>£3000+</span>
                     </div>
                   </div>
 
-                <!-- 按钮（另起一行） -->
-                <div class="row">
-                  <div class="col-12">
-                    <button type="button" class="btn btn-primary w-100 mt-2" id="findAreasBtn">
-                      <i class="bi bi-search me-2"></i>Find Suitable Areas
-                    </button>
+                  <!-- Commute Time -->
+                  <div class="mb-3">
+                    <label for="commuteRange" class="form-label d-flex justify-content-between">
+                      <span><i class="bi bi-clock-history me-2"></i>Max Commute Time</span>
+                      <span class="text-primary" id="commuteValue">30 minutes</span>
+                    </label>
+                    <input type="range" class="form-range" min="10" max="60" step="5" value="30" id="commuteRange">
+                    <div class="d-flex justify-content-between small">
+                      <span>10 min</span>
+                      <span>60 min</span>
+                    </div>
                   </div>
-                </div>
-              </form>
+
+                  <!-- Commute Destination -->
+                  <div class="mb-3">
+                    <label class="form-label"><i class="bi bi-geo-alt me-2"></i>Commute Destination</label>
+                    <select class="form-select" id="commuteDestination">
+                      <option selected>Select location or enter address</option>
+                      <option value="city">City of London</option>
+                      <option value="canary">Canary Wharf</option>
+                      <option value="kings">King's Cross</option>
+                      <option value="westminster">Westminster</option>
+                      <option value="other">Other Location</option>
+                    </select>
+                  </div>
+
+                  <!-- Key Factors -->
+                  <div class="mb-3">
+                    <label class="form-label"><i class="bi bi-star me-2"></i>Most Important Factors (select up to
+                      3)</label>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="safety" id="factorSafety">
+                      <label class="form-check-label" for="factorSafety">
+                        Safety
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="transport" id="factorTransport">
+                      <label class="form-check-label" for="factorTransport">
+                        Public Transport Accessibility
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="shops" id="factorShops">
+                      <label class="form-check-label" for="factorShops">
+                        Shopping & Dining Facilities
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="green" id="factorGreen">
+                      <label class="form-check-label" for="factorGreen">
+                        Green Spaces & Parks
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="nightlife" id="factorNightlife">
+                      <label class="form-check-label" for="factorNightlife">
+                        Nightlife & Entertainment
+                      </label>
+                    </div>
+                  </div>
+
+                  <button type="button" class="btn btn-primary w-100" id="findAreasBtn">
+                    <i class="bi bi-search me-2"></i>Find Suitable Areas
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="col-lg-9" data-aos="fade-left" data-aos-delay="200">
+        <div class="col-lg-9" data-aos="fade-left" data-aos-delay="200">
+          <div class="bg-white p-3 rounded shadow-sm mb-4">
+            <h5 class="text-primary mb-3">Recommended Areas</h5>
+            <!-- Area results map -->
+            <iframe src="./maps&data/CityMap.html" frameborder="0"
+              style="width: 100%; height: 50vh; border-radius: 10px;" loading="lazy"></iframe>
+          </div>
 
-        
-      <!-- 3. 新增：Preferences 下方，独立一行的地图 -->
-      <div class="col-12 p-0 mt-4">
-        <iframe
-          id="mapFrame"
-          src="./maps&data/sectormap.html"
-          frameborder="0"
-          style="width: 95vw; height: 80vh; border: none; margin-left: -12px;"
-          loading="lazy">
-        </iframe>
+          <h5 class="text-muted border-bottom pb-2 mb-3">Areas Recommended for You</h5>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <div class="card h-100 border-success">
+                <div class="card-header bg-success text-white">
+                  Best Match (#1)
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">Greenwich</h5>
+                  <p class="card-text">
+                    <span class="badge rounded-pill bg-info me-1">Convenient</span>
+                    <span class="badge rounded-pill bg-success me-1">Parks</span>
+                    <span class="badge rounded-pill bg-warning">Commute</span>
+                  </p>
+                  <ul class="list-unstyled small">
+                    <li><i class="bi bi-cash text-success me-2"></i>Avg. Rent: £1,650/month</li>
+                    <li><i class="bi bi-shield-check text-success me-2"></i>Safety Index: 8.2/10</li>
+                    <li><i class="bi bi-clock text-success me-2"></i>Commute Time: 25 min</li>
+                    <li><i class="bi bi-shop text-success me-2"></i>Convenience: 8.5/10</li>
+                  </ul>
+                  <button class="btn btn-sm btn-outline-primary mt-2">View Details</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <div class="card h-100 border-primary">
+                <div class="card-header bg-primary text-white">
+                  Recommended (#2)
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">Islington</h5>
+                  <p class="card-text">
+                    <span class="badge rounded-pill bg-info me-1">Convenient</span>
+                    <span class="badge rounded-pill bg-danger me-1">Dining</span>
+                    <span class="badge rounded-pill bg-warning">Commute</span>
+                  </p>
+                  <ul class="list-unstyled small">
+                    <li><i class="bi bi-cash text-success me-2"></i>Avg. Rent: £1,800/month</li>
+                    <li><i class="bi bi-shield-check text-success me-2"></i>Safety Index: 7.8/10</li>
+                    <li><i class="bi bi-clock text-success me-2"></i>Commute Time: 20 min</li>
+                    <li><i class="bi bi-shop text-success me-2"></i>Convenience: 9.1/10</li>
+                  </ul>
+                  <button class="btn btn-sm btn-outline-primary mt-2">View Details</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <div class="card h-100 border-primary">
+                <div class="card-header bg-primary text-white">
+                  Recommended (#3)
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">Hackney</h5>
+                  <p class="card-text">
+                    <span class="badge rounded-pill bg-danger me-1">Trendy</span>
+                    <span class="badge rounded-pill bg-success me-1">Parks</span>
+                    <span class="badge rounded-pill bg-info">Culture</span>
+                  </p>
+                  <ul class="list-unstyled small">
+                    <li><i class="bi bi-cash text-success me-2"></i>Avg. Rent: £1,700/month</li>
+                    <li><i class="bi bi-shield-check text-success me-2"></i>Safety Index: 7.5/10</li>
+                    <li><i class="bi bi-clock text-success me-2"></i>Commute Time: 28 min</li>
+                    <li><i class="bi bi-shop text-success me-2"></i>Convenience: 8.9/10</li>
+                  </ul>
+                  <button class="btn btn-sm btn-outline-primary mt-2">View Details</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-info mt-3 small">
+            <i class="bi bi-info-circle-fill me-2"></i>The above recommendations are automatically generated based on
+            your preference settings. Please note that actual conditions may change, and we recommend on-site visits
+            before making decisions.
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <div class="modal fade" id="logicModal" tabindex="-1" aria-labelledby="logicModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title text-primary" id="logicModalLabel">How Are Recommendations Calculated?</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p><strong>1. Budget</strong>: Filters out areas where the average monthly rent exceeds your selected budget.</p>
-          <p><strong>2. Safety</strong>: Ranks areas by crime rate percentile, keeping those within your selected range.</p>
-          <p><strong>3. Commute</strong>: Calculates approximate commute time using straight-line distance. Areas outside your chosen limit are excluded.</p>
-          <p><strong>4. Convenience Score</strong>: Each area is scored by weighted accessibility to:</p>
-          <ul>
-            <li><strong>Shops</strong> (e.g., supermarkets)</li>
-            <li><strong>Health facilities</strong> (e.g., clinics, pharmacies)</li>
-            <li><strong>Food spots</strong> (e.g., restaurants, takeaways)</li>
-            <li><strong>Leisure</strong> (e.g., parks, gyms)</li>
+  <!-- Source Data -->
+  <section id="source" class="page-section bg-primary text-white">
+    <div class="container px-4 px-lg-5">
+      <h2 class="text-center mb-4" data-aos="fade-up">Data and Sources</h2>
+      <hr class="divider divider-light" />
+      <div class="row">
+        <!-- 数据来源 -->
+        <div class="col-md-5 text-white-100 mb-4 justify-content-center" data-aos="fade-right" data-aos-delay="100">
+          <h3 class="text-center mb-3">Data Sources</h3>
+          <ul class="list-group">
+            <li class="list-group-item bg-transparent text-white border-light">
+              <i class="bi bi-train-front-fill me-2"></i>
+              <a href="https://gis-tfl.opendata.arcgis.com" target="_blank" class="text-white">London Transport Data (TfL)</a>
+            </li>
+            <li class="list-group-item bg-transparent text-white border-light">
+              <i class="bi bi-clock-fill me-2"></i>
+              <a href="https://github.com/pbarber/uk-isochrones-map" target="_blank" class="text-white">Isochrone Map Reference Project</a>
+            </li>
+            <li class="list-group-item bg-transparent text-white border-light">
+              <i class="bi bi-house-fill me-2"></i>
+              <a href="https://data.london.gov.uk/dataset/uk-house-price-index" target="_blank"
+                class="text-white">London Borough House Price Data (GLA)</a>
+            </li>
+            <li class="list-group-item bg-transparent text-white border-light">
+              <i class="bi bi-cash-coin me-2"></i>
+              <a href="https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics"
+                target="_blank" class="text-white">Private Rental Market Statistics (ONS)</a>
+            </li>
+            <li class="list-group-item bg-transparent text-white border-light">
+              <i class="bi bi-map-fill me-2"></i>
+              <a href="https://www.ons.gov.uk/peoplepopulationandcommunity/housing/datasets/medianpricepaidbylowerlayersuperoutputareahpssadataset46"
+                target="_blank" class="text-white">LSOA House Price Data (ONS)</a>
+            </li>
+            <li class="list-group-item bg-transparent text-white border-light">
+              <i class="bi bi-shield-fill me-2"></i>
+              <a href="https://data.police.uk/data/" target="_blank" class="text-white">UK Police Crime Data</a>
+            </li>
           </ul>
-          <p>The total convenience score is computed as a weighted sum based on your selected identity or custom preferences.</p>
-          <hr>
-          <p class="small text-muted">Note: All distances are estimated as-the-crow-flies. Final map filters reflect simplified commute approximations.</p>
+        </div>
+        <!-- 材料与工具 -->
+        <div class="col-md-7 text-white-100 mb-4 justify-content-center" data-aos="fade-left" data-aos-delay="200">
+          <h3 class="text-center mb-3">Technologies and Tools</h3>
+          <div class="row">
+            <div class="col-md-6">
+              <ul class="list-group">
+                <li class="list-group-item bg-transparent text-white border-light">
+                  <i class="bi bi-code-slash me-2"></i><strong>HTML5 & CSS3:</strong> Web structure & styling
+                </li>
+                <li class="list-group-item bg-transparent text-white border-light">
+                  <i class="bi bi-filetype-js me-2"></i><strong>JavaScript:</strong> Interactivity & data handling
+                </li>
+                <li class="list-group-item bg-transparent text-white border-light">
+                  <i class="bi bi-map me-2"></i><strong>Mapbox:</strong> Interactive map library
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <ul class="list-group">
+                <li class="list-group-item bg-transparent text-white border-light">
+                  <i class="bi bi-bar-chart-fill me-2"></i><strong>ECharts:</strong> Data visualization library
+                </li>
+                <li class="list-group-item bg-transparent text-white border-light">
+                  <i class="bi bi-bootstrap me-2"></i><strong>Bootstrap:</strong> Responsive frontend framework
+                </li>
+                <li class="list-group-item bg-transparent text-white border-light">
+                  <i class="bi bi-geo-alt-fill me-2"></i><strong>Turf.js:</strong> Geospatial analysis library
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="mt-4 text-center">
+            <h5 class="mb-3">Project Team</h5>
+            <p>This project was collaboratively developed by a group of students from the CASA Master's program, aiming to provide a comprehensive living guide for London residents and potential newcomers.</p>
+            <button class="btn btn-outline-light mt-2">
+              <i class="bi bi-people-fill me-2"></i>Meet Our Team
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
   <!-- Footer-->
-  <footer class="bg-primary text-white py-5">
+  <footer class="bg-dark text-white py-5">
     <div class="container px-4 px-lg-5">
       <div class="row">
-        <div class="col-md-6 mb-3">
-          <h5>Web Builder</h5>
+        <div class="col-md-4 mb-3">
+          <h5>Liveable London</h5>
+          <p class="small">A comprehensive guide to help you find the ideal place to live in London, integrating data on
+            rent, transport, safety, and convenience.</p>
+        </div>
+        <div class="col-md-4 mb-3">
+          <h5>Quick Links</h5>
           <ul class="list-unstyled">
-            <li><i class="bi bi-person-circle me-2"></i>Lianghao Yu  - City/Transport/Commute/Price Map</li>
-            <li><i class="bi bi-person-circle me-2"></i>Haoda Yang   - Safety Map</li>
-            <li><i class="bi bi-person-circle me-2"></i>Huiting Chen - Convenience Map</li>
-            <li><i class="bi bi-person-circle me-2"></i>Ruonan Zhu   - Recommender</li>
+            <li><a href="#about" class="text-white-50">Project Overview</a></li>
+            <li><a href="#intro" class="text-white-50">City Map</a></li>
+            <li><a href="#housing" class="text-white-50">Housing Analysis</a></li>
+            <li><a href="#selector" class="text-white-50">Area Selector</a></li>
           </ul>
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-md-4 mb-3">
           <h5>Contact Us</h5>
           <ul class="list-unstyled">
-            <li><i class="bi bi-github"></i>https://github.com/YYY677/03GroupWork</li>
+            <li><i class="bi bi-envelope me-2"></i>info@londonliving.example.com</li>
             <li><i class="bi bi-geo-alt me-2"></i>University College London</li>
             <li>
               <a href="#" class="text-white-50 me-2"><i class="bi bi-twitter"></i></a>
@@ -755,7 +818,7 @@
         </div>
       </div>
       <div class="small text-center text-white-50 mt-3">
-        Group 4 &copy; 2025 - CASA0003 Group Project - Liveable London
+        CASA &copy; 2024 - Group Project - Liveable London
       </div>
     </div>
   </footer>
@@ -770,151 +833,43 @@
   <script src="js/scripts.js"></script>
   <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
 
+  <!-- Custom Scripts -->
   <script>
+
+
+    // Display slider values
     document.addEventListener('DOMContentLoaded', function () {
-    // Budget slider display 预算滑杆
-    const budgetRange = document.getElementById('budgetRange');
-    const budgetValue = document.getElementById('budgetValue');
-  
-    if (budgetRange && budgetValue) {
-      budgetRange.addEventListener('input', function () {
-        budgetValue.textContent = '£' + this.value;
-      });
-    }
-    // 安全性吸附
-    const slider = document.getElementById('safetyPercentile');
-    const safetyDisplay = document.getElementById('safetyValue');
-    const safetyValues = [14, 29, 43, 57, 71, 86, 100];
-  
-    slider.addEventListener('input', () => {
-      const index = Math.max(0, Math.min(6, parseInt(slider.value)));
-      const value = safetyValues[index];
-      safetyDisplay.textContent = `Top ${value}%`;
-    });
-  
-    // button highlight
-    const commuteButtons = document.querySelectorAll("#commuteButtons button");
-  
-    commuteButtons.forEach((btn) => {
-      btn.addEventListener("click", function () {
-        commuteButtons.forEach((b) => b.classList.remove("active"));
-        this.classList.add("active");
-        const selectedValue = this.getAttribute("data-value");
-        console.log("Selected commute time:", selectedValue);
-      });
-    });
-  
-    // 默认权重
-    const defaultWeights = {
-      student:      { shop: 2, health: 1, food: 4, leisure: 3 },
-      professional: { shop: 3, health: 2, food: 3, leisure: 2 },
-      family:       { shop: 3, health: 4, food: 2, leisure: 1 },
-      retiree:      { shop: 2, health: 5, food: 1, leisure: 2 }
-    };
-  
-    let currentWeight = {}; // 当前便利性权重
-  
-    // 自定义按钮逻辑
-    const toggleBtn = document.getElementById("toggleCustomBtn");
-    const panel = document.getElementById("customWeightsPanel");
-  
-    toggleBtn.addEventListener("click", function () {
-      const isVisible = panel.style.display === "block";
-      panel.style.display = isVisible ? "none" : "block";
-      if (!isVisible) {
-        updateCustomWeightsUI();
+      const budgetRange = document.getElementById('budgetRange');
+      const budgetValue = document.getElementById('budgetValue');
+
+      if (budgetRange && budgetValue) {
+        budgetRange.addEventListener('input', function () {
+          budgetValue.textContent = '£' + this.value;
+        });
+      }
+
+      const commuteRange = document.getElementById('commuteRange');
+      const commuteValue = document.getElementById('commuteValue');
+
+      if (commuteRange && commuteValue) {
+        commuteRange.addEventListener('input', function () {
+          commuteValue.textContent = this.value + ' minutes';
+        });
       }
     });
-  
-    // 更新权重输入框内容
-    function updateCustomWeightsUI() {
-      document.getElementById("weightShop").value = currentWeight.shop ?? '';
-      document.getElementById("weightHealth").value = currentWeight.health ?? '';
-      document.getElementById("weightFood").value = currentWeight.food ?? '';
-      document.getElementById("weightLeisure").value = currentWeight.leisure ?? '';
-    }
-  
-    // 验证权重总和为 10
-    const inputs = [
-      document.getElementById("weightShop"),
-      document.getElementById("weightHealth"),
-      document.getElementById("weightFood"),
-      document.getElementById("weightLeisure"),
-    ];
-  
-    const submitBtn = document.getElementById("findAreasBtn");
-    const warningDiv = document.createElement("div");
-    warningDiv.className = "text-danger mt-2 small";
-    warningDiv.innerText = "Total weight must equal 10.";
-    warningDiv.style.display = "none";
-    document.getElementById("customWeightsPanel").appendChild(warningDiv);
-  
-    inputs.forEach((input) => {
-      input.addEventListener("input", validateWeights);
-    });
-  
-    function validateWeights() {
-      const total = inputs.reduce((sum, input) => {
-        const val = parseInt(input.value, 10);
-        return sum + (isNaN(val) ? 0 : val);
-      }, 0);
-  
-      if (total !== 10) {
-        warningDiv.style.display = "block";
-        submitBtn.disabled = true;
-      } else {
-        warningDiv.style.display = "none";
-        submitBtn.disabled = false;
+
+    // Area selector functionality
+    document.addEventListener('DOMContentLoaded', function () {
+      const findAreasBtn = document.getElementById('findAreasBtn');
+
+      if (findAreasBtn) {
+        findAreasBtn.addEventListener('click', function () {
+          // Can add real query logic here in the future
+          alert('Area filtering feature is currently in development. Please check back soon!');
+        });
       }
-    }
-    // 获取iframe对象
-    const mapFrame = document.getElementById('mapFrame');
-  
-    submitBtn.addEventListener('click', () => {
-      // 获取用户输入的数据
-      const budget = parseInt(document.getElementById("budgetRange").value, 10);
-      const safetyIdx = parseInt(document.getElementById("safetyPercentile").value, 10);
-      const safetyPercentiles = [14, 29, 43, 57, 71, 86, 100];
-      const safety = safetyPercentiles[safetyIdx];
-      const commutePostcode = document.getElementById("commutePostcode").value.trim();
-      const commuteTimeBtn = document.querySelector("#commuteButtons .active");
-      const commuteTime = commuteTimeBtn ? parseInt(commuteTimeBtn.dataset.value, 10) : 30;
-  
-      let weight = {};
-  
-      if (panel.style.display === "block") {
-        weight.shop = parseInt(document.getElementById("weightShop").value, 10) || 0;
-        weight.health = parseInt(document.getElementById("weightHealth").value, 10) || 0;
-        weight.food = parseInt(document.getElementById("weightFood").value, 10) || 0;
-        weight.leisure = parseInt(document.getElementById("weightLeisure").value, 10) || 0;
-      } else {
-        weight = currentWeight; // 使用默认
-      }
-  
-      // 构造消息对象
-      const preferences = {
-        budget,
-        safety,
-        commutePostcode,
-        commuteTime,
-        weight
-      };
-  
-      // 发送到 iframe
-      mapFrame.contentWindow.postMessage(preferences, "*");
     });
-  
-    const identityButtons = document.querySelectorAll("#identityButtons button");
-    identityButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        identityButtons.forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        const identity = btn.dataset.value;
-        currentWeight = { ...defaultWeights[identity] };
-      });
-    });
-  
-  });
   </script>
-  </body>
-  </html>
+</body>
+
+</html>
