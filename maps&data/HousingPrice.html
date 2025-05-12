@@ -315,7 +315,7 @@
 
 
   <div id="lsoa-legend" class="legend2" style="display: none;">
-    <b>LSOA Price Legend</b>
+    <b>LSOAs property price</b>
     <div><span style="background-color: #b2182b; opacity: 0.7;"></span> <span id="legend-highest">Highest Price</span>
     </div>
     <div><span style="background-color: #d6604d; opacity: 0.7;"></span> <span id="legend-quantile5"></span></div>
@@ -328,7 +328,7 @@
   </div>
 
   <div id="boroughs-legend" class="legend2" style="display: none;">
-    <b>Boroughs Price Legend</b>
+    <b>Boroughs property price</b>
     <div><span style="background-color: #b2182b; opacity: 0.7;"></span> <span id="legend-year-highest">Highest
         Price</span>
     </div>
@@ -343,7 +343,7 @@
   </div>
 
   <div id="boroughs-legend2" class="legend2" style="display: none;">
-    <b>Boroughs Price Legend</b>
+    <b>Boroughs rental price</b>
     <div><span style="background-color: #b2182b; opacity: 0.7;"></span> <span id="legend-year-rental-highest">Highest
         Price</span>
     </div>
@@ -623,7 +623,7 @@
             type: 'fill',
             source: 'lsoa_price_data',
             layout: {
-              visibility: 'none'
+              visibility: 'visible'  // 设置为默认可见
             },
             paint: {
               'fill-color': colorExpression,
@@ -631,6 +631,10 @@
               'fill-opacity': 0.7,
             }
           });
+
+          // 设置LSOA为默认选中
+          document.getElementById('toggle-housing').checked = true;
+          document.getElementById('lsoa-legend').style.display = 'block';
         });
 
       map.on('click', 'lsoa_price', (e) => {
@@ -681,23 +685,138 @@
     map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
     //#endregion
 
-    document.getElementById('toggle-boroughs-housing').addEventListener('change', (e) => {
-      map.setLayoutProperty('boroughs_price', 'visibility', e.target.checked ? 'visible' : 'none');
-      document.getElementById('boroughs-legend').style.display = e.target.checked ? 'block' : 'none';
-      document.getElementById('slider-row').style.display = e.target.checked ? 'block' : 'none';
-      document.getElementById('lsoa-row').style.display = e.target.checked ? 'none' : 'block';
-      document.getElementById('rental-row').style.display = e.target.checked ? 'none' : 'block';
-    })
-    document.getElementById('toggle-housing').addEventListener('change', (e) => {
-      map.setLayoutProperty('lsoa_price', 'visibility', e.target.checked ? 'visible' : 'none');
-      document.getElementById('lsoa-legend').style.display = e.target.checked ? 'block' : 'none';
-      document.getElementById('boroughs-row').style.display = e.target.checked ? 'none' : 'block';
-      document.getElementById('rental-row').style.display = e.target.checked ? 'none' : 'block';
-    })
+    // 单选逻辑实现
+    // 创建一个函数来处理单选逻辑
+    function setupLayerRadioLogic() {
+      const lsoaCheckbox = document.getElementById('toggle-housing');
+      const boroughsCheckbox = document.getElementById('toggle-boroughs-housing');
+      const rentalCheckbox = document.getElementById('toggle-rental');
+      
+      // LSOA图层切换
+      lsoaCheckbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          // 如果选中LSOA，取消选中其他图层
+          boroughsCheckbox.checked = false;
+          rentalCheckbox.checked = false;
+          
+          // 显示LSOA图层和图例
+          map.setLayoutProperty('lsoa_price', 'visibility', 'visible');
+          document.getElementById('lsoa-legend').style.display = 'block';
+          
+          // 隐藏其他图层和相关控件
+          map.setLayoutProperty('boroughs_price', 'visibility', 'none');
+          map.setLayoutProperty('boroughs_rent', 'visibility', 'none');
+          document.getElementById('boroughs-legend').style.display = 'none';
+          document.getElementById('boroughs-legend2').style.display = 'none';
+          document.getElementById('slider-row').style.display = 'none';
+          document.querySelectorAll('.slider-select-row').forEach(row => row.style.display = 'none');
+        } else {
+          // 如果取消选中，确保至少有一个图层选中
+          if (!boroughsCheckbox.checked && !rentalCheckbox.checked) {
+            e.target.checked = true; // 恢复选中状态
+            return;
+          }
+          
+          // 隐藏LSOA图层
+          map.setLayoutProperty('lsoa_price', 'visibility', 'none');
+          document.getElementById('lsoa-legend').style.display = 'none';
+        }
+      });
+      
+      // Borough房价图层切换
+      boroughsCheckbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          // 如果选中Borough房价，取消选中其他图层
+          lsoaCheckbox.checked = false;
+          rentalCheckbox.checked = false;
+          
+          // 显示Borough房价图层和相关控件
+          map.setLayoutProperty('boroughs_price', 'visibility', 'visible');
+          document.getElementById('boroughs-legend').style.display = 'block';
+          document.getElementById('slider-row').style.display = 'block';
+          
+          // 隐藏其他图层和相关控件
+          map.setLayoutProperty('lsoa_price', 'visibility', 'none');
+          map.setLayoutProperty('boroughs_rent', 'visibility', 'none');
+          document.getElementById('lsoa-legend').style.display = 'none';
+          document.getElementById('boroughs-legend2').style.display = 'none';
+          document.querySelectorAll('.slider-select-row').forEach(row => row.style.display = 'none');
+          
+          // 更新时间轴数据
+          updateBoroughsPriceLayer(document.getElementById('slider').value);
+        } else {
+          // 如果取消选中，确保至少有一个图层选中
+          if (!lsoaCheckbox.checked && !rentalCheckbox.checked) {
+            e.target.checked = true; // 恢复选中状态
+            return;
+          }
+          
+          // 隐藏Borough房价图层和相关控件
+          map.setLayoutProperty('boroughs_price', 'visibility', 'none');
+          document.getElementById('boroughs-legend').style.display = 'none';
+          document.getElementById('slider-row').style.display = 'none';
+        }
+      });
+      
+      // Rental价格图层切换
+      rentalCheckbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          // 如果选中Rental价格，取消选中其他图层
+          lsoaCheckbox.checked = false;
+          boroughsCheckbox.checked = false;
+          
+          // 显示Rental价格图层和相关控件
+          map.setLayoutProperty('boroughs_rent', 'visibility', 'visible');
+          document.getElementById('boroughs-legend2').style.display = 'block';
+          document.querySelectorAll('.slider-select-row').forEach(row => row.style.display = 'block');
+          
+          // 隐藏其他图层和相关控件
+          map.setLayoutProperty('lsoa_price', 'visibility', 'none');
+          map.setLayoutProperty('boroughs_price', 'visibility', 'none');
+          document.getElementById('lsoa-legend').style.display = 'none';
+          document.getElementById('boroughs-legend').style.display = 'none';
+          document.getElementById('slider-row').style.display = 'none';
+          
+          // 更新时间轴数据
+          updateBoroughsRentLayer(document.getElementById('slider2').value, document.getElementById('rent-select').value);
+        } else {
+          // 如果取消选中，确保至少有一个图层选中
+          if (!lsoaCheckbox.checked && !boroughsCheckbox.checked) {
+            e.target.checked = true; // 恢复选中状态
+            return;
+          }
+          
+          // 隐藏Rental价格图层和相关控件
+          map.setLayoutProperty('boroughs_rent', 'visibility', 'none');
+          document.getElementById('boroughs-legend2').style.display = 'none';
+          document.querySelectorAll('.slider-select-row').forEach(row => row.style.display = 'none');
+        }
+      });
+    }
+
+    // 移除旧的事件监听器
+    document.getElementById('toggle-boroughs-housing').removeEventListener('change', null);
+    document.getElementById('toggle-housing').removeEventListener('change', null);
+    document.getElementById('toggle-rental').removeEventListener('change', null);
+
+    // 设置单选逻辑
+    setupLayerRadioLogic();
+
+    // 保留时间轴事件监听器
     document.getElementById('slider').addEventListener('input', (e) => {
       let year = parseInt(e.target.value);
       updateBoroughsPriceLayer(year);
-    })
+    });
+
+    document.getElementById('slider2').addEventListener('input', (e) => {
+      let year = parseInt(e.target.value);
+      updateBoroughsRentLayer(year, document.getElementById('rent-select').value);
+    });
+
+    document.getElementById('rent-select').addEventListener('change', (e) => {
+      let rentType = e.target.value;
+      updateBoroughsRentLayer(document.getElementById('slider2').value, rentType);
+    });
 
     function updateBoroughsPriceLayer(year) {
       console.log(year);
@@ -748,24 +867,6 @@
       document.getElementById('legend-year-quantile5').textContent = `£${quantiles[4].toLocaleString()} - £${quantiles[5].toLocaleString()}`;
       document.getElementById('legend-year-highest').textContent = `£${quantiles[5].toLocaleString()} - £${prices[prices.length - 1].toLocaleString()}`;
     }
-
-    document.getElementById('toggle-rental').addEventListener('change', (e) => {
-      map.setLayoutProperty('boroughs_rent', 'visibility', e.target.checked ? 'visible' : 'none');
-      document.querySelectorAll('.slider-select-row').forEach(row => row.style.display = e.target.checked ? 'block' : 'none');
-      document.getElementById('boroughs-legend2').style.display = e.target.checked ? 'block' : 'none';
-      document.getElementById('lsoa-row').style.display = e.target.checked ? 'none' : 'block';
-      document.getElementById('boroughs-row').style.display = e.target.checked ? 'none' : 'block';
-    })
-
-    document.getElementById('slider2').addEventListener('input', (e) => {
-      let year = parseInt(e.target.value);
-      updateBoroughsRentLayer(year, document.getElementById('rent-select').value);
-    });
-
-    document.getElementById('rent-select').addEventListener('change', (e) => {
-      let rentType = e.target.value;
-      updateBoroughsRentLayer(document.getElementById('slider2').value, rentType);
-    });
 
     function updateBoroughsRentLayer(year, rentType) {
       console.log(year, rentType);
