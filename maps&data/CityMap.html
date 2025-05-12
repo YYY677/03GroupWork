@@ -21,6 +21,9 @@
   <link rel="stylesheet"
     href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.css" type="text/css">
 
+  <!-- Turf.js for spatial analysis -->
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+
   <style>
     body {
       margin: 0;
@@ -476,26 +479,84 @@
     });
 
     //#region local geocoder and controls
+    // 修改为初始化一个变量存储LSOA特征
+    let lsoaFeatures = [];
+    
+    // 定义本地搜索函数 - 用于LSOA本地搜索
+    function forwardGeocoder(query) {
+      const q = query.toLowerCase();
+      const matches = [];
+      
+      // 遍历LSOA特征，查找匹配项
+      for (const f of lsoaFeatures) {
+        const name = (f.properties.lsoa21nm || '').toLowerCase();
+        const code = (f.properties.lsoa21cd || '').toLowerCase();
+        
+        // 如果LSOA名称或编码包含查询字符串
+        if (name.includes(q) || code.includes(q)) {
+          // 计算中心点用于定位
+          const centroid = turf.centroid(f.geometry);
+          const center = centroid.geometry.coordinates;
+          
+          // 添加到匹配结果中
+          matches.push({
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: center },
+            text: f.properties.lsoa21nm,
+            place_name: `${f.properties.lsoa21nm}`,
+            properties: f.properties
+          });
+        }
+      }
+      
+      return matches;
+    }
+    
+    // 初始化和配置搜索控件
     const geocoder = new MapboxGeocoder({
       accessToken: mapboxgl.accessToken,
-      placeholder: 'Enter a postcode (recommended)',
+      placeholder: 'You can enter a Postcode or LSOA',
       mapboxgl: mapboxgl,
       marker: false,
       language: 'en',
       bbox: [-9.0, 49.75, 2.01, 61.01], // 限制搜索范围（英国）
+      localGeocoder: forwardGeocoder // 添加本地搜索函数
     });
+    
+    // 搜索结果处理
     geocoder.on('result', function (e) {
-      const lon = e.result.center[0];
-      const lat = e.result.center[1];
+      console.log(e)
+      const lon = e.result.geometry.coordinates[0];
+      const lat = e.result.geometry.coordinates[1];
       const placeName = e.result.place_name;
+      
+      // 移除已有标记
       if (searchMarker) {
         searchMarker.remove();
       }
-      searchMarker = new mapboxgl.Marker({ color: '#f4623a' })
-        .setLngLat([lon, lat])
-        .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(placeName))
-        .addTo(map);
-
+      
+      // 检查是否是本地LSOA结果
+      const props = e.result.properties;
+      const lsoaCode = props.lsoa21cd; // 如果是本地LSOA结果，这个会有值
+      
+      if (lsoaCode) {
+        // 如果是LSOA结果，高亮该LSOA
+        map.setFilter('highlight-lsoa-search', ['==', ['get', 'lsoa21cd'], lsoaCode]);
+        
+        // 同时在中心点添加标记
+        searchMarker = new mapboxgl.Marker({ color: '#f4623a' })
+          .setLngLat([lon, lat])
+            .setPopup(new mapboxgl.Popup({ offset: 25, closeButton: false }).setHTML(`<strong>LSOA Name: ${props.lsoa21nm}<br>LSOA Code: ${props.lsoa21cd}</strong>`))
+          .addTo(map);
+      } else {
+        // 如果是普通搜索结果（如邮编或地址），添加标记
+        searchMarker = new mapboxgl.Marker({ color: '#f4623a' })
+          .setLngLat([lon, lat])
+          .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(placeName))
+          .addTo(map);
+      }
+      
+      // 飞行到结果位置
       map.flyTo({
         center: [lon, lat],
         zoom: 15.5,
@@ -504,6 +565,20 @@
         duration: 1500
       });
     });
+    
+    // 当搜索框被清除时
+    geocoder.on('clear', function() {
+      // 移除标记
+      if (searchMarker) {
+        searchMarker.remove();
+        searchMarker = null;
+      }
+      
+      // 清除LSOA高亮
+      map.setFilter('highlight-lsoa-search', ['==', ['get', 'lsoa21nm'], '']);
+      
+    });
+    
     map.addControl(geocoder, 'top-right');
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
     map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
@@ -650,6 +725,18 @@
         type: 'geojson',
         data: './data/LSOA_21.geojson'
       })
+      
+      // 加载LSOA数据后，将特征存储到变量中供本地搜索使用
+      fetch('./data/LSOA_21.geojson')
+        .then(response => response.json())
+        .then(data => {
+          lsoaFeatures = data.features;
+          console.log(`Loaded ${lsoaFeatures.length} LSOA features for local search`);
+        })
+        .catch(error => {
+          console.error("Error loading LSOA data:", error);
+        });
+        
       map.addLayer({
         id: 'LSOAs',
         type: 'fill',
@@ -675,7 +762,20 @@
         },
         filter: ['==', ['get', 'lsoa21nm'], ''] // 初始无匹配
       });
-
+      // 搜索框专用
+      map.addLayer({
+        id: 'highlight-lsoa-search',
+        type: 'line',
+        source: 'lsoas',
+        layout: {
+          visibility: 'visible'
+        },
+        paint: {
+          'line-color': 'rgba(0, 0, 0, 0.5)',
+          'line-width': 3
+        },
+        filter: ['==', ['get', 'lsoa21nm'], ''] // 初始无匹配
+      });
       // hover 高亮逻辑 - 使用防抖
       const handleLsoaMouseMove = (e) => {
         const features = map.queryRenderedFeatures(e.point, {

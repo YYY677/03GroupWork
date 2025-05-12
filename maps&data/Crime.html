@@ -162,7 +162,7 @@
     </select>
 
     <div id="display-options">
-      <label><input type="checkbox" id="display-count" checked> Total crime</label>
+      <label><input type="checkbox" id="display-count" checked> Total count</label>
       <label><input type="checkbox" id="display-density"> Crime density</label>
     </div>
   </div>
@@ -215,9 +215,9 @@
 
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [-0.05, 51.5],
-      zoom: 10.5
+      style: 'mapbox://styles/mapbox/light-v9',
+      center: [-0.134039, 51.524514],
+      zoom: 9.5
     });
 
     let allFeatures = [], selectedProps = null, chartMode = 'count';
