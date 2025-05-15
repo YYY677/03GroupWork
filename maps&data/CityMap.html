@@ -473,9 +473,9 @@
       container: "map",
       style: "mapbox://styles/mapbox/streets-v12",
       center: [-0.13320, 51.52432],
-      zoom: 9.5,
-      pitch: 0,
-      bearing: 0,
+      zoom: 15,
+      pitch: 54,
+      bearing: -34,
     });
 
     //#region local geocoder and controls
@@ -589,9 +589,15 @@
       updateLegendVisibility();
       updateControlsVisibility();
 
-      // 初始化图层显示状态
-      document.getElementById('toggle-Boroughs').checked = true;
-      document.getElementById('toggle-LSOAs').checked = false;
+      // 初始化图层显示状态（修改为LSOA图层显示，Boroughs图层隐藏）
+      document.getElementById('toggle-Boroughs').checked = false;
+      document.getElementById('toggle-LSOAs').checked = true;
+      
+      // 更新slider控件显示当前pitch和bearing值
+      pitchSlider.value = map.getPitch();
+      pitchValue.textContent = map.getPitch();
+      bearingSlider.value = map.getBearing();
+      bearingValue.textContent = map.getBearing();
 
       // 延迟执行信息面板更新，确保地图加载完成
       setTimeout(() => {
@@ -673,7 +679,7 @@
         type: 'fill',
         source: 'LondonBoroughs',
         layout: {
-          visibility: 'visible'
+          visibility: 'none'  // 修改为初始隐藏
         },
         paint: {
           'fill-color': '#000',
@@ -687,7 +693,7 @@
         type: 'line',
         source: 'LondonBoroughs',
         layout: {
-          visibility: 'visible'
+          visibility: 'none'  // 修改为初始隐藏
         },
         paint: {
           'line-color': 'rgba(0, 0, 0, 0.5)',
@@ -742,7 +748,7 @@
         type: 'fill',
         source: 'lsoas',
         layout: {
-          visibility: 'none'
+          visibility: 'visible'  // 修改为初始显示
         },
         paint: {
           'fill-color': '#000',
@@ -754,7 +760,7 @@
         type: 'line',
         source: 'lsoas',
         layout: {
-          visibility: 'none'
+          visibility: 'visible'  // 修改为初始显示
         },
         paint: {
           'line-color': 'rgba(0, 0, 0, 0.5)',
@@ -1327,7 +1333,7 @@
             'source-layer': 'building',
             'filter': ['!=', ['get', 'type'], 'building:part'],
             'type': 'fill-extrusion',
-            'minzoom': 14,
+            'minzoom': 13, // 降低最小缩放级别，使建筑物更早出现
             'paint': {
               'fill-extrusion-color': [
                 'match',
@@ -1442,25 +1448,30 @@
                 'interpolate',
                 ['linear'],
                 ['zoom'],
-                13.5, 0,
-                14, 5,
-                15.5, ['get', 'height']
+                13, 0,                // 13级开始出现
+                13.5, ['*', ['get', 'height'], 0.2],  // 13.5级时高度为实际高度的20%
+                14.5, ['*', ['get', 'height'], 0.6],  // 14.5级时高度为实际高度的60% 
+                15, ['*', ['get', 'height'], 0.8],    // 15级时高度为实际高度的80%
+                15.5, ['get', 'height']               // 15.5级时显示实际高度
               ],
               'fill-extrusion-base': [
                 'interpolate',
                 ['linear'],
                 ['zoom'],
+                13, 0,
                 13.5, 0,
-                14, 0,
                 15.5, ['get', 'min_height']
               ],
               'fill-extrusion-opacity': [
                 'interpolate',
                 ['linear'],
                 ['zoom'],
-                13.5, 0,
-                14, 0.3,
-                15.5, 0.8
+                13, 0,              // 13级时完全透明
+                13.5, 0.1,          // 13.5级时10%不透明
+                14, 0.3,            // 14级时30%不透明
+                14.5, 0.5,          // 14.5级时50%不透明
+                15, 0.8,           // 15级时65%不透明
+                15.5, 1           // 15.5级时80%不透明
               ]
             }
           },

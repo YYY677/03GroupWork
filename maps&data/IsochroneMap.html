@@ -545,6 +545,26 @@
             updateInfo([], searchParam);
             displayIsochrone(searchParam);
           }
+        } else {
+          // 如果URL中没有指定等时区，则使用默认坐标
+          const defaultCoords = { lng: -0.132370, lat: 51.524819 };
+          
+          // 搜索最近的等时区中心点
+          const found = searchTree.nearest(defaultCoords, 1, 20000);
+          if (found && found.length > 0) {
+            const sa = found[0][0].areaname;
+            console.log("初始等时区:", sa);
+            
+            // 显示等时区但不更新信息面板（保持默认提示信息）
+            displayIsochrone(sa);
+            
+            // 将地图中心设为指定位置
+            map.flyTo({
+              center: [defaultCoords.lng, defaultCoords.lat],
+              zoom: 11,
+              duration: 0 // 立即设置，无动画
+            });
+          }
         }
       });
     };
