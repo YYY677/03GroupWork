@@ -1,66 +1,40 @@
-# A short introduction for this project
+# 🏙️ Livable London — A Group Visualisation Project
 
-## [Check this project](https://yyy677.github.io/Individual-Visualisation/)
+## 🔗 [Check out the live site](https://yyy677.github.io/03GroupWork/)
 
-## Why develop this project?
+## 🧠 Project Motivation
 
-- To enhance my web development skills and become proficient with WebGIS-related APIs.
-- To serve as a foundational base for my graduate design.
-- To answer the CASA0003 Mini Project assessment (Individual Visualisation).
+* To fulfill the CASA0003 Mini Project assessment with a strong emphasis on team-based geovisualisation and storytelling.
+* To integrate multiple urban datasets and deliver insights into housing, transport, safety, amenities, and community features.
 
-## What the visualisation is aiming to show?
+## 📌 What Does the Visualisation Show?
 
-This project provides a comprehensive platform for prospective students planning to study in London.
-It offers essential insights into various aspects of the city—from transportation networks and commute
-times to housing prices—empowering students to make an informed decision about where to live.
+This project visualizes key dimensions of urban livability in London. By integrating spatial and statistical data, it aims to help users identify **ideal places to live** based on personal priorities, such as:
 
-> [!IMPORTANT]
-> **More aspects will be added in the future.**
+* 🏠 Housing affordability
+* 🚇 Transport accessibility
+* 🛡️ Safety and crime levels
+* 🏪 Convenience and local amenities
+* 🗺️ General borough awareness and layout
 
-## Outline the design and technical approach taken
+We provide **an interactive experience** through city maps, data layers, and embedded analytics, helping users make **informed and confident housing decisions**.
 
-### Outline the design
+## 💡 Design & Technical Approach
 
-This project is a long-scroll website featuring a fixed-top navigation bar. The homepage displays a classic London photograph
-with a prominently highlighted fullscreen button. The main content is divided into sections using the `<section>` tag, with map
-and icon code separated from the main page and embedded via iframes.
+### Design Strategy
 
-To enhance overall interactivity, the project leverages the Bootstrap library. Additionally, all Mapbox maps in this project
-are enriched with extensive interactive features—inviting you to explore.
+* A **long-scroll storytelling format** with clearly defined themed sections.
+* Embedded maps via `<iframe>` to modularize development and maintenance.
+* A clean, modern UI with Bootstrap for layout and responsiveness.
+* Focus on interactivity and accessibility for both desktop and mobile users.
 
-### Technical approach taken
+### Technologies Used
 
-- HTML5 & CSS3: Basic webpage structure and styling.
-- JavaScript: Dynamic interactivity and data processing.
-- Mapbox: Mapping library for interactive maps.
-- ECharts: Data visualization library.
-- Bootstrap: Front-end framework for responsive design.
-- Turf.js: Geospatial analysis library for processing and analyzing spatial data.
+* **HTML5 & CSS3** — Page structure and styling
+* **JavaScript (Vanilla + libraries)** — Data handling and DOM interactivity
+* **Mapbox GL JS** — Interactive map rendering and layer control
+* **Turf.js** — Geospatial calculations (e.g., buffer, distance)
+* **ECharts** — Custom charts and visual analysis
+* **Bootstrap** — Responsive layout and UI components
+* **GitHub Pages** — Project hosting and deployment
 
-## Data source
-
-1. [Transport Data](https://gis-tfl.opendata.arcgis.com)
-2. [Isochrone Map references this project](https://github.com/pbarber/uk-isochrones-map)
-3. [Boroughs property data](https://data.london.gov.uk/dataset/uk-house-price-index)
-4. [Boroughs rental data](https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics)
-5. [LSOAs property data](https://www.ons.gov.uk/peoplepopulationandcommunity/housing/datasets/medianpricepaidbylowerlayersuperoutputareahpssadataset46)
-
-## Show
-
-![Project Overview](./assets/0.png)
-
-
-
-![Project Overview](assets/1.png)
-
-
-
-![Project Overview](assets/2.png)
-
-
-
-![Project Overview](assets/3.png)
-
-
-
-![Project Overview](assets/4.png)
