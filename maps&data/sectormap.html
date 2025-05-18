@@ -311,6 +311,22 @@
       const prefs = event.data;
       renderRecommendations(prefs);
     });
+
+    // 添加默认展示
+    const defaultPrefs = {
+      budget: 2000,
+      safety: 43,
+      commutePostcode: "WC1E 6BT",
+      commuteTime: 30,
+      weight: {
+        shop: 2,
+        food: 3,
+        health: 3,
+        leisure: 2
+      }
+    };
+
+    renderRecommendations(defaultPrefs);
   </script>
 </body>
 </html>
