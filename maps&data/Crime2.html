@@ -102,7 +102,8 @@
     <div id="display-options">
       <label><input type="checkbox" id="display-count" checked> Total count</label>
       <label><input type="checkbox" id="display-density"> Crime density</label>
-      <label><input type="checkbox" id="display-average"> 2020–2024 Avg Crime</label>
+      <label><input type="checkbox" id="display-avg-count"> 2020–2024 Avg Count</label>
+      <label><input type="checkbox" id="display-avg-density"> 2020–2024 Avg Density</label>
     </div>
   </div>
 
@@ -135,32 +136,31 @@
   </div>
 
   <script>
-    // 动态定位 Check Source 按钮
+    // --- UI 元件 ---
     window.addEventListener('load', () => {
-      const overlay = document.querySelector('.map-overlay');
-      const box = document.getElementById('check-source-container');
-      const rect = overlay.getBoundingClientRect();
+      const overlay = document.querySelector('.map-overlay'),
+            box     = document.getElementById('check-source-container'),
+            rect    = overlay.getBoundingClientRect();
       box.style.top = rect.bottom + 10 + 'px';
     });
-    // 折叠 Check Source
-    document.getElementById('checkSourceBtn').addEventListener('click', () => {
+    document.getElementById('checkSourceBtn').addEventListener('click', ()=>{
       const src = document.getElementById('sourceContent');
-      src.style.display = (src.style.display === 'block' ? 'none' : 'block');
+      src.style.display = src.style.display==='block'?'none':'block';
     });
 
-    // Map setup
+    // --- 地图 & 状态 ---
     mapboxgl.accessToken = 'pk.eyJ1IjoiY2FzYTAwMDMtaGFvZGEiLCJhIjoiY203dXBnem5xMDMwdjJscXUzcTF0dzI5OCJ9.AYcGJ2cpn5afQoEHnby4TQ';
     let searchMarker = null;
     const map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/mapbox/light-v9',
-      center: [-0.134039, 51.524514],
-      zoom: 10.5
+      container:'map', style:'mapbox://styles/mapbox/light-v9',
+      center:[-0.114039, 51.50], zoom:9.6
     });
 
     let allFeatures = [], selectedProps = null;
-    let chartMode = 'count';
-    let modeAverage = false;
+    let chartMode    = 'count';      // count or density
+    let avgCountMode = false;        // 平均数量
+    let avgDensMode  = false;        // 平均密度
+
     const years = Array.from({length:2024-2011+1},(_,i)=>2011+i);
     const colors = ['#2166AC','#92c5de','#d1e5f0','#fddbc7','#f4a582','#d6604d','#b2182b'];
     const displayLabels = {
@@ -168,40 +168,111 @@
       THEFT:"Theft", VIOLENCE_AGAINST_THE_PERSON:"Violence"
     };
     const chart = echarts.init(document.getElementById('chart'));
-    window.addEventListener('resize', ()=> chart.resize());
+    window.addEventListener('resize',()=>chart.resize());
 
-    // 计算分位 & 画图例
-    function calculateQuantiles(arr,num){
+    // --- 计算平均值并存入 properties ---
+    function computeAverages(features){
+      features.forEach(f=>{
+        ['BURGLARY','ROBBERY','THEFT','VIOLENCE_AGAINST_THE_PERSON']
+        .forEach(type=>{
+          let sum=0,c=0;
+          for(let y=2020;y<=2024;y++){
+            const v=+f.properties[`${y}_${type}`];
+            if(!isNaN(v)){ sum+=v; c++; }
+          }
+          const avg= c? sum/c:0;
+          f.properties[`AVG_${type}`]      = avg;
+          f.properties[`AVG_${type}_DENS`] = f.properties['Area_km2']>0
+            ? avg/f.properties['Area_km2'] : 0;
+        });
+      });
+    }
+
+    // --- 分位数 & 颜色表达式 ---
+    function calculateQuantiles(arr,n){
       const d=arr.filter(v=>!isNaN(v)).sort((a,b)=>a-b);
       if(!d.length) return [];
-      let qs=[]; for(let i=1;i<num;i++) qs.push(d[Math.floor(i*d.length/num)]);
+      const qs=[];
+      for(let i=1;i<n;i++) qs.push(d[Math.floor(i*d.length/n)]);
       return [...new Set(qs)];
     }
-    function updateLegend(type,mode,prop){
-      const lg=document.getElementById('legend'); lg.innerHTML='';
-      const title=document.createElement('div');
-      title.style.fontWeight='bold'; title.style.marginBottom='5px';
-      title.textContent = mode==='average'
-        ? `${displayLabels[type]} (2020–2024 Avg)`
-        : `${displayLabels[type]} (${mode==='density'?'Density':'Total'})`;
-      lg.appendChild(title);
+    function buildStep(prop,isDensity=false){
+      let vals=allFeatures.map(f=> isDensity
+        ? f.properties[prop]/f.properties['Area_km2']
+        : +f.properties[prop]
+      );
+      const qs = calculateQuantiles(vals,7),
+            expr = ['step', isDensity
+              ? ['coalesce',['/',['get',prop],['get','Area_km2']],0]
+              : ['get',prop],
+              colors[0]
+            ];
+      qs.forEach((q,i)=> expr.push(q,colors[i+1]));
+      return expr;
+    }
 
-      let vals = allFeatures.map(f=>+f.properties[prop]);
-      if(mode==='density'||mode==='average-density'){
-        vals = allFeatures.map(f=>{
-          const c=f.properties[prop], a=f.properties['Area_km2'];
-          return a>0 ? c/a : 0;
-        });
-      }
+    // --- 更新普通填色 ---
+    function updateRegular(){
+      const y  = document.getElementById('year-slider').value,
+            ct = document.getElementById('crime-type').value,
+            prop = `${y}_${ct}`,
+            expr = buildStep(prop, chartMode==='density');
+      map.setPaintProperty('LSOAs-fill','fill-color',expr);
+      updateLegend();
+    }
+    // --- 更新平均数量填色 ---
+    function updateAvgCount(){
+      const ct    = document.getElementById('crime-type').value,
+            prop  = `AVG_${ct}`,
+            expr  = buildStep(prop,false);
+      map.setPaintProperty('LSOAs-fill','fill-color',expr);
+      updateLegend(true,false);
+    }
+    // --- 更新平均密度填色 ---
+    function updateAvgDensity(){
+      const ct    = document.getElementById('crime-type').value,
+            prop  = `AVG_${ct}`,
+            expr  = buildStep(prop,true);
+      map.setPaintProperty('LSOAs-fill','fill-color',expr);
+      updateLegend(false,true);
+    }
+
+    // --- 更新图例 ---
+    function updateLegend(isAvgCount,isAvgDens){
+      const lg   = document.getElementById('legend');
+      const ct   = document.getElementById('crime-type').value;
+      lg.innerHTML='';
+      let title='';
+      if(isAvgCount)   title=`Avg Count (2020–2024)`;
+      else if(isAvgDens) title=`Avg Density (/km²)`;
+      else title= `${displayLabels[ct]} (${chartMode==='density'?'Density':'Total'})`;
+      const t = document.createElement('div');
+      t.style.fontWeight='bold';
+      t.style.marginBottom='5px';
+      t.textContent = title;
+      lg.appendChild(t);
+
+      // 取对应属性数组，计算分位，生成 legend-item……
+      let vals = allFeatures.map(f=>{
+        let v;
+        if(isAvgCount)       v=f.properties[`AVG_${ct}`];
+        else if(isAvgDens)   v=f.properties[`AVG_${ct}_DENS`];
+        else {
+          const y=document.getElementById('year-slider').value;
+          v= f.properties[`${y}_${ct}`];
+          if(chartMode==='density') v = v / f.properties['Area_km2'];
+        }
+        return +v;
+      })
       vals = vals.filter(v=>!isNaN(v)).sort((a,b)=>a-b);
       if(!vals.length) return;
-      const qs = calculateQuantiles(vals,7);
-      const breaks = [vals[0], ...qs, vals[vals.length-1]];
+      const qs = calculateQuantiles(vals,7),
+            breaks=[vals[0],...qs,vals[vals.length-1]];
       for(let i=0;i<breaks.length-1;i++){
         const item=document.createElement('div'); item.className='legend-item';
         const key=document.createElement('span'); key.className='legend-key';
-        key.style.backgroundColor=colors[i];
-        const lbl = (i===breaks.length-2)
+        key.style.backgroundColor = colors[i];
+        const lbl = i===breaks.length-2
           ? `${breaks[i].toFixed(2)}+`
           : `${breaks[i].toFixed(2)} - ${breaks[i+1].toFixed(2)}`;
         item.appendChild(key);
@@ -210,100 +281,51 @@
       }
     }
 
-    // 更新填色
-    function updateLayer(){
-      if(modeAverage){
-        updateAvgLayer();
-        return;
-      }
-      const y = document.getElementById('year-slider').value;
-      const ct= document.getElementById('crime-type').value;
-      const prop = `${y}_${ct}`;
-      const m = chartMode==='density' ? 'density' : 'count';
-      const expr = chartMode==='density'
-        ? getQuantileDensityColor(prop)
-        : getQuantileColor(prop);
-      map.setPaintProperty('LSOAs-fill','fill-color',expr);
-      updateLegend(ct,chartMode,prop);
-    }
-    function getQuantileColor(prop){
-      const vals=allFeatures.map(f=>+f.properties[prop]);
-      const qs=calculateQuantiles(vals,7);
-      let expr=['step',['get',prop],colors[0]];
-      qs.forEach((q,i)=>expr.push(q,colors[i+1]));
-      return expr;
-    }
-    function getQuantileDensityColor(prop){
-      const vals=allFeatures.map(f=>{
-        const c=+f.properties[prop],a=+f.properties['Area_km2'];
-        return a>0?c/a:0;
-      });
-      const qs=calculateQuantiles(vals,7);
-      let expr=['step',['coalesce',['/',['get',prop],['get','Area_km2']],0],colors[0]];
-      qs.forEach((q,i)=>expr.push(q,colors[i+1]));
-      return expr;
-    }
-
-    // 更新平均图层
-    function updateAvgLayer(){
-      const ct = document.getElementById('crime-type').value;
-      const propCount  = `AVG_${ct}`;
-      const propDensity= `AVG_${ct}_DENS`;
-      const mode = chartMode==='density' ? 'average-density' : 'average';
-      const expr = chartMode==='density'
-        ? getQuantileDensityColor(propCount)  // 使用 count/DENS 两种分位逻辑一致
-        : getQuantileColor(propCount);
-      map.setPaintProperty('LSOAs-fill','fill-color',expr);
-      updateLegend(ct, mode, mode==='average' ? propCount : propCount);
-    }
-
-    // 计算 2021-2024 平均
-    function computeAverages(features){
-      features.forEach(f=>{
-        ['BURGLARY','ROBBERY','THEFT','VIOLENCE_AGAINST_THE_PERSON'].forEach(type=>{
-          let sum=0,count=0;
-          for(let y=2020;y<=2024;y++){
-            const v=+f.properties[`${y}_${type}`];
-            if(!isNaN(v)){ sum+=v; count++; }
-          }
-          const avg = count>0? sum/count : 0;
-          f.properties[`AVG_${type}`] = avg;
-          f.properties[`AVG_${type}_DENS`] = f.properties['Area_km2']>0
-            ? avg / f.properties['Area_km2'] : 0;
-        });
-      });
-    }
-
-    // 点击图表（不在平均模式弹）
+    // --- 绘制底部图表（仅非平均模式） ---
     function updateCharts(){
-      if(!selectedProps || modeAverage) return;
-      const y=+document.getElementById('year-slider').value;
-      const area=+selectedProps['Area_km2']||1;
-      const pieData=Object.keys(displayLabels).map(type=>{
+      if(!selectedProps) return;
+      // 平均模式不弹
+      if(avgCountMode||avgDensMode) return;
+
+      const y=document.getElementById('year-slider').value,
+            ct=document.getElementById('crime-type').value,
+            area=+selectedProps['Area_km2']||1;
+      const pieData = Object.keys(displayLabels).map(type=>{
         const v=+selectedProps[`${y}_${type}`]||0;
         return { name:displayLabels[type], value: chartMode==='count'?v:+(v/area).toFixed(2) };
       });
       const lineSeries=Object.keys(displayLabels).map(type=>({
-        name:displayLabels[type], type:'line', smooth:true,
+        name:displayLabels[type],
+        type:'line',
+        smooth:true,
         data: years.map(yy=>{
           const v=+selectedProps[`${yy}_${type}`]||0;
           return chartMode==='count'?v:+(v/area).toFixed(2);
         })
       }));
-      const opt={
-        tooltip:{trigger:'item',
-            formatter: params => {
-        if(params.seriesType === 'line') {
-          return `${params.seriesName}: ${params.value}${chartMode==='density'?'/km²':''}`;
-        }
-        // 饼图的 tooltip
-        return `${params.seriesName}<br>${params.name}: ${params.value}${chartMode==='density'?'/km²':''} (${params.percent}%)`;
-      }
+
+      const opt = {
+        tooltip:{
+          trigger:'item',
+          formatter: params=>{
+            const suffix = chartMode==='density' ? '/km²' : '';
+            if(params.seriesType==='line'){
+              return `${params.seriesName}: ${params.value}${suffix}`;
+            }
+            return `${params.seriesName}<br/>${params.name}: ${params.value}${suffix} (${params.percent}%)`;
+          }
         },
-        legend:{bottom:0,left:'center',textStyle:{fontSize:12}},
+        legend:{ bottom:0,left:'center',textStyle:{fontSize:12} },
         grid:{top:'50%',left:'8%',right:'8%',bottom:'10%'},
-        xAxis:{type:'category',data:years,boundaryGap:false,axisLabel:{fontSize:11}},
-        yAxis:{type:'value',name:chartMode==='count'?'Count':'Density',axisLabel:{fontSize:11}},
+        xAxis:{ type:'category',data:years,boundaryGap:false,axisLabel:{fontSize:11} },
+        yAxis:{
+          type:'value',
+          name: chartMode==='count'?'Count':'Density',
+          nameLocation:'middle',
+          nameGap:35,
+          nameTextStyle:{ fontSize:12, padding:[0,0,10,0] },
+          axisLabel:{ fontSize:11, formatter: v=> chartMode==='density' ? `${v}/km²` : v }
+        },
         series:[
           { name:'Proportion', type:'pie', radius:'30%', center:['50%','25%'],
             label:{formatter:'{b}: {c} ({d}%)',fontSize:12}, data:pieData },
@@ -314,35 +336,37 @@
       chart.resize();
     }
 
-    // 主加载
+    // --- 主流程 ---
     map.on('load',()=>{
       fetch('data/Crime_data_2011_2024_merged2.geojson')
         .then(r=>r.json()).then(data=>{
           allFeatures = data.features;
           computeAverages(data.features);
-          map.addSource('LSOAs',{ type:'geojson', data });
+
+          map.addSource('LSOAs',{type:'geojson',data});
           map.addLayer({
             id:'LSOAs-fill', type:'fill', source:'LSOAs',
-            paint:{ 'fill-color': getQuantileColor('2011_BURGLARY'), 'fill-opacity':0.7 }
+            paint:{'fill-color':buildStep('2011_BURGLARY',false),'fill-opacity':0.7}
           });
-          updateLegend('BURGLARY','count','2011_BURGLARY');
+          updateLegend();
           map.addLayer({
             id:'LSOA-highlight', type:'line', source:'LSOAs',
-            paint:{ 'line-color':'#333','line-width':2 },
+            paint:{'line-color':'#333','line-width':2},
             filter:['==',['get','LSOA Code'],'']
           });
 
-          // local + online Geocoder
+          // Geocoder（线上+本地混用）
           function forwardGeocoder(query){
-            const q=query.toLowerCase(), matches=[];
+            const q=query.toLowerCase(), matches=[]; 
             allFeatures.forEach(f=>{
               const name=(f.properties['LSOA Name']||'').toLowerCase();
               const code=(f.properties['LSOA Code']||'').toLowerCase();
               if(name.includes(q)||code.includes(q)){
-                const center=turf.centroid(f.geometry).geometry.coordinates;
                 matches.push({
-                  type:'Feature', geometry:{type:'Point',coordinates:center},
-                  text:f.properties['LSOA Name'], place_name:f.properties['LSOA Name'],
+                  type:'Feature',
+                  geometry:{type:'Point',coordinates:turf.centroid(f.geometry).geometry.coordinates},
+                  text:f.properties['LSOA Name'],
+                  place_name:f.properties['LSOA Name'],
                   properties:f.properties
                 });
               }
@@ -352,46 +376,38 @@
           const geocoder = new MapboxGeocoder({
             accessToken: mapboxgl.accessToken,
             placeholder:'Search postcode, LSOA or address…',
-            mapboxgl, marker:false,
-            bbox:[-9.0,49.75,2.01,61.01], countries:'gb',
-            localGeocoder: forwardGeocoder
+            marker:false, bbox:[-9,49.75,2.01,61.01], countries:'gb',
+            localGeocoder:forwardGeocoder, mapboxgl
           });
           map.addControl(geocoder,'top-right');
           map.addControl(new mapboxgl.NavigationControl(),'top-right');
           map.addControl(new mapboxgl.ScaleControl(),'bottom-left');
 
           geocoder.on('result', e=>{
-            const props = e.result.properties;
-            const code  = props['LSOA Code'] || '';
-            const name  = props['LSOA Name'] || e.result.place_name;
-            const [lon,lat] = e.result.geometry.coordinates;
+            const props=e.result.properties||{},
+                  code=props['LSOA Code']||'',
+                  name=props['LSOA Name']||e.result.place_name,
+                  [lon,lat]=e.result.geometry.coordinates;
 
-            map.flyTo({ center:[lon,lat], zoom:13 });
+            map.flyTo({center:[lon,lat],zoom:13});
             if(searchMarker){ searchMarker.remove(); searchMarker=null; }
 
             if(code){
-              // 本地平均 or 普通 LSOA
               map.setFilter('LSOA-highlight',['==',['get','LSOA Code'],code]);
               selectedProps = props;
-              document.getElementById('chart-container').style.display = modeAverage? 'none' : 'block';
-              if(!modeAverage) updateCharts();
+              // 平均模式时不弹表
+              document.getElementById('chart-container').style.display = (avgCountMode||avgDensMode)?'none':'block';
+              if(!(avgCountMode||avgDensMode)) updateCharts();
             } else {
-              // online postcode/address
-              searchMarker = new mapboxgl.Marker({ color:'#f4623a' })
+              searchMarker = new mapboxgl.Marker({color:'#f4623a'})
                 .setLngLat([lon,lat])
                 .setPopup(new mapboxgl.Popup().setText(name))
                 .addTo(map);
-
-              const pt = turf.point([lon,lat]);
-              let containing = null;
-              allFeatures.some(f=>{
-                if(turf.booleanPointInPolygon(pt,f.geometry)){
-                  containing = f; return true;
-                }
-              });
-              if(containing){
-                map.setFilter('LSOA-highlight',['==',['get','LSOA Code'],containing.properties['LSOA Code']]);
-                searchMarker.getPopup().setHTML(`<strong>${name}</strong><br/>In LSOA: ${containing.properties['LSOA Name']}`);
+              const pt=turf.point([lon,lat]);
+              const found = allFeatures.find(f=>turf.booleanPointInPolygon(pt,f.geometry));
+              if(found){
+                map.setFilter('LSOA-highlight',['==',['get','LSOA Code'],found.properties['LSOA Code']]);
+                searchMarker.getPopup().setHTML(`<strong>${name}</strong><br/>In LSOA: ${found.properties['LSOA Name']}`);
               }
             }
           });
@@ -405,88 +421,98 @@
         .catch(console.error);
     });
 
-    // UI 绑定
+    // --- 绑定 UI 事件 ---
+    document.getElementById('year-slider').addEventListener('input',e=>{
+      document.getElementById('year-label').textContent=e.target.value;
+      if(!avgCountMode && !avgDensMode) updateRegular();
+    });
+    document.getElementById('crime-type').addEventListener('change',()=>{
+      if(avgCountMode)   updateAvgCount();
+      else if(avgDensMode) updateAvgDensity();
+      else updateRegular();
+    });
+
+    // 四个复选框互斥逻辑
+    const cbCount   = document.getElementById('display-count');
+    const cbDensity = document.getElementById('display-density');
+    const cbAvgCnt  = document.getElementById('display-avg-count');
+    const cbAvgDen  = document.getElementById('display-avg-density');
+    const allCbs = [cbCount, cbDensity, cbAvgCnt, cbAvgDen];
+
+    allCbs.forEach(cb=>{
+      cb.addEventListener('change', ()=>{
+        if(cb.checked){
+          allCbs.forEach(other => {
+            if(other!==cb) other.checked=false;
+          });
+        }
+        avgCountMode   = cbAvgCnt.checked;
+        avgDensityMode = cbAvgDen.checked;
+        chartMode      = cbDensity.checked?'density':'count';
+        document.getElementById('year-slider').disabled = avgCountMode||avgDensityMode;
+
+        if(avgCountMode){
+          updateAvgCount();
+        } else if(avgDensityMode){
+          updateAvgDensity();
+        } else {
+          updateRegular();
+        }
+      });
+    });
+
+    // 年份与类型切换
     document.getElementById('year-slider').addEventListener('input', e=>{
-      document.getElementById('year-label').textContent = e.target.value;
-      if(!modeAverage) updateLayer();
+      document.getElementById('year-label').textContent=e.target.value;
+      if(!avgCountMode && !avgDensityMode) updateRegular();
     });
     document.getElementById('crime-type').addEventListener('change', ()=>{
-      if(modeAverage) updateAvgLayer(); else updateLayer();
-    });
-    const cbCount   = document.getElementById('display-count'),
-          cbDensity = document.getElementById('display-density'),
-          cbAverage = document.getElementById('display-average');
-    cbCount.addEventListener('change', ()=>{
-      if(cbCount.checked){
-        cbDensity.checked = false; cbAverage.checked=false;
-        chartMode='count'; modeAverage=false;
-        document.getElementById('year-slider').disabled = false;
-        updateLayer();
-      } else cbCount.checked=true;
-    });
-    cbDensity.addEventListener('change', ()=>{
-      if(cbDensity.checked){
-        cbCount.checked=false; cbAverage.checked=false;
-        chartMode='density'; modeAverage=false;
-        document.getElementById('year-slider').disabled = false;
-        updateLayer();
-      } else cbDensity.checked=true;
-    });
-    cbAverage.addEventListener('change', ()=>{
-      if(cbAverage.checked){
-        cbCount.checked=false; cbDensity.checked=false;
-        modeAverage=true;
-        document.getElementById('year-slider').disabled = true;
-        updateAvgLayer();
-      } else {
-        // revert to count
-        cbCount.checked=true; modeAverage=false;
-        document.getElementById('year-slider').disabled = false;
-        updateLayer();
-      }
+      if(avgCountMode)      updateAvgCount();
+      else if(avgDensityMode) updateAvgDensity();
+      else updateRegular();
     });
 
     // hover popup
-    const hoverPopup = new mapboxgl.Popup({ closeButton:false, closeOnClick:false });
+    const hoverPopup = new mapboxgl.Popup({closeButton:false,closeOnClick:false});
     map.on('mouseenter','LSOAs-fill',()=>map.getCanvas().style.cursor='pointer');
-    map.on('mousemove','LSOAs-fill', e=>{
+    map.on('mousemove','LSOAs-fill',e=>{
       const p=e.features[0].properties;
-      const area=+p['Area_km2']||1;
       let cnt, dens;
-      if(modeAverage){
-        cnt = +p[`AVG_${document.getElementById('crime-type').value}`].toFixed(2);
-        dens= +p[`AVG_${document.getElementById('crime-type').value}_DENS`].toFixed(2);
+      if(avgCountMode){
+        cnt = p[`AVG_${document.getElementById('crime-type').value}`].toFixed(2);
+        dens = (p[`AVG_${document.getElementById('crime-type').value}_DENS`].toFixed(2)) + '/km²';
+      } else if(avgDensMode){
+        cnt = p[`AVG_${document.getElementById('crime-type').value}`].toFixed(2);
+        dens = (p[`AVG_${document.getElementById('crime-type').value}_DENS`].toFixed(2)) + '/km²';
       } else {
-        const y = document.getElementById('year-slider').value;
-        const ct= document.getElementById('crime-type').value;
+        const y=document.getElementById('year-slider').value,
+              ct=document.getElementById('crime-type').value;
         cnt = +p[`${y}_${ct}`]||0;
-        dens= area>0 ? (cnt/area).toFixed(2) : 'N/A';
+        dens= (chartMode==='density' && p['Area_km2']>0)
+          ? (cnt/p['Area_km2']).toFixed(2) + '/km²'
+          : cnt;
       }
       hoverPopup.setLngLat(e.lngLat)
-        .setHTML(`<strong>${p['LSOA Name']}</strong><br>`+
-                 `Avg Count: ${cnt}<br>`+
-                 `Avg Density: ${dens}/km²`)
+        .setHTML(`<strong>${p['LSOA Name']}</strong><br/>Count: ${cnt}<br/>Density: ${dens}`)
         .addTo(map);
     });
-    map.on('mouseleave','LSOAs-fill', ()=>{
-      map.getCanvas().style.cursor=''; hoverPopup.remove();
-    });
+    map.on('mouseleave','LSOAs-fill',()=>{ map.getCanvas().style.cursor=''; hoverPopup.remove(); });
 
-    // click → 高亮 & 图表
-    map.on('click','LSOAs-fill', e=>{
+    // click → 高亮 & 弹窗
+    map.on('click','LSOAs-fill',e=>{
       const p=e.features[0].properties;
       map.setFilter('LSOA-highlight',['==',['get','LSOA Code'],p['LSOA Code']]);
       selectedProps = p;
-      if(!modeAverage){
+      if(!avgCountMode && !avgDensMode){
         document.getElementById('lsoa-name').textContent = `LSOA: ${p['LSOA Name']} (${p['LSOA Code']})`;
         document.getElementById('chart-container').style.display='block';
         updateCharts();
       }
     });
-    document.getElementById('chart-close-btn').addEventListener('click', ()=>{
+    document.getElementById('chart-close-btn').addEventListener('click',()=>{
       document.getElementById('chart-container').style.display='none';
-      selectedProps=null;
       map.setFilter('LSOA-highlight',['==',['get','LSOA Code'],'']);
+      selectedProps=null;
     });
   </script>
 
