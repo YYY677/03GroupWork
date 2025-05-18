@@ -307,22 +307,14 @@
         })
       }));
       const opt={
-        tooltip:{trigger:'item',
-          formatter: params => {
-        if(params.seriesType === 'line') {
-          return `${params.seriesName}: ${params.value}${chartMode==='density'?'/km²':''}`;
-        }
-        // 饼图的 tooltip
-        return `${params.seriesName}<br>${params.name}: ${params.value}${chartMode==='density'?'/km²':''} (${params.percent}%)`;
-      }
-        },
+        tooltip:{trigger:'item'},
         legend:{bottom:0,left:'center',textStyle:{fontSize:12}},
         grid:{top:'50%',left:'8%',right:'8%',bottom:'10%'},
         xAxis:{type:'category',data:years,boundaryGap:false,axisLabel:{fontSize:11}},
-        yAxis:{type:'value',name:chartMode==='count'?'Count':'Density(/km²)',axisLabel:{fontSize:11}},
+        yAxis:{type:'value',name:chartMode==='count'?'Count':'Density',axisLabel:{fontSize:11}},
         series:[
           {name:'Proportion',type:'pie',radius:'30%',center:['50%','25%'],
-            label:{formatter: `${params.name}: ${params.value}${chartMode==='density'?'/km²':''} (${params.percent}%)`,fontSize:12},data:pieData},
+            label:{formatter:'{b}: {c} ({d}%)',fontSize:12},data:pieData},
           ...lineSeries
         ]
       };
@@ -486,7 +478,7 @@
         .setHTML(`<strong>${p['LSOA Name']}</strong><br>`+
                  `Area: ${area.toFixed(3)} km²<br>`+
                  `Count: ${cnt}<br>`+
-                 `Density: ${dens} /km²`)
+                 `Density: ${dens}`)
         .addTo(map);
     });
     map.on('mouseleave','LSOAs-fill',()=>{
